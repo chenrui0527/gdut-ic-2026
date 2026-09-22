@@ -3,58 +3,71 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>陈睿 · 个人主页</title>
+<title>陈睿</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<header class="hero">
-  <div class="avatar">睿</div>
-  <h1>陈睿</h1>
-  <p class="sub">广东工业大学 · 电子科学与技术 · 2026 级</p>
-  <p class="tags"><span>数字电路</span><span>EDA</span><span>AI 工具链</span><span>Python</span></p>
-</header>
-
 <main>
+  <header>
+    <h1>陈睿</h1>
+    <p class="meta">广东工业大学 · 电子科学与技术 · 2026 级</p>
+    <p class="lede">现在主要在做两件事：把电路的基本功补上，还有学着用 AI 工具把重复的活自动化。</p>
+  </header>
+
   <section>
-    <h2>关于我</h2>
-    <p>我是陈睿，大一新生，专业是电子科学与技术。喜欢把东西真的做出来：用 C 语言和 Python 写程序，用 Linux 敲命令，也习惯让 AI 工具帮我加速学习和开发，但每一段代码我都会自己读一遍、跑一遍，确认它为什么能工作。</p>
+    <h2>最近在做什么</h2>
+    <ul class="dated">
+      <li>
+        <span class="d">9 月 22 日</span>
+        把这段时间做的东西整理进 GitHub 仓库：一份个人简介 PDF、这个页面，还有一个会自己玩的贪吃蛇小游戏。
+      </li>
+      <li>
+        <span class="d">9 月</span>
+        读了一篇讲用大模型智能体来调逻辑综合的论文（SynAct，arXiv:2608.12751），做了一版汇报 PPT，还在继续改。
+      </li>
+      <li>
+        <span class="d">暑假</span>
+        自学 C 语言和 Linux 常用命令，跟学长学了点 Python。
+      </li>
+    </ul>
   </section>
 
   <section>
-    <h2>我在学什么</h2>
-    <ul>
-      <li><strong>电路与数字逻辑：</strong>正在补数电、模电基础，动手用 PySpice 做过 RC 滤波、戴维南等效和 MOS 共源放大的手算与仿真对照。</li>
-      <li><strong>编程：</strong>C 语言（基础）、Python（能写脚本做数据处理和小工具）、Linux 常用命令。</li>
-      <li><strong>AI 辅助开发：</strong>用 Codex、DeepSeek Harness 这类工具做需求拆解、写代码、查错，重点练习"把需求讲清楚"和"验证 AI 的结论"。</li>
-    </ul>
+    <h2>接下来要补的</h2>
+    <p>数字电路、Verilog、脚本和 Linux 工具链。想做 EDA 方向的东西，这几样绕不开，所以我打算先从这里开始。</p>
   </section>
 
   <section>
     <h2>作品</h2>
-    <div class="cards">
-      <a class="card" href="../game/snake.html">
-        <h3>贪吃蛇（人工 + AI 自动演示）</h3>
-        <p>纯前端单文件，键盘可玩；内置 AI 自动寻路，连续吃到 15 个食物不死亡。带计分统计与主题切换。</p>
-      </a>
-      <div class="card">
-        <h3>个人简介 PDF</h3>
-        <p>姓名、专业、兴趣与联系方式的单页介绍，随作品一起提交。</p>
-      </div>
-    </div>
+    <ul>
+      <li>
+        <a href="../game/snake.html">贪吃蛇（人工可玩 + AI 自动演示）</a>
+        —— 一个单文件 HTML。AI 自动玩的时候，在 20×20 棋盘上连续吃到 15 个食物不会死；这件事我写了脚本跑 100 局统计过，不是"应该可以"。
+      </li>
+      <li>
+        <a href="../profile/个人简介.pdf">个人简介 PDF</a>
+        —— 一页，姓名、专业、兴趣方向和联系方式。
+      </li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>平时用什么</h2>
+    <p>写代码用 VS Code，AI 工具主要用 Codex 和 DeepSeek Harness。我一般让它们写第一版，但代码跑不通、或者我自己讲不清原理之前，我不会说自己“会”。</p>
   </section>
 
   <section>
     <h2>联系我</h2>
-    <ul class="contact">
-      <li>邮箱：<a href="mailto:chenrui34@mails.gdut.edu.cn">chenrui34@mails.gdut.edu.cn</a></li>
-      <li>微信：chenrui10151015</li>
-      <li>GitHub：<a href="https://github.com/chenrui0527">github.com/chenrui0527</a></li>
-    </ul>
+    <p>
+      邮箱：<a href="mailto:chenrui34@mails.gdut.edu.cn">chenrui34@mails.gdut.edu.cn</a><br>
+      微信：chenrui10151015<br>
+      GitHub：<a href="https://github.com/chenrui0527">github.com/chenrui0527</a>
+    </p>
   </section>
-</main>
 
-<footer>
-  <p>本页为纯 HTML/CSS 手写，托管在 GitHub Pages。</p>
-</footer>
+  <footer>
+    页面是纯 HTML / CSS 写的，没有用框架、没有用模板。最近更新：2026 年 9 月 22 日。
+  </footer>
+</main>
 </body>
 </html>
