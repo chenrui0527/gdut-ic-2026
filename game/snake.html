@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>贪吃蛇 · 人工 + AI 自动演示</title>
+<style>
+  :root {
+    --bg: #0f1720; --panel: #16212c; --text: #e8eef5; --sub: #8fa3b8;
+    --grid: #1d2b39; --snake: #4fd18b; --head: #9ae6b4; --food: #ff7a6b; --line: #26384a;
+  }
+  body.light {
+    --bg: #f4f6f9; --panel: #ffffff; --text: #1b2733; --sub: #5d7186;
+    --grid: #e6ebf1; --snake: #2f9e6b; --head: #1f7a52; --food: #e0533f; --line: #d7dee6;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; background: var(--bg); color: var(--text);
+    font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+    display: flex; align-items: center; justify-content: center; padding: 24px;
+  }
+  .wrap { display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap; justify-content: center; }
+  .board { position: relative; }
+  canvas { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; display: block; }
+  .panel { width: 260px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px; }
+  h1 { font-size: 18px; margin: 0 0 12px; }
+  .row { display: flex; justify-content: space-between; font-size: 14px; padding: 6px 0; border-bottom: 1px dashed var(--line); }
+  .row span:last-child { font-weight: 700; }
+  .row.big span:last-child { color: var(--snake); font-size: 16px; }
+  .buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+  button {
+    flex: 1 1 46%; padding: 10px 8px; font-size: 13px; cursor: pointer; color: var(--text);
+    background: transparent; border: 1px solid var(--line); border-radius: 8px; font-family: inherit;
+  }
+  button:hover { border-color: var(--snake); }
+  button.on { background: var(--snake); color: #06231a; border-color: var(--snake); font-weight: 700; }
+  .tip { margin-top: 14px; font-size: 12px; color: var(--sub); line-height: 1.7; }
+  .overlay {
+    position: absolute; inset: 0; display: none; align-items: center; justify-content: center;
+    flex-direction: column; gap: 10px; background: rgba(0,0,0,.55); border-radius: 10px; text-align: center;
+  }
+  .overlay.show { display: flex; }
+  .overlay h2 { margin: 0; font-size: 20px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="board">
+    <canvas id="cv" width="480" height="480"></canvas>
+    <div class="overlay" id="ov"><h2 id="ovt"></h2><div class="tip" id="ovs"></div></div>
+  </div>
+
+  <div class="panel">
+    <h1>贪吃蛇 · 人工 + AI</h1>
+    <div class="row"><span>当前得分</span><span id="score">0</span></div>
+    <div class="row"><span>蛇长</span><span id="len">3</span></div>
+    <div class="row"><span>本局已吃</span><span id="ate">0</span></div>
+    <div class="row big"><span>AI 连续吃（目标 15）</span><span id="aia">0 / 15</span></div>
+    <div class="row"><span>最高分</span><span id="best">0</span></div>
+    <div class="row"><span>累计局数</span><span id="games">0</span></div>
+    <div class="buttons">
+      <button id="btnNew">新一局</button>
+      <button id="btnAI">AI 自动演示</button>
+      <button id="btnTheme">切换主题</button>
+      <button id="btnReset">重置统计</button>
+    </div>
+    <div class="tip">
+      阶段一：方向键 / WASD 手动操作，碰墙或撞到自己结束。<br>
+      阶段二：点「AI 自动演示」，AI 会自己找食物并避免把自己困死，连续吃到 15 个不死亡即达标。<br>
+      「新一局」不会清空最高分和局数，只有「重置统计」会。
+    </div>
+  </div>
+</div>
+
+<script id="core">
+/* ===== CORE-BEGIN 纯逻辑区：不依赖页面，可被测试脚本单独运行 ===== */
+var CORE = (function () {
+  var DIRS = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
+  var NAMES = ['up', 'down', 'left', 'right'];
+
+  // 可复现的伪随机数（同一个种子跑出同一局）
+  function makeRng(seed) {
+    var s = seed >>> 0;
+    return function () {
+      s = (s * 1664525 + 1013904223) >>> 0;
+      return s / 4294967296;
+    };
+  }
+
+  function createState(w, h, seed) {
+    var st = {
+      w: w, h: h, rng: makeRng(seed), snake: [], dir: 'right',
+      food: { x: 0, y: 0 }, alive: true, score: 0, ate: 0
+    };
+    var cx = Math.floor(w / 2), cy = Math.floor(h / 2);
+    st.snake.push({ x: cx, y: cy }, { x: cx - 1, y: cy }, { x: cx - 2, y: cy });
+    spawnFood(st);
+    return st;
+  }
+
+  function key(p) { return p.x + ',' + p.y; }
+
+  function spawnFood(st) {
+    var free = [];
+    var used = {};
+    for (var i = 0; i < st.snake.length; i++) used[key(st.snake[i])] = 1;
+    for (var y = 0; y < st.h; y++) {
+      for (var x = 0; x < st.w; x++) if (!used[x + ',' + y]) free.push({ x: x, y: y });
+    }
+    if (!free.length) return;
+    st.food = free[Math.floor(st.rng() * free.length)];
+  }
+
+  // 判断从 head 出发按 dir 走一步会不会撞墙 / 撞自己
+  function hitWall(st, head) { return head.x < 0 || head.y < 0 || head.x >= st.w || head.y >= st.h; }
+
+  function bodySet(st, willEat) {
+    // 不吃食物时蛇尾会让位，所以尾巴那一格不算障碍
+    var set = {};
+    var last = willEat ? st.snake.length : st.snake.length - 1;
+    for (var i = 0; i < last; i++) set[key(st.snake[i])] = 1;
+    return set;
+  }
+
+  function tryHead(st, dir) {
+    var d = DIRS[dir];
+    return { x: st.snake[0].x + d[0], y: st.snake[0].y + d[1] };
+  }
+
+  function moveIsLegal(st, dir) {
+    var head = tryHead(st, dir);
+    if (hitWall(st, head)) return false;
+    var willEat = head.x === st.food.x && head.y === st.food.y;
+    if (bodySet(st, willEat)[key(head)]) return false;
+    return true;
+  }
+
+  function legalMoves(st) {
+    var out = [];
+    for (var i = 0; i < NAMES.length; i++) if (moveIsLegal(st, NAMES[i])) out.push(NAMES[i]);
+    return out;
+  }
+
+  // 真正走一步（会改变状态）
+  function step(st, dir) {
+    if (!st.alive) return;
+    var head = tryHead(st, dir);
+    if (hitWall(st, head)) { st.alive = false; return; }
+    var willEat = head.x === st.food.x && head.y === st.food.y;
+    if (bodySet(st, willEat)[key(head)]) { st.alive = false; return; }
+    st.dir = dir;
+    st.snake.unshift(head);
+    if (willEat) { st.ate++; st.score += 10; spawnFood(st); }
+    else st.snake.pop();
+  }
+
+  // 从 start 到 goal 的最短路第一步（BFS）
+  function bfsFirstStep(st, start, goal) {
+    var q = [start], seen = {}, prev = {};
+    seen[key(start)] = 1;
+    var blocked = bodySet(st, false);
+    blocked[key(st.snake[st.snake.length - 1])] = 0; // 尾巴会移动，可通行
+    while (q.length) {
+      var cur = q.shift();
+      if (cur.x === goal.x && cur.y === goal.y) {
+        var node = cur;
+        while (prev[key(node)]) {
+          var p = prev[key(node)];
+          if (p.x === start.x && p.y === start.y) return { x: node.x - start.x, y: node.y - start.y };
+          node = p;
+        }
+        return null;
+      }
+      for (var i = 0; i < NAMES.length; i++) {
+        var d = DIRS[NAMES[i]];
+        var nx = cur.x + d[0], ny = cur.y + d[1];
+        var nk = nx + ',' + ny;
+        if (nx < 0 || ny < 0 || nx >= st.w || ny >= st.h) continue;
+        if (seen[nk]) continue;
+        if (blocked[nk]) continue;
+        seen[nk] = 1; prev[nk] = cur;
+        q.push({ x: nx, y: ny });
+      }
+    }
+    return null;
+  }
+
+  // 走完这一步后，从新蛇头出发还能到达多少空格（判断会不会把自己困死）
+  function spaceAfterMove(st, dir) {
+    var head = tryHead(st, dir);
+    var willEat = head.x === st.food.x && head.y === st.food.y;
+    var set = bodySet(st, willEat);
+    var tail = st.snake[st.snake.length - 1];
+    set[key(head)] = 1;
+    if (!willEat) delete set[key(tail)];
+    var q = [head], seen = {};
+    seen[key(head)] = 1;
+    var count = 0;
+    while (q.length) {
+      var cur = q.shift();
+      for (var i = 0; i < NAMES.length; i++) {
+        var d = DIRS[NAMES[i]];
+        var nx = cur.x + d[0], ny = cur.y + d[1], nk = nx + ',' + ny;
+        if (nx < 0 || ny < 0 || nx >= st.w || ny >= st.h) continue;
+        if (seen[nk] || set[nk]) continue;
+        seen[nk] = 1; count++;
+        q.push({ x: nx, y: ny });
+      }
+    }
+    return count;
+  }
+
+  function dirToVec(dir) { return DIRS[dir]; }
+  function nameFromVec(v) {
+    for (var i = 0; i < NAMES.length; i++) {
+      if (DIRS[NAMES[i]][0] === v.x && DIRS[NAMES[i]][1] === v.y) return NAMES[i];
+    }
+    return null;
+  }
+
+  // 直冲食物的“笨”策略：只按曼哈顿距离最近的走（用来对照）
+  function naiveMove(st) {
+    var best = null, bestD = 1e9;
+    var moves = legalMoves(st);
+    for (var i = 0; i < moves.length; i++) {
+      var h = tryHead(st, moves[i]);
+      var d = Math.abs(h.x - st.food.x) + Math.abs(h.y - st.food.y);
+      if (d < bestD) { bestD = d; best = moves[i]; }
+    }
+    return best || st.dir;
+  }
+
+  // 安全策略：优先沿最短路去吃食物，但走之前必须确认“不会把自己困死”，
+  // 否则改走能保留最多活动空间的一步（相当于先去追自己的尾巴）
+  function safeMove(st) {
+    var moves = legalMoves(st);
+    if (!moves.length) return st.dir;
+    var need = st.snake.length + 1;
+
+    var toFood = bfsFirstStep(st, st.snake[0], st.food);
+    if (toFood && moves.indexOf(nameFromVec(toFood)) >= 0) {
+      var dirFood = nameFromVec(toFood);
+      if (spaceAfterMove(st, dirFood) >= need) return dirFood;
+    }
+
+    // 退而求其次：在“安全”的走法里挑活动空间最大的
+    var bestDir = moves[0], bestSpace = -1;
+    for (var i = 0; i < moves.length; i++) {
+      var sp = spaceAfterMove(st, moves[i]);
+      if (sp > bestSpace) { bestSpace = sp; bestDir = moves[i]; }
+    }
+    if (bestSpace >= st.snake.length) return bestDir;
+
+    // 实在不行就选离食物最远的，拖时间（很少发生）
+    var far = moves[0], farD = -1;
+    for (var j = 0; j < moves.length; j++) {
+      var h = tryHead(st, moves[j]);
+      var d = Math.abs(h.x - st.food.x) + Math.abs(h.y - st.food.y);
+      if (d > farD) { farD = d; far = moves[j]; }
+    }
+    return far;
+  }
+
+  return {
+    DIRS: DIRS, NAMES: NAMES,
+    createState: createState, step: step, legalMoves: legalMoves,
+    spaceAfterMove: spaceAfterMove, naiveMove: naiveMove, safeMove: safeMove,
+    spawnFood: spawnFood
+  };
+})();
+/* ===== CORE-END ===== */
+</script>
+
+<script>
+(function () {
+  var W = 20, H = 20, CELL = 24;
+  var cv = document.getElementById('cv'), ctx = cv.getContext('2d');
+  var st = CORE.createState(W, H, Date.now() % 100000);
+  var aiOn = false, timer = null, aiEaten = 0, bestChain = 0;
+
+  // 统计跨局保留：最高分与局数写进 localStorage
+  var stat = JSON.parse(localStorage.getItem('snakeStat') || '{"best":0,"games":0,"theme":"dark"}');
+  document.body.className = stat.theme === 'light' ? 'light' : '';
+
+  function saveStat() { localStorage.setItem('snakeStat', JSON.stringify(stat)); }
+
+  function draw() {
+    var css = getComputedStyle(document.body);
+    var grid = css.getPropertyValue('--grid').trim();
+    var snakeColor = css.getPropertyValue('--snake').trim();
+    var headColor = css.getPropertyValue('--head').trim();
+    var foodColor = css.getPropertyValue('--food').trim();
+    var panel = css.getPropertyValue('--panel').trim();
+
+    ctx.fillStyle = panel; ctx.fillRect(0, 0, cv.width, cv.height);
+    ctx.strokeStyle = grid; ctx.lineWidth = 1;
+    for (var i = 1; i < W; i++) {
+      ctx.beginPath(); ctx.moveTo(i * CELL, 0); ctx.lineTo(i * CELL, H * CELL); ctx.stroke();
+    }
+    for (var j = 1; j < H; j++) {
+      ctx.beginPath(); ctx.moveTo(0, j * CELL); ctx.lineTo(W * CELL, j * CELL); ctx.stroke();
+    }
+    ctx.fillStyle = foodColor;
+    ctx.beginPath();
+    ctx.arc(st.food.x * CELL + CELL / 2, st.food.y * CELL + CELL / 2, CELL * 0.32, 0, Math.PI * 2);
+    ctx.fill();
+    for (var k = st.snake.length - 1; k >= 0; k--) {
+      ctx.fillStyle = k === 0 ? headColor : snakeColor;
+      ctx.fillRect(st.snake[k].x * CELL + 2, st.snake[k].y * CELL + 2, CELL - 4, CELL - 4);
+    }
+  }
+
+  function refresh() {
+    document.getElementById('score').textContent = st.score;
+    document.getElementById('len').textContent = st.snake.length;
+    document.getElementById('ate').textContent = st.ate;
+    document.getElementById('best').textContent = stat.best;
+    document.getElementById('games').textContent = stat.games;
+    document.getElementById('aia').textContent = aiEaten + ' / 15';
+  }
+
+  function gameOver() {
+    stat.games += 1;
+    if (st.score > stat.best) stat.best = st.score;
+    saveStat();
+    stopAI();
+    var ov = document.getElementById('ov');
+    ov.classList.add('show');
+    document.getElementById('ovt').textContent = '游戏结束';
+    document.getElementById('ovs').innerHTML = '本局得分 ' + st.score + ' · 吃到 ' + st.ate + ' 个食物<br>点「新一局」再来';
+    refresh();
+  }
+
+  function newGame(keepStats) {
+    document.getElementById('ov').classList.remove('show');
+    st = CORE.createState(W, H, Math.floor(Math.random() * 1e9));
+    refresh();
+    draw();
+  }
+
+  function tick(useAI) {
+    if (!st.alive) return;
+    var dir = useAI ? CORE.safeMove(st) : null;
+    var before = st.ate;
+    CORE.step(st, dir);
+    if (st.ate > before) {
+      aiEaten += 1;
+      if (aiEaten > bestChain) bestChain = aiEaten;
+      if (aiEaten >= 15) {
+        document.getElementById('ov').classList.add('show');
+        document.getElementById('ovt').textContent = 'AI 达标：连续吃 15 个不死';
+        document.getElementById('ovs').innerHTML = '这是阶段二的硬指标。AI 会继续跑，看它还能撑多久。';
+      }
+    }
+    if (!st.alive) gameOver();
+    refresh(); draw();
+  }
+
+  function startAI() {
+    if (timer) return;
+    aiOn = true;
+    document.getElementById('btnAI').classList.add('on');
+    timer = setInterval(function () { tick(true); }, 70);
+  }
+
+  function stopAI() {
+    aiOn = false;
+    if (timer) { clearInterval(timer); timer = null; }
+    document.getElementById('btnAI').classList.remove('on');
+  }
+
+  document.getElementById('btnNew').onclick = function () { aiEaten = 0; stopAI(); newGame(true); };
+  document.getElementById('btnAI').onclick = function () {
+    if (aiOn) { stopAI(); } else { aiEaten = 0; startAI(); }
+  };
+  document.getElementById('btnTheme').onclick = function () {
+    stat.theme = stat.theme === 'light' ? 'dark' : 'light';
+    document.body.className = stat.theme === 'light' ? 'light' : '';
+    saveStat(); draw();
+  };
+  document.getElementById('btnReset').onclick = function () {
+    stat.best = 0; stat.games = 0; saveStat(); refresh();
+  };
+
+  // 手动模式：按键立刻走一步
+  document.addEventListener('keydown', function (e) {
+    var map = {
+      ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right',
+      w: 'up', s: 'down', a: 'left', d: 'right', W: 'up', S: 'down', A: 'left', D: 'right'
+    };
+    var dir = map[e.key];
+    if (!dir || aiOn || !st.alive) return;
+    var d = CORE.DIRS[dir], h = CORE.DIRS[st.dir];
+    if (d[0] + h[0] === 0 && d[1] + h[1] === 0) return;
+    var before = st.ate;
+    CORE.step(st, dir);
+    aiEaten = aiEaten; // 手动模式不改 AI 计数
+    if (!st.alive) gameOver();
+    refresh(); draw();
+  });
+
+  refresh(); draw();
+})();
+</script>
+</body>
+</html>
