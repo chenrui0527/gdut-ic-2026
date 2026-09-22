@@ -46,7 +46,7 @@
 <body>
 <div class="wrap">
   <div class="board">
-    <canvas id="cv" width="480" height="480"></canvas>
+    <canvas id="cv" width="360" height="360"></canvas>
     <div class="overlay" id="ov"><h2 id="ovt"></h2><div class="tip" id="ovs"></div></div>
   </div>
 
@@ -273,7 +273,7 @@ var CORE = (function () {
 
 <script>
 (function () {
-  var W = 20, H = 20, CELL = 24;
+  var W = 15, H = 15, CELL = 24;
   var cv = document.getElementById('cv'), ctx = cv.getContext('2d');
   var st = CORE.createState(W, H, Date.now() % 100000);
   var aiOn = false, timer = null, aiEaten = 0, bestChain = 0;
