@@ -15,7 +15,9 @@
 └── README.md
 ```
 
-个人网站地址：`https://<我的用户名>.github.io/<仓库名>/website/`（部署后替换成真实网址）
+仓库地址：https://github.com/chenrui0527/gdut-ic-2026
+
+个人网站地址：https://chenrui0527.github.io/gdut-ic-2026/website/
 
 ---
 
