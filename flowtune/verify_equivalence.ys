@@ -1,0 +1,30 @@
+# 前端验证：用形式化等价性检查证明"综合后的门级网表"和"原始 RTL"功能完全一致。
+# 用法：yowasp-yosys -s verify_equivalence.ys
+
+# 1) 读入原始 RTL，作为参考设计（gold）
+read_verilog rtl/counter.v
+prep -top counter
+async2sync
+design -stash gold
+
+# 2) 再综合一份门级网表（gate）
+design -reset
+read_verilog rtl/counter.v
+synth -top counter -run :fine
+opt -full
+techmap
+simplemap
+opt_clean
+async2sync
+design -stash gate
+
+# 3) 把两份设计放进同一个模块做等价性比较
+design -copy-from gold -as gold counter
+design -copy-from gate -as gate counter
+equiv_make gold gate equiv
+hierarchy -top equiv
+
+# 4) 先证组合部分，再用时序归纳证明触发器等时序部分
+equiv_simple
+equiv_induct -seq 3
+equiv_status -assert

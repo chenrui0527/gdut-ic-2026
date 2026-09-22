@@ -148,10 +148,16 @@ AI 每一步做两件事：先用广搜（BFS）算出到食物的最短路的**
 
 ---
 
-## 五、进阶挑战
+## 五、进阶挑战：复现 FlowTune 论文（多臂老虎机做逻辑综合流程搜索）
 
-本次未提交（任务书说明“两个任务选做一个即可”，本作品选择了小游戏部分）。
-后续计划：阅读 arXiv:2606.25673《Croc: Training the Next Generation Chip Designers on Domain-Specific End-to-End Open Source Silicon》，并用 Verilator / Yosys 跑通前仿真与综合。
+进度挑战选的是“读懂论文 + 跑通前端后端”这一类。论文：**FlowTune: End-to-End Automatic Logic Optimization Exploration via Domain-Specific Multiarmed Bandit**（IEEE TCAD，作者 Cunxi Yu），<https://ieeexplore.ieee.org/abstract/document/9916059>。
+
+- **前端（设计输入与功能验证）**：写 RTL（4 位计数器、8×8 乘法器），用 Yosys 读入并展开，再用**形式化等价性检查**证明综合出来的门级网表与原始 RTL 功能一致，跑完输出 `Equivalence successfully proven!`。
+- **后端（逻辑综合与优化）**：把 RTL 综合成门级网表，统计门数与关键路径深度。
+- **论文核心（多臂老虎机）**：把流程优化建模成**多阶段多臂老虎机**，用 UCB1 在 3 个阶段的候选配方里选择（共 54 种组合），把真实综合出来的门数当奖励反馈。
+- **实测结果**：8×8 乘法器门数 769 → **367**（−52%），4 位计数器 39 → **10**（−74%）；老虎机只用了 **2 次**评估就找到了穷举 **54 次**才能确认的最优配方。
+
+代码、运行方式和更详细的说明见 [flowtune/README.md](flowtune/README.md)（`flowtune/` 目录）。
 
 ---
 

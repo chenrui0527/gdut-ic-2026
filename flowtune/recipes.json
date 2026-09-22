@@ -1,0 +1,37 @@
+{
+  "designs": [
+    { "name": "counter", "file": "rtl/counter.v", "top": "counter" },
+    { "name": "mult8",   "file": "rtl/mult8.v",   "top": "mult8" }
+  ],
+  "map_after_stage": 2,
+  "map_step": "techmap; simplemap",
+  "stages": [
+    {
+      "name": "粗粒度优化",
+      "arms": [
+        "opt -fast",
+        "opt -full",
+        "opt -full; wreduce"
+      ]
+    },
+    {
+      "name": "映射前优化",
+      "arms": [
+        "opt -full",
+        "opt -full; opt_merge",
+        "opt -full; share"
+      ]
+    },
+    {
+      "name": "映射后优化",
+      "arms": [
+        "opt_clean",
+        "opt -full; opt_merge; opt_clean",
+        "opt -full; opt_clean",
+        "opt_merge; opt_clean",
+        "opt -fast; opt_clean",
+        "peepopt; opt_clean"
+      ]
+    }
+  ]
+}
