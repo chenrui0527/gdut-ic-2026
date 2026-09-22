@@ -31,7 +31,7 @@
             "opt -full",
             "opt_clean"
           ],
-          "seconds": 0.48
+          "seconds": 17.25
         },
         {
           "round": 2,
@@ -43,7 +43,7 @@
             "opt -full; opt_merge",
             "opt -full; opt_merge; opt_clean"
           ],
-          "seconds": 0.47
+          "seconds": 0.45
         },
         {
           "round": 3,
@@ -55,7 +55,7 @@
             "opt -full; share",
             "opt -full; opt_clean"
           ],
-          "seconds": 0.47
+          "seconds": 0.43
         },
         {
           "round": 4,
@@ -67,7 +67,7 @@
             "opt -full; opt_merge",
             "opt_merge; opt_clean"
           ],
-          "seconds": 0.46
+          "seconds": 0.44
         },
         {
           "round": 5,
@@ -79,7 +79,7 @@
             "opt -full; share",
             "opt -fast; opt_clean"
           ],
-          "seconds": 0.46
+          "seconds": 0.43
         },
         {
           "round": 6,
@@ -91,7 +91,7 @@
             "opt -full; share",
             "peepopt; opt_clean"
           ],
-          "seconds": 0.46
+          "seconds": 0.43
         },
         {
           "round": 7,
@@ -103,7 +103,7 @@
             "opt -full",
             "opt -full; opt_clean"
           ],
-          "seconds": 0.46
+          "seconds": 0.41
         },
         {
           "round": 8,
@@ -115,7 +115,7 @@
             "opt -full",
             "opt -fast; opt_clean"
           ],
-          "seconds": 0.48
+          "seconds": 0.41
         },
         {
           "round": 9,
@@ -139,7 +139,7 @@
             "opt -full; opt_merge",
             "opt -full; opt_clean"
           ],
-          "seconds": 0.47
+          "seconds": 0.48
         },
         {
           "round": 11,
@@ -151,7 +151,7 @@
             "opt -full; share",
             "opt -full; opt_merge; opt_clean"
           ],
-          "seconds": 0.48
+          "seconds": 0.47
         },
         {
           "round": 12,
@@ -163,7 +163,7 @@
             "opt -full",
             "opt -fast; opt_clean"
           ],
-          "seconds": 0.48
+          "seconds": 0.44
         },
         {
           "round": 13,
@@ -175,7 +175,7 @@
             "opt -full",
             "opt_clean"
           ],
-          "seconds": 0.48
+          "seconds": 0.41
         },
         {
           "round": 14,
@@ -199,7 +199,7 @@
             "opt -full; opt_merge",
             "peepopt; opt_clean"
           ],
-          "seconds": 0.46
+          "seconds": 0.47
         },
         {
           "round": 16,
@@ -211,7 +211,7 @@
             "opt -full; share",
             "opt -fast; opt_clean"
           ],
-          "seconds": 0.46
+          "seconds": 0.48
         },
         {
           "round": 17,
@@ -223,7 +223,7 @@
             "opt -full; opt_merge",
             "opt -full; opt_merge; opt_clean"
           ],
-          "seconds": 0.47
+          "seconds": 0.45
         },
         {
           "round": 18,
@@ -235,7 +235,7 @@
             "opt -full",
             "opt -full; opt_clean"
           ],
-          "seconds": 0.46
+          "seconds": 0.41
         },
         {
           "round": 19,
@@ -247,7 +247,7 @@
             "opt -full; share",
             "opt -fast; opt_clean"
           ],
-          "seconds": 0.46
+          "seconds": 0.43
         },
         {
           "round": 20,
@@ -259,7 +259,7 @@
             "opt -full",
             "opt -full; opt_merge; opt_clean"
           ],
-          "seconds": 0.45
+          "seconds": 0.46
         },
         {
           "round": 21,
@@ -271,7 +271,7 @@
             "opt -full; opt_merge",
             "opt -full; opt_clean"
           ],
-          "seconds": 0.5
+          "seconds": 0.42
         },
         {
           "round": 22,
@@ -283,7 +283,7 @@
             "opt -full; opt_merge",
             "opt -full; opt_merge; opt_clean"
           ],
-          "seconds": 0.47
+          "seconds": 0.45
         },
         {
           "round": 23,
@@ -295,7 +295,7 @@
             "opt -full",
             "opt -full; opt_clean"
           ],
-          "seconds": 0.46
+          "seconds": 0.41
         },
         {
           "round": 24,
@@ -307,7 +307,7 @@
             "opt -full; share",
             "opt -fast; opt_clean"
           ],
-          "seconds": 0.46
+          "seconds": 0.48
         },
         {
           "round": 25,
@@ -319,7 +319,7 @@
             "opt -full; share",
             "opt -full; opt_merge; opt_clean"
           ],
-          "seconds": 0.48
+          "seconds": 0.47
         },
         {
           "round": 26,
@@ -331,7 +331,7 @@
             "opt -full",
             "opt -full; opt_clean"
           ],
-          "seconds": 0.46
+          "seconds": 0.43
         },
         {
           "round": 27,
@@ -343,7 +343,7 @@
             "opt -full; opt_merge",
             "opt -fast; opt_clean"
           ],
-          "seconds": 0.46
+          "seconds": 0.44
         },
         {
           "round": 28,
@@ -355,7 +355,7 @@
             "opt -full; opt_merge",
             "opt -full; opt_clean"
           ],
-          "seconds": 0.47
+          "seconds": 0.44
         },
         {
           "round": 29,
@@ -367,7 +367,7 @@
             "opt -full",
             "opt -full; opt_merge; opt_clean"
           ],
-          "seconds": 0.48
+          "seconds": 0.42
         },
         {
           "round": 30,
@@ -379,7 +379,7 @@
             "opt -full; share",
             "opt -fast; opt_clean"
           ],
-          "seconds": 0.46
+          "seconds": 0.48
         }
       ],
       "stage_means": [
@@ -496,7 +496,7 @@
             "opt -full",
             "opt_clean"
           ],
-          "seconds": 0.49
+          "seconds": 0.48
         },
         {
           "round": 2,
@@ -508,7 +508,7 @@
             "opt -full; opt_merge",
             "opt -full; opt_merge; opt_clean"
           ],
-          "seconds": 0.5
+          "seconds": 0.49
         },
         {
           "round": 3,
@@ -520,7 +520,7 @@
             "opt -full; share",
             "opt -full; opt_clean"
           ],
-          "seconds": 0.51
+          "seconds": 0.48
         },
         {
           "round": 4,
@@ -532,7 +532,7 @@
             "opt -full; opt_merge",
             "opt_merge; opt_clean"
           ],
-          "seconds": 0.49
+          "seconds": 0.47
         },
         {
           "round": 5,
@@ -544,7 +544,7 @@
             "opt -full; share",
             "opt -fast; opt_clean"
           ],
-          "seconds": 0.5
+          "seconds": 0.52
         },
         {
           "round": 6,
@@ -556,7 +556,7 @@
             "opt -full; share",
             "peepopt; opt_clean"
           ],
-          "seconds": 0.49
+          "seconds": 0.5
         },
         {
           "round": 7,
@@ -592,7 +592,7 @@
             "opt -full",
             "opt -full; opt_merge; opt_clean"
           ],
-          "seconds": 0.5
+          "seconds": 0.52
         },
         {
           "round": 10,
@@ -604,7 +604,7 @@
             "opt -full; opt_merge",
             "opt_merge; opt_clean"
           ],
-          "seconds": 0.49
+          "seconds": 0.47
         },
         {
           "round": 11,
@@ -616,7 +616,7 @@
             "opt -full; share",
             "peepopt; opt_clean"
           ],
-          "seconds": 0.49
+          "seconds": 0.5
         },
         {
           "round": 12,
@@ -628,7 +628,7 @@
             "opt -full",
             "opt_clean"
           ],
-          "seconds": 0.49
+          "seconds": 0.48
         },
         {
           "round": 13,
@@ -640,7 +640,7 @@
             "opt -full; opt_merge",
             "opt -full; opt_clean"
           ],
-          "seconds": 0.5
+          "seconds": 0.49
         },
         {
           "round": 14,
@@ -652,7 +652,7 @@
             "opt -full; opt_merge",
             "opt -full; opt_merge; opt_clean"
           ],
-          "seconds": 0.5
+          "seconds": 0.51
         },
         {
           "round": 15,
@@ -664,7 +664,7 @@
             "opt -full; share",
             "opt -fast; opt_clean"
           ],
-          "seconds": 0.49
+          "seconds": 0.48
         },
         {
           "round": 16,
@@ -676,7 +676,7 @@
             "opt -full",
             "opt -fast; opt_clean"
           ],
-          "seconds": 0.49
+          "seconds": 0.51
         },
         {
           "round": 17,
@@ -688,7 +688,7 @@
             "opt -full; opt_merge",
             "opt -full; opt_merge; opt_clean"
           ],
-          "seconds": 0.5
+          "seconds": 0.51
         },
         {
           "round": 18,
@@ -712,7 +712,7 @@
             "opt -full; share",
             "opt_merge; opt_clean"
           ],
-          "seconds": 0.48
+          "seconds": 0.54
         },
         {
           "round": 20,
@@ -748,7 +748,7 @@
             "opt -full; opt_merge",
             "opt -full; opt_merge; opt_clean"
           ],
-          "seconds": 0.5
+          "seconds": 0.51
         },
         {
           "round": 23,
@@ -760,7 +760,7 @@
             "opt -full",
             "peepopt; opt_clean"
           ],
-          "seconds": 0.5
+          "seconds": 0.44
         },
         {
           "round": 24,
@@ -772,7 +772,7 @@
             "opt -full; share",
             "opt_clean"
           ],
-          "seconds": 0.49
+          "seconds": 0.45
         },
         {
           "round": 25,
@@ -784,7 +784,7 @@
             "opt -full; opt_merge",
             "opt -full; opt_merge; opt_clean"
           ],
-          "seconds": 0.5
+          "seconds": 0.51
         },
         {
           "round": 26,
@@ -796,7 +796,7 @@
             "opt -full; opt_merge",
             "opt -full; opt_clean"
           ],
-          "seconds": 0.5
+          "seconds": 0.49
         },
         {
           "round": 27,
@@ -832,7 +832,7 @@
             "opt -full; opt_merge",
             "opt_merge; opt_clean"
           ],
-          "seconds": 0.49
+          "seconds": 0.47
         },
         {
           "round": 30,
