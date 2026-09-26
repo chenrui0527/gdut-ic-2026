@@ -372,6 +372,7 @@ var CORE = (function () {
     if (st.score > stat.best) stat.best = st.score;
     saveStat();
     stopAI();
+    stopLoop();
     var ov = document.getElementById('ov');
     ov.classList.add('show');
     document.getElementById('ovt').textContent = '游戏结束';
@@ -379,14 +380,23 @@ var CORE = (function () {
     refresh();
   }
 
-  function newGame(keepStats) {
+  function hideOverlay() { document.getElementById('ov').classList.remove('show'); }
+
+  function newGame() {
     document.getElementById('ov').classList.remove('show');
     st = CORE.createState(W, H, Math.floor(Math.random() * 1e9));
     pendingDir = st.dir;
     stopLoop();
-    startLoop();
     refresh();
     draw();
+  }
+
+  // 开局提示：不按键就不启动时钟，避免"页面一打开蛇就自己冲出去撞死"
+  function showStartHint() {
+    var ov = document.getElementById('ov');
+    ov.classList.add('show');
+    document.getElementById('ovt').textContent = '按方向键开始';
+    document.getElementById('ovs').innerHTML = '也可以点右边的「AI 自动演示」，让它自己跑';
   }
 
   // 统一的游戏时钟：人工和 AI 都由它驱动，区别只在“这一步的方向谁来决定”
@@ -395,13 +405,15 @@ var CORE = (function () {
     var dir = aiOn ? CORE.smartMove(st) : pendingDir;
     var before = st.ate;
     CORE.step(st, dir);
-    if (st.ate > before) {
+    if (st.ate > before && aiOn) {          // 只统计 AI 操作时吃到的食物
       aiEaten += 1;
       if (aiEaten > bestChain) bestChain = aiEaten;
-      if (aiEaten >= 15) {
-        document.getElementById('ov').classList.add('show');
+      if (aiEaten === 15) {
+        var ov = document.getElementById('ov');
+        ov.classList.add('show');
         document.getElementById('ovt').textContent = 'AI 达标：连续吃 15 个不死';
         document.getElementById('ovs').innerHTML = '这是阶段二的硬指标。AI 会继续跑，看它还能撑多久。';
+        setTimeout(function () { if (st.alive) hideOverlay(); }, 2500);   // 提示 2.5 秒后自动隐藏，别挡住棋盘
       }
     }
     if (!st.alive) gameOver();
@@ -420,6 +432,8 @@ var CORE = (function () {
   function startAI() {
     aiOn = true;
     document.getElementById('btnAI').classList.add('on');
+    if (!st.alive) { newGame(); }
+    hideOverlay();
     startLoop();
   }
 
@@ -428,9 +442,17 @@ var CORE = (function () {
     document.getElementById('btnAI').classList.remove('on');
   }
 
-  document.getElementById('btnNew').onclick = function () { aiEaten = 0; stopAI(); newGame(true); };
+  document.getElementById('btnNew').onclick = function () {
+    aiEaten = 0;
+    stopAI();
+    newGame();
+    hideOverlay();
+    startLoop();          // 点了"新一局"说明人已经准备好，直接开始
+  };
   document.getElementById('btnAI').onclick = function () {
-    if (aiOn) { stopAI(); } else { aiEaten = 0; startAI(); }
+    if (aiOn) { stopAI(); return; }   // 关掉 AI：蛇按当前方向继续走，人可以按键接管
+    aiEaten = 0;
+    startAI();                        // 里面会处理"上一局已结束"的情况：自动开新局
   };
   document.getElementById('btnTheme').onclick = function () {
     stat.theme = stat.theme === 'light' ? 'dark' : 'light';
@@ -448,13 +470,15 @@ var CORE = (function () {
       w: 'up', s: 'down', a: 'left', d: 'right', W: 'up', S: 'down', A: 'left', D: 'right'
     };
     var dir = map[e.key];
-    if (!dir || aiOn || !st.alive) return;
+    if (!dir || aiOn) return;
+    if (!st.alive) { newGame(); }     // 上一局死了，按键直接开新局
     var d = CORE.DIRS[dir], h = CORE.DIRS[st.dir];
-    if (d[0] + h[0] === 0 && d[1] + h[1] === 0) return;   // 不允许 180° 掉头
-    pendingDir = dir;
+    if (!(d[0] + h[0] === 0 && d[1] + h[1] === 0)) pendingDir = dir;   // 不允许 180° 掉头
+    hideOverlay();
+    startLoop();                      // 第一次按键才开始跑
   });
 
-  refresh(); draw(); startLoop();
+  refresh(); draw(); showStartHint();
 })();
 </script>
 </body>
