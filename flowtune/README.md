@@ -119,11 +119,42 @@ flowtune/
 
 ## 八、诚实说明
 
-- 论文原文没有公开可用的代码（我在 GitHub 上没有找到作者发布的 FlowTune 实现），本机也没有 C++ 编译环境，
-  所以**这个项目复现的是论文的算法框架（多阶段多臂老虎机选配方 + 真实综合反馈），不是原作者的代码**。
-- 本机 Yosys 是 WebAssembly 版，不带 iverilog/verilator，也没有 ABC 外部二进制，因此：
+- 论文里说的"代码公开"是成立的：作者仓库是 <https://github.com/Yu-Maryland/FlowTune>，**我已经把它编译并跑通**（见第九节，在 GitHub Actions 的 Ubuntu 上完成）。
+- 我自己实现的那套（第五～七节）跑在 Yosys（WebAssembly 版）上，它不带 iverilog/verilator，也没有 ABC 外部二进制，因此：
   - 技术映射用的是 Yosys 自带的 `techmap` + `simplemap`，不是论文里的 ABC 配方；
   - 前端用形式化等价性检查代替波形仿真。
-- 奖励只用了"门数"（面积）这一个指标；论文还考虑了延时，以及多个设计之间的泛化。
-- 第五节的跨设计迁移是我对论文 “domain-specific” 思想的一个**可运行代理实现**（用已优化设计的臂统计做先验），
+- 我自己实现的奖励只用了"门数"（面积）这一个指标；论文还考虑延时，以及多个设计之间的泛化。
+- 第五节的跨设计迁移是我对论文 "domain-specific" 思想的一个**可运行代理实现**（用已优化设计的臂统计做先验），
   并不是论文里完整的领域知识建模：论文还会结合设计特征做 context、并覆盖不同的电路表示与后端工具。
+
+## 九、官方代码复现（跑通作者仓库，GitHub Actions 自动执行）
+
+前面第五节到第七节是我自己实现的多阶段老虎机；这一节是**把作者的官方代码真正编译并运行起来**（代码级复现）。
+
+- **官方仓库**：<https://github.com/Yu-Maryland/FlowTune>（FlowTune 的实现就是 ABC 的一个分支，编译出一个带 `ftune` 命令的 `abc`）
+- **为什么在云端跑**：本机是 Windows，没有 Linux 编译器（也没装 WSL），而作者的 `install.sh` 要求 Ubuntu + g++ + cmake + readline。
+  所以我写了工作流 [.github/workflows/flowtune-official.yml](../../.github/workflows/flowtune-official.yml)，在 GitHub Actions 的 `ubuntu-latest` 上自动完成：装依赖 → `cmake && make` 编译 ABC → 运行作者的 `single_design.sh`。
+- **完整日志**（自动提交回仓库）：[flowtune-official/official-run-report.md](../../flowtune-official/official-run-report.md)
+
+**跑出来的结果**（作者代码的真实输出）：
+
+| 项目 | 结果 |
+|---|---|
+| 编译 | 成功，生成 `abc`（25.9 MB，`UC Berkeley, ABC 1.01`） |
+| `ftune` 命令 | 正常运行，打印出多臂老虎机的探索过程与最终选择 |
+| 臂统计（`ARM -- ACTIONS -- WINRATE`） | 例如 adder2：6 个臂 × 6 个动作，胜率均 1/6（因为该设计所有流程结果相同） |
+| `adder2` 基准 | AIG 节点 10 → 10、级数 4 → 4（这个设计已经是极简，没有优化空间） |
+| `bfly` 基准 | AIG 节点 **23192 → 22270**（−4.0%），级数 87 → 87 |
+| 产物 | 生成 `adder2.ftune.aig`（FlowTune 优化后的 AIG） |
+
+**FlowTune 在这两个基准上选出的最佳流程**（作者代码打印）：
+
+```
+strash;rewrite;dc2;resub -K 8;refactor;refactor -z;rewrite -z;strash;ifraig;dch -f;strash;print_stats;
+```
+
+**说明与边界**：
+
+- 这是**跑通了作者代码**（代码级复现）；第六节那张"5 设计 × 10 种子"的表才是**方法级**实验（我自己实现的老虎机 + Yosys 环境）。
+- 官方仓库的默认示例参数很小（`-i 5 -s 5`），我按它的用法原样跑，没有改参数，所以提升幅度有限；论文里报的大数字是在更大规模的基准和更多迭代下得到的。
+- 编译过程中遇到的坑也记录在报告里：新版本 gcc 需要 `-fcommon -w` 兜住老代码的多重定义；`ftune` 内部会调用 `abc`，必须把编译产物加进 `PATH`，否则内部评估全部失败（第一次运行就是这个错，第二次修好后正常）。

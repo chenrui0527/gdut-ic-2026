@@ -158,6 +158,7 @@ AI 每一步做两件事：先用广搜（BFS）算出到食物的最短路的**
 - **后端（逻辑综合与优化）**：把 RTL 综合成门级网表，统计门数与关键路径深度。
 - **论文核心（多臂老虎机 + 领域知识）**：把流程优化建模成**多阶段多臂老虎机**，用 UCB1 在 3 个阶段的候选配方里选择（共 54 种组合），把真实综合出来的门数当奖励反馈；并实现**跨设计经验迁移**（论文 domain-specific 思想的代理实现），把前一个设计学到的经验带到下一个设计。
 - **实测结果**（5 个设计、每个配置 10 个随机种子）：8×8 乘法器门数 769 → **367**（−52%），16 位加法器 198 → 113，4 位 ALU 183 → 120，4 位计数器 39 → 10；找到最优所需评估次数，冷启动中位数 **2 次**、弱迁移降到 **1 次**（穷举要 54 次），并且发现**强迁移会负迁移**（乘法器反而变 4 次）——说明迁移强度本身需要领域知识来决策。
+- **官方代码级复现**：找到并编译了作者的官方仓库（[Yu-Maryland/FlowTune](https://github.com/Yu-Maryland/FlowTune)，FlowTune 是 ABC 的一个分支），在 GitHub Actions 的 Ubuntu 环境里跑通它的 `ftune` 命令与官方示例脚本；`bfly` 基准的 AIG 节点数 **23192 → 22270**，日志自动提交在 [flowtune-official/official-run-report.md](flowtune-official/official-run-report.md)（因为我本机是 Windows、没有 Linux 编译器，所以借助云端 Ubuntu 完成）。
 
 代码、运行方式和更详细的说明见 [flowtune/README.md](flowtune/README.md)（`flowtune/` 目录）。
 
