@@ -1,5 +1,8 @@
 # FlowTune 论文复现：用多臂老虎机做逻辑综合流程搜索
 
+这一部分是第五题（进阶挑战）。下面写的是我实际做过的事，包括跑失败、返工的过程，
+以及最后在云端 Ubuntu 上把作者官方代码编译并跑通的结果。
+
 这个子项目对应招新考核书第五部分"进阶挑战"里的第 2 类任务（读懂论文 + 跑通前端后端），
 论文是 IEEE Xplore 上的 **FlowTune: End-to-End Automatic Logic Optimization Exploration via Domain-Specific Multiarmed Bandit**（IEEE TCAD，作者 Cunxi Yu）：
 <https://ieeexplore.ieee.org/abstract/document/9916059>
@@ -117,7 +120,7 @@ flowtune/
 └── results/                 实验输出（每种配置的 CSV + summary.json）
 ```
 
-## 八、诚实说明
+## 八、我自己实现的那套，还差什么
 
 - 论文里说的"代码公开"是成立的：作者仓库是 <https://github.com/Yu-Maryland/FlowTune>，**我已经把它编译并跑通**（见第九节，在 GitHub Actions 的 Ubuntu 上完成）。
 - 我自己实现的那套（第五～七节）跑在 Yosys（WebAssembly 版）上，它不带 iverilog/verilator，也没有 ABC 外部二进制，因此：
