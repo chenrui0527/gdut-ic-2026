@@ -1,6 +1,6 @@
 # FlowTune 官方代码运行记录（GitHub Actions）
 
-- 运行时间（UTC）：2026-09-26 08:22:21
+- 运行时间（UTC）：2026-09-26 08:32:50
 - 运行环境：ubuntu-latest（x86_64），gcc 13
 - 官方仓库：https://github.com/Yu-Maryland/FlowTune
 
@@ -11,8 +11,8 @@
 [ 88%] Building C object CMakeFiles/libabc.dir/src/bdd/cudd/cuddAddInv.c.o
 [ 88%] Building C object CMakeFiles/libabc.dir/src/bdd/cudd/cuddAddIte.c.o
 [ 88%] Building C object CMakeFiles/libabc.dir/src/bdd/cudd/cuddAddNeg.c.o
-[ 88%] Building C object CMakeFiles/libabc.dir/src/bdd/cudd/cuddAndAbs.c.o
 [ 90%] Building C object CMakeFiles/libabc.dir/src/bdd/cudd/cuddAddWalsh.c.o
+[ 90%] Building C object CMakeFiles/libabc.dir/src/bdd/cudd/cuddAndAbs.c.o
 [ 90%] Building C object CMakeFiles/libabc.dir/src/bdd/cudd/cuddAnneal.c.o
 [ 90%] Building C object CMakeFiles/libabc.dir/src/bdd/cudd/cuddApa.c.o
 [ 90%] Building C object CMakeFiles/libabc.dir/src/bdd/cudd/cuddApprox.c.o
@@ -58,8 +58,8 @@
 [ 94%] Building C object CMakeFiles/libabc.dir/src/bdd/cudd/cuddZddFuncs.c.o
 [ 94%] Building C object CMakeFiles/libabc.dir/src/bdd/cudd/cuddZddGroup.c.o
 [ 94%] Building C object CMakeFiles/libabc.dir/src/bdd/cudd/cuddZddIsop.c.o
-[ 94%] Building C object CMakeFiles/libabc.dir/src/bdd/cudd/cuddZddMisc.c.o
 [ 94%] Building C object CMakeFiles/libabc.dir/src/bdd/cudd/cuddZddLin.c.o
+[ 94%] Building C object CMakeFiles/libabc.dir/src/bdd/cudd/cuddZddMisc.c.o
 [ 94%] Building C object CMakeFiles/libabc.dir/src/bdd/cudd/cuddZddPort.c.o
 [ 94%] Building C object CMakeFiles/libabc.dir/src/bdd/cudd/cuddZddReord.c.o
 [ 94%] Building C object CMakeFiles/libabc.dir/src/bdd/cudd/cuddZddSetop.c.o
@@ -130,56 +130,20 @@
 
 ## 2. 编译产物
 ```
--rwxr-xr-x 1 runner runner 25900400 Sep 26 08:21 official-flowtune/src/build/abc
+-rwxr-xr-x 1 runner runner 25900400 Sep 26 08:25 official-flowtune/src/build/abc
 ```
 
 ## 3. 官方示例运行输出（single_design.sh adder2 adder2.blif 1 1 0 1 1）
 ```
 *************  level-0 tuning starts *********** 
-UC Berkeley, ABC 1.01 (compiled Sep 26 2026 08:20:54)
+UC Berkeley, ABC 1.01 (compiled Sep 26 2026 08:24:44)
 abc 01> ftune -d adder2.blif -r 1 -t 0 -p 1 -i 1 -s 1
 rm: cannot remove '.temp.result.txt': No such file or directory
 rm: cannot remove 'adder2.blif.log': No such file or directory
 Your current setups:
 Design = adder2.blif, target = 0, repeats = 1, prefix = 1, forget = 0, iteration = 1, nSample = 1, liberty = (null)
 begin:abc -c "read adder2.blif;strash;
-sh: 1: sh: 1: abc: not foundabc: not found
-
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-0,1e+09
+0,10
 Best Flow(s) (#max=5):
 strash;rewrite;dc2;resub -K 8;refactor;refactor -z;rewrite -z;strash;ifraig;dch -f;strash;print_stats;
 strash;rewrite;rewrite -z;refactor -z;dc2;refactor;resub -K 8;strash;ifraig;dch -f;strash;print_stats;
@@ -187,55 +151,19 @@ strash;rewrite;rewrite -z;refactor -z;dc2;refactor;resub -K 8;strash;ifraig;dch 
 strash;rewrite;refactor;dc2;rewrite -z;resub -K 8;refactor -z;strash;ifraig;dch -f;strash;print_stats;
 strash;rewrite;resub -K 8;dc2;refactor;refactor -z;rewrite -z;strash;ifraig;dch -f;strash;print_stats;
 abc 01> ***EOF***
-UC Berkeley, ABC 1.01 (compiled Sep 26 2026 08:20:54)
+UC Berkeley, ABC 1.01 (compiled Sep 26 2026 08:24:44)
 abc 01> read adder2.blif; source adder2.script;strash;write internal.aig;ps
 [1;37mADD2                          :[0m i/o =    4/    3  lat =    0  and =     10  lev =  4
 [1;37mADD2                          :[0m i/o =    4/    3  lat =    0  and =     10  lev =  4
 abc 10> ***EOF***
 *************  level[1] tuning starts *********** 
-UC Berkeley, ABC 1.01 (compiled Sep 26 2026 08:20:54)
+UC Berkeley, ABC 1.01 (compiled Sep 26 2026 08:24:44)
 abc 01> ftune -d internal.aig -r 1 -t 0 -p 1 -i 1 -s 1
 rm: cannot remove 'internal.aig.log': No such file or directory
 Your current setups:
 Design = internal.aig, target = 0, repeats = 1, prefix = 1, forget = 0, iteration = 1, nSample = 1, liberty = (null)
 begin:abc -c "read internal.aig;strash;
-sh: 1: sh: 1: abc: not foundabc: not foundsh: 1: sh: 1: 
-abc: not found
-abc: not found
-
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: sh: 1: abc: not foundabc: not found
-
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: sh: 1: abc: not foundabc: not found
-
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-0,1e+09
+0,10
 Best Flow(s) (#max=5):
 strash;rewrite;dc2;resub -K 8;refactor;refactor -z;rewrite -z;strash;ifraig;dch -f;strash;print_stats;
 strash;rewrite;rewrite -z;refactor -z;dc2;refactor;resub -K 8;strash;ifraig;dch -f;strash;print_stats;
@@ -243,7 +171,7 @@ strash;rewrite;rewrite -z;refactor -z;dc2;refactor;resub -K 8;strash;ifraig;dch 
 strash;rewrite;refactor;dc2;rewrite -z;resub -K 8;refactor -z;strash;ifraig;dch -f;strash;print_stats;
 strash;rewrite;resub -K 8;dc2;refactor;refactor -z;rewrite -z;strash;ifraig;dch -f;strash;print_stats;
 abc 01> ***EOF***
-UC Berkeley, ABC 1.01 (compiled Sep 26 2026 08:20:54)
+UC Berkeley, ABC 1.01 (compiled Sep 26 2026 08:24:44)
 abc 01> read internal.aig; source adder2.script;strash;write internal.aig
 [1;37minternal                      :[0m i/o =    4/    3  lat =    0  and =     10  lev =  4
 abc 10> ***EOF***
@@ -252,124 +180,230 @@ abc 10> ***EOF***
 ********************************************************
 ```
 
+## 3b. 多轮采样运行（1 5 0 5 1，能看出老虎机的学习过程）
+```
+*************  level-0 tuning starts *********** 
+UC Berkeley, ABC 1.01 (compiled Sep 26 2026 08:24:44)
+abc 01> ftune -d adder2.blif -r 1 -t 0 -p 1 -i 5 -s 5
+Your current setups:
+Design = adder2.blif, target = 0, repeats = 1, prefix = 1, forget = 0, iteration = 5, nSample = 5, liberty = (null)
+begin:abc -c "read adder2.blif;strash;
+0,10
+1,10
+2,10
+3,10
+4,10
+Best Flow(s) (#max=5):
+strash;rewrite;dc2;resub -K 8;refactor;refactor -z;rewrite -z;strash;ifraig;dch -f;strash;print_stats;
+strash;rewrite;rewrite -z;refactor -z;dc2;refactor;resub -K 8;strash;ifraig;dch -f;strash;print_stats;
+strash;rewrite;rewrite -z;refactor -z;dc2;refactor;resub -K 8;strash;ifraig;dch -f;strash;print_stats;
+strash;rewrite;refactor;dc2;rewrite -z;resub -K 8;refactor -z;strash;ifraig;dch -f;strash;print_stats;
+strash;rewrite;resub -K 8;dc2;refactor;refactor -z;rewrite -z;strash;ifraig;dch -f;strash;print_stats;
+abc 01> ***EOF***
+UC Berkeley, ABC 1.01 (compiled Sep 26 2026 08:24:44)
+abc 01> read adder2.blif; source adder2.script;strash;write internal.aig;ps
+[1;37mADD2                          :[0m i/o =    4/    3  lat =    0  and =     10  lev =  4
+[1;37mADD2                          :[0m i/o =    4/    3  lat =    0  and =     10  lev =  4
+abc 10> ***EOF***
+*************  level[1] tuning starts *********** 
+UC Berkeley, ABC 1.01 (compiled Sep 26 2026 08:24:44)
+abc 01> ftune -d internal.aig -r 1 -t 0 -p 1 -i 5 -s 5
+rm: cannot remove 'internal.aig.log': No such file or directory
+Your current setups:
+Design = internal.aig, target = 0, repeats = 1, prefix = 1, forget = 0, iteration = 5, nSample = 5, liberty = (null)
+begin:abc -c "read internal.aig;strash;
+0,10
+1,10
+2,10
+3,10
+4,10
+Best Flow(s) (#max=5):
+strash;rewrite;dc2;resub -K 8;refactor;refactor -z;rewrite -z;strash;ifraig;dch -f;strash;print_stats;
+strash;rewrite;rewrite -z;refactor -z;dc2;refactor;resub -K 8;strash;ifraig;dch -f;strash;print_stats;
+strash;rewrite;rewrite -z;refactor -z;dc2;refactor;resub -K 8;strash;ifraig;dch -f;strash;print_stats;
+strash;rewrite;refactor;dc2;rewrite -z;resub -K 8;refactor -z;strash;ifraig;dch -f;strash;print_stats;
+strash;rewrite;resub -K 8;dc2;refactor;refactor -z;rewrite -z;strash;ifraig;dch -f;strash;print_stats;
+abc 01> ***EOF***
+UC Berkeley, ABC 1.01 (compiled Sep 26 2026 08:24:44)
+abc 01> read internal.aig; source adder2.script;strash;write internal.aig
+[1;37minternal                      :[0m i/o =    4/    3  lat =    0  and =     10  lev =  4
+abc 10> ***EOF***
+********************************************************
+[0;31m Final design produced by FlowTune: adder2.ftune.aig[0m
+********************************************************
+```
+
+## 3c. FlowTune 学到的臂统计（.temp.result.txt）
+```
+(Warning)Mean : 10; best : 10; size : 36stdev: 0
+0: mean=10; stdev=0; current_epoch_win_rate : 0
+1: mean=10; stdev=0; current_epoch_win_rate : 0
+2: mean=10; stdev=0; current_epoch_win_rate : 0
+3: mean=10; stdev=0; current_epoch_win_rate : 0
+4: mean=10; stdev=0; current_epoch_win_rate : 0
+5: mean=10; stdev=0; current_epoch_win_rate : 0
+
+*********  Info  ************
+******  ARM   --  ACTIONS --  WINRATE  *********
+	 [0] -- [6] : [0.166667]
+	 [1] -- [6] : [0.166667]
+	 [2] -- [6] : [0.166667]
+	 [3] -- [6] : [0.166667]
+	 [4] -- [6] : [0.166667]
+	 [5] -- [6] : [0.166667]
+Mean : 10; best : 10; size : 42stdev: 0
+0: mean=10; stdev=0; current_epoch_win_rate : 0
+1: mean=10; stdev=0; current_epoch_win_rate : 0
+2: mean=10; stdev=0; current_epoch_win_rate : 0
+3: mean=10; stdev=0; current_epoch_win_rate : 0
+4: mean=10; stdev=0; current_epoch_win_rate : 0
+5: mean=10; stdev=0; current_epoch_win_rate : 0
+
+*********  Info  ************
+******  ARM   --  ACTIONS --  WINRATE  *********
+	 [0] -- [7] : [0.166667]
+	 [1] -- [7] : [0.166667]
+	 [2] -- [7] : [0.166667]
+	 [3] -- [7] : [0.166667]
+	 [4] -- [7] : [0.166667]
+	 [5] -- [7] : [0.166667]
+Mean : 10; best : 10; size : 48stdev: 0
+0: mean=10; stdev=0; current_epoch_win_rate : 0
+1: mean=10; stdev=0; current_epoch_win_rate : 0
+2: mean=10; stdev=0; current_epoch_win_rate : 0
+3: mean=10; stdev=0; current_epoch_win_rate : 0
+4: mean=10; stdev=0; current_epoch_win_rate : 0
+5: mean=10; stdev=0; current_epoch_win_rate : 0
+
+*********  Info  ************
+******  ARM   --  ACTIONS --  WINRATE  *********
+	 [0] -- [8] : [0.166667]
+	 [1] -- [8] : [0.166667]
+	 [2] -- [8] : [0.166667]
+	 [3] -- [8] : [0.166667]
+	 [4] -- [8] : [0.166667]
+	 [5] -- [8] : [0.166667]
+Mean : 10; best : 10; size : 54stdev: 0
+0: mean=10; stdev=0; current_epoch_win_rate : 0
+1: mean=10; stdev=0; current_epoch_win_rate : 0
+2: mean=10; stdev=0; current_epoch_win_rate : 0
+3: mean=10; stdev=0; current_epoch_win_rate : 0
+4: mean=10; stdev=0; current_epoch_win_rate : 0
+5: mean=10; stdev=0; current_epoch_win_rate : 0
+
+*********  Info  ************
+******  ARM   --  ACTIONS --  WINRATE  *********
+	 [0] -- [9] : [0.166667]
+	 [1] -- [9] : [0.166667]
+	 [2] -- [9] : [0.166667]
+	 [3] -- [9] : [0.166667]
+	 [4] -- [9] : [0.166667]
+	 [5] -- [9] : [0.166667]
+Mean : 10; best : 10; size : 60stdev: 0
+0: mean=10; stdev=0; current_epoch_win_rate : 0
+1: mean=10; stdev=0; current_epoch_win_rate : 0
+2: mean=10; stdev=0; current_epoch_win_rate : 0
+3: mean=10; stdev=0; current_epoch_win_rate : 0
+4: mean=10; stdev=0; current_epoch_win_rate : 0
+5: mean=10; stdev=0; current_epoch_win_rate : 0
+
+```
+
+## 3d. FlowTune 最终选出的流程（adder2.script）
+```
+read internal.aig;strash;rewrite;resub -K 8;dc2;refactor;refactor -z;rewrite -z;strash;ifraig;dch -f;strash;print_stats;
+```
+
 ## 4. 第二个基准的运行输出
+### ftune_adder2_long.log
+```
+*************  level-0 tuning starts *********** 
+UC Berkeley, ABC 1.01 (compiled Sep 26 2026 08:24:44)
+abc 01> ftune -d adder2.blif -r 1 -t 0 -p 1 -i 5 -s 5
+Your current setups:
+Design = adder2.blif, target = 0, repeats = 1, prefix = 1, forget = 0, iteration = 5, nSample = 5, liberty = (null)
+begin:abc -c "read adder2.blif;strash;
+0,10
+1,10
+2,10
+3,10
+4,10
+Best Flow(s) (#max=5):
+strash;rewrite;dc2;resub -K 8;refactor;refactor -z;rewrite -z;strash;ifraig;dch -f;strash;print_stats;
+strash;rewrite;rewrite -z;refactor -z;dc2;refactor;resub -K 8;strash;ifraig;dch -f;strash;print_stats;
+strash;rewrite;rewrite -z;refactor -z;dc2;refactor;resub -K 8;strash;ifraig;dch -f;strash;print_stats;
+strash;rewrite;refactor;dc2;rewrite -z;resub -K 8;refactor -z;strash;ifraig;dch -f;strash;print_stats;
+strash;rewrite;resub -K 8;dc2;refactor;refactor -z;rewrite -z;strash;ifraig;dch -f;strash;print_stats;
+abc 01> ***EOF***
+UC Berkeley, ABC 1.01 (compiled Sep 26 2026 08:24:44)
+abc 01> read adder2.blif; source adder2.script;strash;write internal.aig;ps
+[1;37mADD2                          :[0m i/o =    4/    3  lat =    0  and =     10  lev =  4
+[1;37mADD2                          :[0m i/o =    4/    3  lat =    0  and =     10  lev =  4
+abc 10> ***EOF***
+*************  level[1] tuning starts *********** 
+UC Berkeley, ABC 1.01 (compiled Sep 26 2026 08:24:44)
+abc 01> ftune -d internal.aig -r 1 -t 0 -p 1 -i 5 -s 5
+rm: cannot remove 'internal.aig.log': No such file or directory
+Your current setups:
+Design = internal.aig, target = 0, repeats = 1, prefix = 1, forget = 0, iteration = 5, nSample = 5, liberty = (null)
+begin:abc -c "read internal.aig;strash;
+0,10
+1,10
+2,10
+3,10
+4,10
+Best Flow(s) (#max=5):
+strash;rewrite;dc2;resub -K 8;refactor;refactor -z;rewrite -z;strash;ifraig;dch -f;strash;print_stats;
+strash;rewrite;rewrite -z;refactor -z;dc2;refactor;resub -K 8;strash;ifraig;dch -f;strash;print_stats;
+strash;rewrite;rewrite -z;refactor -z;dc2;refactor;resub -K 8;strash;ifraig;dch -f;strash;print_stats;
+strash;rewrite;refactor;dc2;rewrite -z;resub -K 8;refactor -z;strash;ifraig;dch -f;strash;print_stats;
+strash;rewrite;resub -K 8;dc2;refactor;refactor -z;rewrite -z;strash;ifraig;dch -f;strash;print_stats;
+abc 01> ***EOF***
+UC Berkeley, ABC 1.01 (compiled Sep 26 2026 08:24:44)
+abc 01> read internal.aig; source adder2.script;strash;write internal.aig
+[1;37minternal                      :[0m i/o =    4/    3  lat =    0  and =     10  lev =  4
+abc 10> ***EOF***
+********************************************************
+[0;31m Final design produced by FlowTune: adder2.ftune.aig[0m
+********************************************************
+```
 ### ftune_bfly.abc.log
 ```
 *************  level-0 tuning starts *********** 
-UC Berkeley, ABC 1.01 (compiled Sep 26 2026 08:20:54)
+UC Berkeley, ABC 1.01 (compiled Sep 26 2026 08:24:44)
 abc 01> ftune -d bfly.abc.blif -r 1 -t 0 -p 1 -i 1 -s 1
 rm: cannot remove 'bfly.abc.blif.log': No such file or directory
 Your current setups:
 Design = bfly.abc.blif, target = 0, repeats = 1, prefix = 1, forget = 0, iteration = 1, nSample = 1, liberty = (null)
 begin:abc -c "read bfly.abc.blif;strash;
-sh: 1: sh: 1: sh: 1: sh: 1: abc: not foundabc: not foundabc: not foundabc: not found
-
-
-
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not foundsh: 1: 
-abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: sh: 1: abc: not foundabc: not found
-
-0,1e+09
+0,23192
 Best Flow(s) (#max=5):
-strash;rewrite;dc2;resub -K 8;refactor;refactor -z;rewrite -z;strash;ifraig;dch -f;strash;print_stats;
-strash;rewrite;rewrite -z;refactor -z;dc2;refactor;resub -K 8;strash;ifraig;dch -f;strash;print_stats;
-strash;rewrite;rewrite -z;refactor -z;dc2;refactor;resub -K 8;strash;ifraig;dch -f;strash;print_stats;
-strash;rewrite;refactor;dc2;rewrite -z;resub -K 8;refactor -z;strash;ifraig;dch -f;strash;print_stats;
-strash;rewrite;resub -K 8;dc2;refactor;refactor -z;rewrite -z;strash;ifraig;dch -f;strash;print_stats;
+strash;dc2;dc2;refactor;resub -K 8;rewrite -z;refactor -z;strash;ifraig;dch -f;strash;print_stats;
 abc 01> ***EOF***
-UC Berkeley, ABC 1.01 (compiled Sep 26 2026 08:20:54)
+UC Berkeley, ABC 1.01 (compiled Sep 26 2026 08:24:44)
 abc 01> <source bfly.abc.script;strash;write internal.aig;ps
 Hierarchy reader converted 4 instances of blackboxes.
 Hierarchy reader converted 4 instances of blackboxes.
 Warning: The choice nodes in the original AIG are removed by strashing.
-[1;37mbfly                          :[0m i/o =  482/  257  lat = 1748  and =  23680  lev = 90
-[1;37mbfly                          :[0m i/o =  482/  257  lat = 1748  and =  23680  lev = 90
-abc 10> ***EOF***
+[1;37mbfly                          :[0m i/o =  482/  257  lat = 1748  and =  23192  lev = 87
+[1;37mbfly                          :[0m i/o =  482/  257  lat = 1748  and =  23192  lev = 87
+abc 11> ***EOF***
 *************  level[1] tuning starts *********** 
-UC Berkeley, ABC 1.01 (compiled Sep 26 2026 08:20:54)
+UC Berkeley, ABC 1.01 (compiled Sep 26 2026 08:24:44)
 abc 01> ftune -d internal.aig -r 1 -t 0 -p 1 -i 1 -s 1
 rm: cannot remove 'internal.aig.log': No such file or directory
 Your current setups:
 Design = internal.aig, target = 0, repeats = 1, prefix = 1, forget = 0, iteration = 1, nSample = 1, liberty = (null)
 begin:abc -c "read internal.aig;strash;
-sh: 1: sh: 1: abc: not foundabc: not foundsh: 1: 
-
-abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not foundsh: 1: 
-abc: not found
-sh: 1: abc: not found
-sh: 1: sh: 1: abc: not foundabc: not found
-
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-sh: 1: abc: not found
-0,1e+09
+0,22270
 Best Flow(s) (#max=5):
-strash;rewrite;dc2;resub -K 8;refactor;refactor -z;rewrite -z;strash;ifraig;dch -f;strash;print_stats;
-strash;rewrite;rewrite -z;refactor -z;dc2;refactor;resub -K 8;strash;ifraig;dch -f;strash;print_stats;
-strash;rewrite;rewrite -z;refactor -z;dc2;refactor;resub -K 8;strash;ifraig;dch -f;strash;print_stats;
-strash;rewrite;refactor;dc2;rewrite -z;resub -K 8;refactor -z;strash;ifraig;dch -f;strash;print_stats;
-strash;rewrite;resub -K 8;dc2;refactor;refactor -z;rewrite -z;strash;ifraig;dch -f;strash;print_stats;
+strash;dc2;refactor -z;rewrite -z;dc2;resub -K 8;refactor;strash;ifraig;dch -f;strash;print_stats;
 abc 01> ***EOF***
-UC Berkeley, ABC 1.01 (compiled Sep 26 2026 08:20:54)
+UC Berkeley, ABC 1.01 (compiled Sep 26 2026 08:24:44)
 abc 01> read internal.aig; source bfly.abc.script;strash;write internal.aig
 Warning: The choice nodes in the original AIG are removed by strashing.
-[1;37minternal                      :[0m i/o =  482/  257  lat = 1748  and =  22761  lev = 87
-abc 10> ***EOF***
+[1;37minternal                      :[0m i/o =  482/  257  lat = 1748  and =  22270  lev = 87
+abc 11> ***EOF***
 ********************************************************
 [0;31m Final design produced by FlowTune: bfly.abc.ftune.aig[0m
 ********************************************************
@@ -377,7 +411,7 @@ abc 10> ***EOF***
 
 ## 5. FlowTune 产物文件
 ```
--rw-r--r-- 1 runner runner    225 Sep 26 08:21 official-flowtune/FlowTune-AIG-Optimization/adder2.ftune.aig
--rw-r--r-- 1 runner runner 178700 Sep 26 08:22 official-flowtune/FlowTune-AIG-Optimization/bfly.abc.ftune.aig
--rw-r--r-- 1 runner runner 167139 Sep 26 08:20 official-flowtune/FlowTune-AIG-Optimization/bfly.ftune.aig
+-rw-r--r-- 1 runner runner    225 Sep 26 08:25 official-flowtune/FlowTune-AIG-Optimization/adder2.ftune.aig
+-rw-r--r-- 1 runner runner 176481 Sep 26 08:32 official-flowtune/FlowTune-AIG-Optimization/bfly.abc.ftune.aig
+-rw-r--r-- 1 runner runner 167139 Sep 26 08:24 official-flowtune/FlowTune-AIG-Optimization/bfly.ftune.aig
 ```
