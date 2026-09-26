@@ -65,7 +65,7 @@
       <button id="btnReset">重置统计</button>
     </div>
     <div class="tip">
-      阶段一：方向键 / WASD 手动操作，碰墙或撞到自己结束。<br>
+      阶段一：方向键 / WASD 只改方向，蛇自己按固定节奏前进（每 100 毫秒一步，不按键盘也会走）；碰墙或撞到自己结束。<br>
       阶段二：点「AI 自动演示」，AI 会结合自己的长度和当前的位置决定怎么走（先看走完还剩多少活动空间，蛇越长越保守，尽量不贴墙），连续吃到 15 个不死亡即达标。<br>
       「新一局」不会清空最高分和局数，只有「重置统计」会。
     </div>
@@ -322,7 +322,9 @@ var CORE = (function () {
   var W = 15, H = 15, CELL = 24;
   var cv = document.getElementById('cv'), ctx = cv.getContext('2d');
   var st = CORE.createState(W, H, Date.now() % 100000);
-  var aiOn = false, timer = null, aiEaten = 0, bestChain = 0;
+  var aiOn = false, loopTimer = null, aiEaten = 0, bestChain = 0;
+  var TICK_MS = 100;            // 游戏时钟：每 100 毫秒走一步，跟有没有按键无关
+  var pendingDir = st.dir;      // 玩家按键先存起来，等下一个时钟节拍再生效
 
   // 统计跨局保留：最高分与局数写进 localStorage
   var stat = JSON.parse(localStorage.getItem('snakeStat') || '{"best":0,"games":0,"theme":"dark"}');
@@ -380,13 +382,17 @@ var CORE = (function () {
   function newGame(keepStats) {
     document.getElementById('ov').classList.remove('show');
     st = CORE.createState(W, H, Math.floor(Math.random() * 1e9));
+    pendingDir = st.dir;
+    stopLoop();
+    startLoop();
     refresh();
     draw();
   }
 
-  function tick(useAI) {
-    if (!st.alive) return;
-    var dir = useAI ? CORE.smartMove(st) : null;
+  // 统一的游戏时钟：人工和 AI 都由它驱动，区别只在“这一步的方向谁来决定”
+  function onTick() {
+    if (!st.alive) { stopLoop(); return; }
+    var dir = aiOn ? CORE.smartMove(st) : pendingDir;
     var before = st.ate;
     CORE.step(st, dir);
     if (st.ate > before) {
@@ -402,16 +408,23 @@ var CORE = (function () {
     refresh(); draw();
   }
 
+  function startLoop() {
+    if (loopTimer) return;
+    loopTimer = setInterval(onTick, TICK_MS);
+  }
+
+  function stopLoop() {
+    if (loopTimer) { clearInterval(loopTimer); loopTimer = null; }
+  }
+
   function startAI() {
-    if (timer) return;
     aiOn = true;
     document.getElementById('btnAI').classList.add('on');
-    timer = setInterval(function () { tick(true); }, 70);
+    startLoop();
   }
 
   function stopAI() {
     aiOn = false;
-    if (timer) { clearInterval(timer); timer = null; }
     document.getElementById('btnAI').classList.remove('on');
   }
 
@@ -428,7 +441,7 @@ var CORE = (function () {
     stat.best = 0; stat.games = 0; saveStat(); refresh();
   };
 
-  // 手动模式：按键立刻走一步
+  // 手动模式：按键只改方向，蛇自己按游戏时钟往前走
   document.addEventListener('keydown', function (e) {
     var map = {
       ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right',
@@ -437,15 +450,11 @@ var CORE = (function () {
     var dir = map[e.key];
     if (!dir || aiOn || !st.alive) return;
     var d = CORE.DIRS[dir], h = CORE.DIRS[st.dir];
-    if (d[0] + h[0] === 0 && d[1] + h[1] === 0) return;
-    var before = st.ate;
-    CORE.step(st, dir);
-    aiEaten = aiEaten; // 手动模式不改 AI 计数
-    if (!st.alive) gameOver();
-    refresh(); draw();
+    if (d[0] + h[0] === 0 && d[1] + h[1] === 0) return;   // 不允许 180° 掉头
+    pendingDir = dir;
   });
 
-  refresh(); draw();
+  refresh(); draw(); startLoop();
 })();
 </script>
 </body>
