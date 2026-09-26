@@ -1,0 +1,116 @@
+name: FlowTune 官方代码复现（编译 + 运行作者示例）
+
+on:
+  push:
+    paths:
+      - '.github/workflows/flowtune-official.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    steps:
+      - name: 拉取本仓库
+        uses: actions/checkout@v4
+
+      - name: 安装编译依赖
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake libreadline-dev flex bison
+
+      - name: 克隆官方 FlowTune 仓库
+        run: git clone --depth 1 https://github.com/Yu-Maryland/FlowTune.git official-flowtune
+
+      - name: 编译 ABC + FlowTune
+        continue-on-error: true
+        run: |
+          set -x
+          mkdir -p official-flowtune/src/build
+          cd official-flowtune/src/build
+          cp ../../abc.rc . || true
+          # 老代码在新版 gcc 上常见的多重定义问题，加 -fcommon -w 兜住
+          cmake .. -DCMAKE_C_FLAGS="-fcommon -w" -DCMAKE_CXX_FLAGS="-fcommon -w -std=c++11" > build.log 2>&1 || true
+          make -j"$(nproc)" >> build.log 2>&1 || true
+          ls -l abc || true
+
+      - name: 运行官方快速测试（single_design.sh）
+        continue-on-error: true
+        run: |
+          cd official-flowtune/FlowTune-AIG-Optimization
+          cp ../src/build/abc ./abc || true
+          chmod +x ./abc ./single_design.sh || true
+          ./abc -c "gen -N 2 -a adder2.blif; st; write adder2.blif" > /tmp/gen.log 2>&1 || true
+          ./single_design.sh adder2 adder2.blif 1 1 0 1 1 > /tmp/ftune_adder2.log 2>&1 || true
+          cp /tmp/ftune_adder2.log "$GITHUB_WORKSPACE/ftune_adder2.log"
+          cat /tmp/ftune_adder2.log || true
+
+      - name: 再跑一个规模更大的基准（验证可重复性）
+        continue-on-error: true
+        run: |
+          cd official-flowtune
+          ls Benchmarks/BLIF | head -20 || true
+          # 挑一个 BLIF 基准复制到工作目录，跑同一条命令
+          bench=$(ls Benchmarks/BLIF/*.blif 2>/dev/null | head -1 || true)
+          if [ -n "$bench" ]; then
+            cp "$bench" FlowTune-AIG-Optimization/ 2>/dev/null || true
+            cd FlowTune-AIG-Optimization
+            name=$(basename "$bench" .blif)
+            ./single_design.sh "$name" "$name.blif" 1 1 0 1 1 > "/tmp/ftune_$name.log" 2>&1 || true
+            cp "/tmp/ftune_$name.log" "$GITHUB_WORKSPACE/" || true
+            cat "/tmp/ftune_$name.log" || true
+          else
+            echo "没有找到 BLIF 基准，跳过" 
+          fi
+
+      - name: 把运行记录提交回仓库
+        if: always()
+        run: |
+          mkdir -p flowtune-official
+          {
+            echo "# FlowTune 官方代码运行记录（GitHub Actions）"
+            echo
+            echo "- 运行时间（UTC）：$(date -u '+%Y-%m-%d %H:%M:%S')"
+            echo "- 运行环境：ubuntu-latest（$(uname -m)），gcc $(gcc -dumpversion 2>/dev/null || echo '?')"
+            echo "- 官方仓库：https://github.com/Yu-Maryland/FlowTune"
+            echo
+            echo "## 1. 编译日志（末尾 120 行）"
+            echo '```'
+            tail -n 120 official-flowtune/src/build/build.log 2>/dev/null || echo "(没有 build.log)"
+            echo '```'
+            echo
+            echo "## 2. 编译产物"
+            echo '```'
+            ls -l official-flowtune/src/build/abc 2>/dev/null || echo "(没有生成 abc)"
+            echo '```'
+            echo
+            echo "## 3. 官方示例运行输出（single_design.sh adder2 adder2.blif 1 1 0 1 1）"
+            echo '```'
+            cat ftune_adder2.log 2>/dev/null || echo "(没有输出)"
+            echo '```'
+            echo
+            echo "## 4. 第二个基准的运行输出"
+            for f in ftune_*.log; do
+              [ "$f" = "ftune_adder2.log" ] && continue
+              [ -f "$f" ] || continue
+              echo "### $f"
+              echo '```'
+              cat "$f"
+              echo '```'
+            done
+            echo
+            echo "## 5. FlowTune 产物文件"
+            echo '```'
+            ls -l official-flowtune/FlowTune-AIG-Optimization/*.aig 2>/dev/null || echo "(没有 aig 产物)"
+            echo '```'
+          } > flowtune-official/official-run-report.md
+
+          git config user.name "flowtune-runner"
+          git config user.email "actions@users.noreply.github.com"
+          git add flowtune-official/official-run-report.md
+          git commit -m "记录：FlowTune 官方代码编译与运行结果（GitHub Actions 自动生成）" || echo "没有变化"
+          git push || echo "推送失败（可能没有写权限）"
