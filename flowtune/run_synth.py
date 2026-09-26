@@ -3,10 +3,13 @@
 一条完整的流程 = 读入设计 -> 粗粒度综合 -> 三个阶段各自选一个配方 -> 统计。
 """
 
+import glob
 import json
 import os
 import re
+import shutil
 import subprocess
+import sys
 import time
 from pathlib import Path
 
@@ -16,11 +19,24 @@ HERE = Path(__file__).resolve().parent
 def find_yosys() -> str:
     if os.environ.get("YOSYS"):
         return os.environ["YOSYS"]
-    candidate = Path(
-        r"C:\Users\12239\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Scripts\yowasp-yosys.exe"
-    )
-    if candidate.exists():
-        return str(candidate)
+    # 1) PATH 里有没有 yosys / yowasp-yosys
+    for name in ("yowasp-yosys", "yosys"):
+        found = shutil.which(name)
+        if found:
+            return found
+    # 2) 当前 Python 环境的 Scripts 目录（pip 装出来的可执行文件都在这里）
+    local = Path(sys.executable).parent / "Scripts" / "yowasp-yosys.exe"
+    if local.exists():
+        return str(local)
+    # 3) 兜底：在 Codex 运行时目录里搜一遍（版本更新后路径会变，所以用通配符找）
+    for pattern in (
+        r"C:\Users\12239\.cache\codex-runtimes\*\*\python\Scripts\yowasp-yosys.exe",
+        r"C:\Users\12239\.cache\codex-runtimes\*\*\*\python\Scripts\yowasp-yosys.exe",
+        r"C:\Users\12239\AppData\Local\Programs\Python\**\Scripts\yowasp-yosys.exe",
+    ):
+        hits = sorted(glob.glob(pattern, recursive=True))
+        if hits:
+            return str(hits[-1])
     return "yosys"
 
 

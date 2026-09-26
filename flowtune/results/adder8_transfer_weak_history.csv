@@ -1,0 +1,31 @@
+round,cells,depth,reward,seconds,arms
+1,52,12,0.4639,0.45,opt -fast | opt -full; opt_merge | opt -fast; opt_clean
+2,52,12,0.4639,0.5,opt -full; wreduce | opt -full | opt -full; opt_merge; opt_clean
+3,52,12,0.4639,0.44,opt -full | opt -full; share | opt -full; opt_clean
+4,97,15,0.0,0.48,opt -fast | opt -full; opt_merge | opt_merge; opt_clean
+5,97,15,0.0,0.47,opt -full; wreduce | opt -full | peepopt; opt_clean
+6,97,15,0.0,0.47,opt -full | opt -full; share | opt_clean
+7,52,12,0.4639,0.45,opt -fast | opt -full; opt_merge | opt -fast; opt_clean
+8,52,12,0.4639,0.5,opt -full; wreduce | opt -full | opt -full; opt_merge; opt_clean
+9,52,12,0.4639,0.44,opt -full | opt -full; share | opt -full; opt_clean
+10,52,12,0.4639,0.45,opt -fast | opt -full; opt_merge | opt -fast; opt_clean
+11,52,12,0.4639,0.42,opt -full; wreduce | opt -full | opt -full; opt_clean
+12,52,12,0.4639,0.46,opt -full | opt -full; share | opt -full; opt_merge; opt_clean
+13,52,12,0.4639,0.45,opt -fast | opt -full; opt_merge | opt -fast; opt_clean
+14,52,12,0.4639,0.5,opt -full; wreduce | opt -full | opt -full; opt_merge; opt_clean
+15,52,12,0.4639,0.44,opt -full | opt -full; share | opt -full; opt_clean
+16,97,15,0.0,0.48,opt -fast | opt -full; opt_merge | opt_merge; opt_clean
+17,97,15,0.0,0.46,opt -full; wreduce | opt -full | opt_clean
+18,97,15,0.0,0.41,opt -full | opt -full; share | peepopt; opt_clean
+19,52,12,0.4639,0.45,opt -fast | opt -full; opt_merge | opt -fast; opt_clean
+20,52,12,0.4639,0.5,opt -full; wreduce | opt -full | opt -full; opt_merge; opt_clean
+21,52,12,0.4639,0.44,opt -full | opt -full; share | opt -full; opt_clean
+22,52,12,0.4639,0.45,opt -fast | opt -full; opt_merge | opt -fast; opt_clean
+23,52,12,0.4639,0.5,opt -full; wreduce | opt -full | opt -full; opt_merge; opt_clean
+24,52,12,0.4639,0.44,opt -full | opt -full; share | opt -full; opt_clean
+25,52,12,0.4639,0.45,opt -fast | opt -full; opt_merge | opt -fast; opt_clean
+26,52,12,0.4639,0.5,opt -full; wreduce | opt -full | opt -full; opt_merge; opt_clean
+27,52,12,0.4639,0.44,opt -full | opt -full; share | opt -full; opt_clean
+28,97,15,0.0,0.48,opt -fast | opt -full; opt_merge | opt_merge; opt_clean
+29,97,15,0.0,0.47,opt -full; wreduce | opt -full | peepopt; opt_clean
+30,97,15,0.0,0.47,opt -full | opt -full; share | opt_clean

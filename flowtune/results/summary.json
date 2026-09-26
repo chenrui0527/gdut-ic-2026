@@ -1,932 +1,247 @@
-[
-  {
-    "design": "counter",
-    "baseline_cells": 39,
-    "bandit_best_cells": 10,
-    "bandit_best_round": 2,
-    "full_search_best_cells": 10,
-    "combinations": 54,
-    "bandit": {
-      "design": "counter",
-      "rounds": 30,
-      "baseline_cells": 39,
-      "best": {
-        "round": 2,
-        "cells": 10,
-        "depth": 9,
-        "arms": [
-          "opt -full",
-          "opt -full; opt_merge",
-          "opt -full; opt_merge; opt_clean"
-        ]
-      },
-      "history": [
-        {
-          "round": 1,
-          "cells": 39,
-          "depth": 29,
-          "reward": 0.0,
-          "arms": [
-            "opt -fast",
-            "opt -full",
-            "opt_clean"
-          ],
-          "seconds": 17.25
-        },
-        {
-          "round": 2,
-          "cells": 10,
-          "depth": 9,
-          "reward": 0.7436,
-          "arms": [
-            "opt -full",
-            "opt -full; opt_merge",
-            "opt -full; opt_merge; opt_clean"
-          ],
-          "seconds": 0.45
-        },
-        {
-          "round": 3,
-          "cells": 10,
-          "depth": 9,
-          "reward": 0.7436,
-          "arms": [
-            "opt -full; wreduce",
-            "opt -full; share",
-            "opt -full; opt_clean"
-          ],
-          "seconds": 0.43
-        },
-        {
-          "round": 4,
-          "cells": 39,
-          "depth": 29,
-          "reward": 0.0,
-          "arms": [
-            "opt -full; wreduce",
-            "opt -full; opt_merge",
-            "opt_merge; opt_clean"
-          ],
-          "seconds": 0.44
-        },
-        {
-          "round": 5,
-          "cells": 10,
-          "depth": 9,
-          "reward": 0.7436,
-          "arms": [
-            "opt -full",
-            "opt -full; share",
-            "opt -fast; opt_clean"
-          ],
-          "seconds": 0.43
-        },
-        {
-          "round": 6,
-          "cells": 39,
-          "depth": 29,
-          "reward": 0.0,
-          "arms": [
-            "opt -full",
-            "opt -full; share",
-            "peepopt; opt_clean"
-          ],
-          "seconds": 0.43
-        },
-        {
-          "round": 7,
-          "cells": 10,
-          "depth": 9,
-          "reward": 0.7436,
-          "arms": [
-            "opt -fast",
-            "opt -full",
-            "opt -full; opt_clean"
-          ],
-          "seconds": 0.41
-        },
-        {
-          "round": 8,
-          "cells": 10,
-          "depth": 9,
-          "reward": 0.7436,
-          "arms": [
-            "opt -fast",
-            "opt -full",
-            "opt -fast; opt_clean"
-          ],
-          "seconds": 0.41
-        },
-        {
-          "round": 9,
-          "cells": 10,
-          "depth": 9,
-          "reward": 0.7436,
-          "arms": [
-            "opt -full; wreduce",
-            "opt -full; opt_merge",
-            "opt -full; opt_merge; opt_clean"
-          ],
-          "seconds": 0.47
-        },
-        {
-          "round": 10,
-          "cells": 10,
-          "depth": 9,
-          "reward": 0.7436,
-          "arms": [
-            "opt -full",
-            "opt -full; opt_merge",
-            "opt -full; opt_clean"
-          ],
-          "seconds": 0.48
-        },
-        {
-          "round": 11,
-          "cells": 10,
-          "depth": 9,
-          "reward": 0.7436,
-          "arms": [
-            "opt -fast",
-            "opt -full; share",
-            "opt -full; opt_merge; opt_clean"
-          ],
-          "seconds": 0.47
-        },
-        {
-          "round": 12,
-          "cells": 10,
-          "depth": 9,
-          "reward": 0.7436,
-          "arms": [
-            "opt -full; wreduce",
-            "opt -full",
-            "opt -fast; opt_clean"
-          ],
-          "seconds": 0.44
-        },
-        {
-          "round": 13,
-          "cells": 39,
-          "depth": 29,
-          "reward": 0.0,
-          "arms": [
-            "opt -full",
-            "opt -full",
-            "opt_clean"
-          ],
-          "seconds": 0.41
-        },
-        {
-          "round": 14,
-          "cells": 39,
-          "depth": 29,
-          "reward": 0.0,
-          "arms": [
-            "opt -full; wreduce",
-            "opt -full; share",
-            "opt_merge; opt_clean"
-          ],
-          "seconds": 0.47
-        },
-        {
-          "round": 15,
-          "cells": 39,
-          "depth": 29,
-          "reward": 0.0,
-          "arms": [
-            "opt -fast",
-            "opt -full; opt_merge",
-            "peepopt; opt_clean"
-          ],
-          "seconds": 0.47
-        },
-        {
-          "round": 16,
-          "cells": 10,
-          "depth": 9,
-          "reward": 0.7436,
-          "arms": [
-            "opt -full; wreduce",
-            "opt -full; share",
-            "opt -fast; opt_clean"
-          ],
-          "seconds": 0.48
-        },
-        {
-          "round": 17,
-          "cells": 10,
-          "depth": 9,
-          "reward": 0.7436,
-          "arms": [
-            "opt -full",
-            "opt -full; opt_merge",
-            "opt -full; opt_merge; opt_clean"
-          ],
-          "seconds": 0.45
-        },
-        {
-          "round": 18,
-          "cells": 10,
-          "depth": 9,
-          "reward": 0.7436,
-          "arms": [
-            "opt -fast",
-            "opt -full",
-            "opt -full; opt_clean"
-          ],
-          "seconds": 0.41
-        },
-        {
-          "round": 19,
-          "cells": 10,
-          "depth": 9,
-          "reward": 0.7436,
-          "arms": [
-            "opt -full",
-            "opt -full; share",
-            "opt -fast; opt_clean"
-          ],
-          "seconds": 0.43
-        },
-        {
-          "round": 20,
-          "cells": 10,
-          "depth": 9,
-          "reward": 0.7436,
-          "arms": [
-            "opt -fast",
-            "opt -full",
-            "opt -full; opt_merge; opt_clean"
-          ],
-          "seconds": 0.46
-        },
-        {
-          "round": 21,
-          "cells": 10,
-          "depth": 9,
-          "reward": 0.7436,
-          "arms": [
-            "opt -full; wreduce",
-            "opt -full; opt_merge",
-            "opt -full; opt_clean"
-          ],
-          "seconds": 0.42
-        },
-        {
-          "round": 22,
-          "cells": 10,
-          "depth": 9,
-          "reward": 0.7436,
-          "arms": [
-            "opt -full",
-            "opt -full; opt_merge",
-            "opt -full; opt_merge; opt_clean"
-          ],
-          "seconds": 0.45
-        },
-        {
-          "round": 23,
-          "cells": 10,
-          "depth": 9,
-          "reward": 0.7436,
-          "arms": [
-            "opt -fast",
-            "opt -full",
-            "opt -full; opt_clean"
-          ],
-          "seconds": 0.41
-        },
-        {
-          "round": 24,
-          "cells": 10,
-          "depth": 9,
-          "reward": 0.7436,
-          "arms": [
-            "opt -full; wreduce",
-            "opt -full; share",
-            "opt -fast; opt_clean"
-          ],
-          "seconds": 0.48
-        },
-        {
-          "round": 25,
-          "cells": 10,
-          "depth": 9,
-          "reward": 0.7436,
-          "arms": [
-            "opt -fast",
-            "opt -full; share",
-            "opt -full; opt_merge; opt_clean"
-          ],
-          "seconds": 0.47
-        },
-        {
-          "round": 26,
-          "cells": 10,
-          "depth": 9,
-          "reward": 0.7436,
-          "arms": [
-            "opt -full",
-            "opt -full",
-            "opt -full; opt_clean"
-          ],
-          "seconds": 0.43
-        },
-        {
-          "round": 27,
-          "cells": 10,
-          "depth": 9,
-          "reward": 0.7436,
-          "arms": [
-            "opt -full; wreduce",
-            "opt -full; opt_merge",
-            "opt -fast; opt_clean"
-          ],
-          "seconds": 0.44
-        },
-        {
-          "round": 28,
-          "cells": 10,
-          "depth": 9,
-          "reward": 0.7436,
-          "arms": [
-            "opt -fast",
-            "opt -full; opt_merge",
-            "opt -full; opt_clean"
-          ],
-          "seconds": 0.44
-        },
-        {
-          "round": 29,
-          "cells": 10,
-          "depth": 9,
-          "reward": 0.7436,
-          "arms": [
-            "opt -full",
-            "opt -full",
-            "opt -full; opt_merge; opt_clean"
-          ],
-          "seconds": 0.42
-        },
-        {
-          "round": 30,
-          "cells": 10,
-          "depth": 9,
-          "reward": 0.7436,
-          "arms": [
-            "opt -full; wreduce",
-            "opt -full; share",
-            "opt -fast; opt_clean"
-          ],
-          "seconds": 0.48
-        }
-      ],
-      "stage_means": [
-        [
-          {
-            "arm": "opt -fast",
-            "n": 10,
-            "mean_reward": 0.5949
-          },
-          {
-            "arm": "opt -full",
-            "n": 10,
-            "mean_reward": 0.5949
-          },
-          {
-            "arm": "opt -full; wreduce",
-            "n": 10,
-            "mean_reward": 0.5949
-          }
-        ],
-        [
-          {
-            "arm": "opt -full",
-            "n": 10,
-            "mean_reward": 0.5949
-          },
-          {
-            "arm": "opt -full; opt_merge",
-            "n": 10,
-            "mean_reward": 0.5949
-          },
-          {
-            "arm": "opt -full; share",
-            "n": 10,
-            "mean_reward": 0.5949
-          }
-        ],
-        [
-          {
-            "arm": "opt_clean",
-            "n": 2,
-            "mean_reward": 0.0
-          },
-          {
-            "arm": "opt -full; opt_merge; opt_clean",
-            "n": 8,
-            "mean_reward": 0.7436
-          },
-          {
-            "arm": "opt -full; opt_clean",
-            "n": 8,
-            "mean_reward": 0.7436
-          },
-          {
-            "arm": "opt_merge; opt_clean",
-            "n": 2,
-            "mean_reward": 0.0
-          },
-          {
-            "arm": "opt -fast; opt_clean",
-            "n": 8,
-            "mean_reward": 0.7436
-          },
-          {
-            "arm": "peepopt; opt_clean",
-            "n": 2,
-            "mean_reward": 0.0
-          }
-        ]
+{
+  "rounds_per_design": 30,
+  "ucb_c": 1.2,
+  "seeds": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "designs": [
+    "counter",
+    "mult8",
+    "adder8",
+    "alu4",
+    "adder16"
+  ],
+  "stages": [
+    {
+      "name": "粗粒度优化",
+      "arms": [
+        "opt -fast",
+        "opt -full",
+        "opt -full; wreduce"
       ]
     },
-    "full_search": {
-      "tried": 54,
-      "best": {
-        "cells": 10,
-        "depth": 9,
-        "arms": [
-          "opt -fast",
-          "opt -full",
-          "opt -full; opt_merge; opt_clean"
-        ]
+    {
+      "name": "映射前优化",
+      "arms": [
+        "opt -full",
+        "opt -full; opt_merge",
+        "opt -full; share"
+      ]
+    },
+    {
+      "name": "映射后优化",
+      "arms": [
+        "opt_clean",
+        "opt -full; opt_merge; opt_clean",
+        "opt -full; opt_clean",
+        "opt_merge; opt_clean",
+        "opt -fast; opt_clean",
+        "peepopt; opt_clean"
+      ]
+    }
+  ],
+  "baseline_cells": {
+    "counter": 39,
+    "mult8": 769,
+    "adder8": 97,
+    "alu4": 183,
+    "adder16": 198
+  },
+  "exhaustive_best_cells": {
+    "counter": 10,
+    "mult8": 367,
+    "adder8": 52,
+    "alu4": 120,
+    "adder16": 113
+  },
+  "evals_to_best": {
+    "cold": {
+      "counter": {
+        "median": 2,
+        "mean": 2.0,
+        "min": 2,
+        "max": 2,
+        "hit_rate": "10/10"
+      },
+      "mult8": {
+        "median": 2,
+        "mean": 2.0,
+        "min": 2,
+        "max": 2,
+        "hit_rate": "10/10"
+      },
+      "adder8": {
+        "median": 2,
+        "mean": 2.0,
+        "min": 2,
+        "max": 2,
+        "hit_rate": "10/10"
+      },
+      "alu4": {
+        "median": 2,
+        "mean": 2.0,
+        "min": 2,
+        "max": 2,
+        "hit_rate": "10/10"
+      },
+      "adder16": {
+        "median": 2,
+        "mean": 2.0,
+        "min": 2,
+        "max": 2,
+        "hit_rate": "10/10"
+      }
+    },
+    "transfer_weak": {
+      "counter": {
+        "median": 2,
+        "mean": 2.0,
+        "min": 2,
+        "max": 2,
+        "hit_rate": "10/10"
+      },
+      "mult8": {
+        "median": 1,
+        "mean": 1.0,
+        "min": 1,
+        "max": 1,
+        "hit_rate": "10/10"
+      },
+      "adder8": {
+        "median": 1,
+        "mean": 1.0,
+        "min": 1,
+        "max": 1,
+        "hit_rate": "10/10"
+      },
+      "alu4": {
+        "median": 1,
+        "mean": 1.0,
+        "min": 1,
+        "max": 1,
+        "hit_rate": "10/10"
+      },
+      "adder16": {
+        "median": 1,
+        "mean": 1.0,
+        "min": 1,
+        "max": 1,
+        "hit_rate": "10/10"
+      }
+    },
+    "transfer_strong": {
+      "counter": {
+        "median": 2,
+        "mean": 2.0,
+        "min": 2,
+        "max": 2,
+        "hit_rate": "10/10"
+      },
+      "mult8": {
+        "median": 4,
+        "mean": 4.0,
+        "min": 4,
+        "max": 4,
+        "hit_rate": "10/10"
+      },
+      "adder8": {
+        "median": 1,
+        "mean": 1.0,
+        "min": 1,
+        "max": 1,
+        "hit_rate": "10/10"
+      },
+      "alu4": {
+        "median": 1,
+        "mean": 1.0,
+        "min": 1,
+        "max": 1,
+        "hit_rate": "10/10"
+      },
+      "adder16": {
+        "median": 1,
+        "mean": 1.0,
+        "min": 1,
+        "max": 1,
+        "hit_rate": "10/10"
       }
     }
   },
-  {
-    "design": "mult8",
-    "baseline_cells": 769,
-    "bandit_best_cells": 367,
-    "bandit_best_round": 2,
-    "full_search_best_cells": 367,
-    "combinations": 54,
-    "bandit": {
-      "design": "mult8",
-      "rounds": 30,
-      "baseline_cells": 769,
-      "best": {
-        "round": 2,
-        "cells": 367,
-        "depth": 22,
-        "arms": [
-          "opt -full",
-          "opt -full; opt_merge",
-          "opt -full; opt_merge; opt_clean"
-        ]
+  "final_prior_stats": [
+    [
+      {
+        "arm": "opt -fast",
+        "n": 310,
+        "mean_reward": 0.5049
       },
-      "history": [
-        {
-          "round": 1,
-          "cells": 769,
-          "depth": 30,
-          "reward": 0.0,
-          "arms": [
-            "opt -fast",
-            "opt -full",
-            "opt_clean"
-          ],
-          "seconds": 0.48
-        },
-        {
-          "round": 2,
-          "cells": 367,
-          "depth": 22,
-          "reward": 0.5228,
-          "arms": [
-            "opt -full",
-            "opt -full; opt_merge",
-            "opt -full; opt_merge; opt_clean"
-          ],
-          "seconds": 0.49
-        },
-        {
-          "round": 3,
-          "cells": 367,
-          "depth": 22,
-          "reward": 0.5228,
-          "arms": [
-            "opt -full; wreduce",
-            "opt -full; share",
-            "opt -full; opt_clean"
-          ],
-          "seconds": 0.48
-        },
-        {
-          "round": 4,
-          "cells": 652,
-          "depth": 30,
-          "reward": 0.1521,
-          "arms": [
-            "opt -full; wreduce",
-            "opt -full; opt_merge",
-            "opt_merge; opt_clean"
-          ],
-          "seconds": 0.47
-        },
-        {
-          "round": 5,
-          "cells": 367,
-          "depth": 22,
-          "reward": 0.5228,
-          "arms": [
-            "opt -full",
-            "opt -full; share",
-            "opt -fast; opt_clean"
-          ],
-          "seconds": 0.52
-        },
-        {
-          "round": 6,
-          "cells": 769,
-          "depth": 30,
-          "reward": 0.0,
-          "arms": [
-            "opt -full",
-            "opt -full; share",
-            "peepopt; opt_clean"
-          ],
-          "seconds": 0.5
-        },
-        {
-          "round": 7,
-          "cells": 367,
-          "depth": 22,
-          "reward": 0.5228,
-          "arms": [
-            "opt -fast",
-            "opt -full",
-            "opt -full; opt_clean"
-          ],
-          "seconds": 0.5
-        },
-        {
-          "round": 8,
-          "cells": 367,
-          "depth": 22,
-          "reward": 0.5228,
-          "arms": [
-            "opt -full; wreduce",
-            "opt -full; opt_merge",
-            "opt -fast; opt_clean"
-          ],
-          "seconds": 0.5
-        },
-        {
-          "round": 9,
-          "cells": 367,
-          "depth": 22,
-          "reward": 0.5228,
-          "arms": [
-            "opt -fast",
-            "opt -full",
-            "opt -full; opt_merge; opt_clean"
-          ],
-          "seconds": 0.52
-        },
-        {
-          "round": 10,
-          "cells": 652,
-          "depth": 30,
-          "reward": 0.1521,
-          "arms": [
-            "opt -full; wreduce",
-            "opt -full; opt_merge",
-            "opt_merge; opt_clean"
-          ],
-          "seconds": 0.47
-        },
-        {
-          "round": 11,
-          "cells": 769,
-          "depth": 30,
-          "reward": 0.0,
-          "arms": [
-            "opt -full",
-            "opt -full; share",
-            "peepopt; opt_clean"
-          ],
-          "seconds": 0.5
-        },
-        {
-          "round": 12,
-          "cells": 769,
-          "depth": 30,
-          "reward": 0.0,
-          "arms": [
-            "opt -fast",
-            "opt -full",
-            "opt_clean"
-          ],
-          "seconds": 0.48
-        },
-        {
-          "round": 13,
-          "cells": 367,
-          "depth": 22,
-          "reward": 0.5228,
-          "arms": [
-            "opt -full; wreduce",
-            "opt -full; opt_merge",
-            "opt -full; opt_clean"
-          ],
-          "seconds": 0.49
-        },
-        {
-          "round": 14,
-          "cells": 367,
-          "depth": 22,
-          "reward": 0.5228,
-          "arms": [
-            "opt -full; wreduce",
-            "opt -full; opt_merge",
-            "opt -full; opt_merge; opt_clean"
-          ],
-          "seconds": 0.51
-        },
-        {
-          "round": 15,
-          "cells": 367,
-          "depth": 22,
-          "reward": 0.5228,
-          "arms": [
-            "opt -fast",
-            "opt -full; share",
-            "opt -fast; opt_clean"
-          ],
-          "seconds": 0.48
-        },
-        {
-          "round": 16,
-          "cells": 367,
-          "depth": 22,
-          "reward": 0.5228,
-          "arms": [
-            "opt -full",
-            "opt -full",
-            "opt -fast; opt_clean"
-          ],
-          "seconds": 0.51
-        },
-        {
-          "round": 17,
-          "cells": 367,
-          "depth": 22,
-          "reward": 0.5228,
-          "arms": [
-            "opt -full; wreduce",
-            "opt -full; opt_merge",
-            "opt -full; opt_merge; opt_clean"
-          ],
-          "seconds": 0.51
-        },
-        {
-          "round": 18,
-          "cells": 367,
-          "depth": 22,
-          "reward": 0.5228,
-          "arms": [
-            "opt -fast",
-            "opt -full",
-            "opt -full; opt_clean"
-          ],
-          "seconds": 0.5
-        },
-        {
-          "round": 19,
-          "cells": 652,
-          "depth": 30,
-          "reward": 0.1521,
-          "arms": [
-            "opt -full",
-            "opt -full; share",
-            "opt_merge; opt_clean"
-          ],
-          "seconds": 0.54
-        },
-        {
-          "round": 20,
-          "cells": 367,
-          "depth": 22,
-          "reward": 0.5228,
-          "arms": [
-            "opt -full; wreduce",
-            "opt -full; opt_merge",
-            "opt -fast; opt_clean"
-          ],
-          "seconds": 0.5
-        },
-        {
-          "round": 21,
-          "cells": 367,
-          "depth": 22,
-          "reward": 0.5228,
-          "arms": [
-            "opt -fast",
-            "opt -full",
-            "opt -full; opt_clean"
-          ],
-          "seconds": 0.5
-        },
-        {
-          "round": 22,
-          "cells": 367,
-          "depth": 22,
-          "reward": 0.5228,
-          "arms": [
-            "opt -full; wreduce",
-            "opt -full; opt_merge",
-            "opt -full; opt_merge; opt_clean"
-          ],
-          "seconds": 0.51
-        },
-        {
-          "round": 23,
-          "cells": 769,
-          "depth": 30,
-          "reward": 0.0,
-          "arms": [
-            "opt -fast",
-            "opt -full",
-            "peepopt; opt_clean"
-          ],
-          "seconds": 0.44
-        },
-        {
-          "round": 24,
-          "cells": 769,
-          "depth": 30,
-          "reward": 0.0,
-          "arms": [
-            "opt -full",
-            "opt -full; share",
-            "opt_clean"
-          ],
-          "seconds": 0.45
-        },
-        {
-          "round": 25,
-          "cells": 367,
-          "depth": 22,
-          "reward": 0.5228,
-          "arms": [
-            "opt -full; wreduce",
-            "opt -full; opt_merge",
-            "opt -full; opt_merge; opt_clean"
-          ],
-          "seconds": 0.51
-        },
-        {
-          "round": 26,
-          "cells": 367,
-          "depth": 22,
-          "reward": 0.5228,
-          "arms": [
-            "opt -full; wreduce",
-            "opt -full; opt_merge",
-            "opt -full; opt_clean"
-          ],
-          "seconds": 0.49
-        },
-        {
-          "round": 27,
-          "cells": 367,
-          "depth": 22,
-          "reward": 0.5228,
-          "arms": [
-            "opt -full; wreduce",
-            "opt -full; opt_merge",
-            "opt -fast; opt_clean"
-          ],
-          "seconds": 0.5
-        },
-        {
-          "round": 28,
-          "cells": 367,
-          "depth": 22,
-          "reward": 0.5228,
-          "arms": [
-            "opt -fast",
-            "opt -full",
-            "opt -full; opt_clean"
-          ],
-          "seconds": 0.5
-        },
-        {
-          "round": 29,
-          "cells": 652,
-          "depth": 30,
-          "reward": 0.1521,
-          "arms": [
-            "opt -full; wreduce",
-            "opt -full; opt_merge",
-            "opt_merge; opt_clean"
-          ],
-          "seconds": 0.47
-        },
-        {
-          "round": 30,
-          "cells": 367,
-          "depth": 22,
-          "reward": 0.5228,
-          "arms": [
-            "opt -fast",
-            "opt -full",
-            "opt -fast; opt_clean"
-          ],
-          "seconds": 0.49
-        }
-      ],
-      "stage_means": [
-        [
-          {
-            "arm": "opt -fast",
-            "n": 10,
-            "mean_reward": 0.3659
-          },
-          {
-            "arm": "opt -full",
-            "n": 7,
-            "mean_reward": 0.2458
-          },
-          {
-            "arm": "opt -full; wreduce",
-            "n": 13,
-            "mean_reward": 0.4372
-          }
-        ],
-        [
-          {
-            "arm": "opt -full",
-            "n": 10,
-            "mean_reward": 0.3659
-          },
-          {
-            "arm": "opt -full; opt_merge",
-            "n": 13,
-            "mean_reward": 0.4372
-          },
-          {
-            "arm": "opt -full; share",
-            "n": 7,
-            "mean_reward": 0.2458
-          }
-        ],
-        [
-          {
-            "arm": "opt_clean",
-            "n": 3,
-            "mean_reward": 0.0
-          },
-          {
-            "arm": "opt -full; opt_merge; opt_clean",
-            "n": 6,
-            "mean_reward": 0.5228
-          },
-          {
-            "arm": "opt -full; opt_clean",
-            "n": 7,
-            "mean_reward": 0.5228
-          },
-          {
-            "arm": "opt_merge; opt_clean",
-            "n": 4,
-            "mean_reward": 0.1521
-          },
-          {
-            "arm": "opt -fast; opt_clean",
-            "n": 7,
-            "mean_reward": 0.5228
-          },
-          {
-            "arm": "peepopt; opt_clean",
-            "n": 3,
-            "mean_reward": 0.0
-          }
-        ]
-      ]
-    },
-    "full_search": {
-      "tried": 54,
-      "best": {
-        "cells": 367,
-        "depth": 22,
-        "arms": [
-          "opt -fast",
-          "opt -full",
-          "opt -full; opt_merge; opt_clean"
-        ]
+      {
+        "arm": "opt -full",
+        "n": 310,
+        "mean_reward": 0.5043
+      },
+      {
+        "arm": "opt -full; wreduce",
+        "n": 310,
+        "mean_reward": 0.5037
       }
-    }
-  }
-]
+    ],
+    [
+      {
+        "arm": "opt -full",
+        "n": 310,
+        "mean_reward": 0.5043
+      },
+      {
+        "arm": "opt -full; opt_merge",
+        "n": 310,
+        "mean_reward": 0.5049
+      },
+      {
+        "arm": "opt -full; share",
+        "n": 310,
+        "mean_reward": 0.5037
+      }
+    ],
+    [
+      {
+        "arm": "opt_clean",
+        "n": 52,
+        "mean_reward": 0.0
+      },
+      {
+        "arm": "opt -full; opt_merge; opt_clean",
+        "n": 253,
+        "mean_reward": 0.6065
+      },
+      {
+        "arm": "opt -full; opt_clean",
+        "n": 257,
+        "mean_reward": 0.6073
+      },
+      {
+        "arm": "opt_merge; opt_clean",
+        "n": 60,
+        "mean_reward": 0.0609
+      },
+      {
+        "arm": "opt -fast; opt_clean",
+        "n": 256,
+        "mean_reward": 0.6087
+      },
+      {
+        "arm": "peepopt; opt_clean",
+        "n": 52,
+        "mean_reward": 0.0
+      }
+    ]
+  ]
+}

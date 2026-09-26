@@ -1,7 +1,10 @@
 {
   "designs": [
     { "name": "counter", "file": "rtl/counter.v", "top": "counter" },
-    { "name": "mult8",   "file": "rtl/mult8.v",   "top": "mult8" }
+    { "name": "mult8",   "file": "rtl/mult8.v",   "top": "mult8" },
+    { "name": "adder8",  "file": "rtl/adder8.v",  "top": "adder8" },
+    { "name": "alu4",    "file": "rtl/alu4.v",    "top": "alu4" },
+    { "name": "adder16", "file": "rtl/adder16.v", "top": "adder16" }
   ],
   "map_after_stage": 2,
   "map_step": "techmap; simplemap",

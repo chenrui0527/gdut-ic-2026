@@ -1,0 +1,31 @@
+round,cells,depth,reward,seconds,arms
+1,120,16,0.3443,0.45,opt -full; wreduce | opt -full; share | opt -fast; opt_clean
+2,120,16,0.3443,0.47,opt -fast | opt -full | opt -fast; opt_clean
+3,120,16,0.3443,0.45,opt -full | opt -full; opt_merge | opt -full; opt_clean
+4,120,16,0.3443,0.45,opt -full; wreduce | opt -full; share | opt -full; opt_merge; opt_clean
+5,120,16,0.3443,0.47,opt -fast | opt -full | opt -fast; opt_clean
+6,120,16,0.3443,0.51,opt -full | opt -full; opt_merge | opt -full; opt_merge; opt_clean
+7,120,16,0.3443,0.44,opt -full; wreduce | opt -full; share | opt -full; opt_clean
+8,120,16,0.3443,0.47,opt -fast | opt -full | opt -fast; opt_clean
+9,120,16,0.3443,0.51,opt -full | opt -full; opt_merge | opt -full; opt_merge; opt_clean
+10,120,16,0.3443,0.44,opt -full; wreduce | opt -full; share | opt -full; opt_clean
+11,120,16,0.3443,0.47,opt -fast | opt -full | opt -fast; opt_clean
+12,120,16,0.3443,0.51,opt -full | opt -full; opt_merge | opt -full; opt_merge; opt_clean
+13,120,16,0.3443,0.44,opt -full; wreduce | opt -full; share | opt -full; opt_clean
+14,120,16,0.3443,0.47,opt -fast | opt -full | opt -fast; opt_clean
+15,120,16,0.3443,0.51,opt -full | opt -full; opt_merge | opt -full; opt_merge; opt_clean
+16,120,16,0.3443,0.44,opt -full; wreduce | opt -full; share | opt -full; opt_clean
+17,120,16,0.3443,0.47,opt -fast | opt -full | opt -fast; opt_clean
+18,120,16,0.3443,0.45,opt -full | opt -full; opt_merge | opt -full; opt_clean
+19,120,16,0.3443,0.45,opt -full; wreduce | opt -full; share | opt -full; opt_merge; opt_clean
+20,120,16,0.3443,0.47,opt -fast | opt -full | opt -fast; opt_clean
+21,120,16,0.3443,0.45,opt -full | opt -full; opt_merge | opt -full; opt_clean
+22,120,16,0.3443,0.45,opt -full; wreduce | opt -full; share | opt -full; opt_merge; opt_clean
+23,120,16,0.3443,0.47,opt -fast | opt -full | opt -fast; opt_clean
+24,120,16,0.3443,0.45,opt -full | opt -full; opt_merge | opt -full; opt_clean
+25,120,16,0.3443,0.45,opt -full; wreduce | opt -full; share | opt -full; opt_merge; opt_clean
+26,120,16,0.3443,0.47,opt -fast | opt -full | opt -fast; opt_clean
+27,120,16,0.3443,0.45,opt -full | opt -full; opt_merge | opt -full; opt_clean
+28,120,16,0.3443,0.45,opt -full; wreduce | opt -full; share | opt -full; opt_merge; opt_clean
+29,120,16,0.3443,0.47,opt -fast | opt -full | opt -fast; opt_clean
+30,120,16,0.3443,0.45,opt -full | opt -full; opt_merge | opt -full; opt_clean
