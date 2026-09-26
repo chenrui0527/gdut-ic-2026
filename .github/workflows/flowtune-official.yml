@@ -38,6 +38,13 @@ jobs:
           make -j"$(nproc)" >> build.log 2>&1 || true
           ls -l abc || true
 
+      - name: 把编译出来的 abc 放进 PATH（ftune 内部会调用它）
+        run: |
+          # ftune 内部用 system("abc ...") 调用自己，PATH 里没有 abc 就会失败
+          echo "$GITHUB_WORKSPACE/official-flowtune/src/build" >> "$GITHUB_PATH"
+          echo "$GITHUB_WORKSPACE/official-flowtune/FlowTune-AIG-Optimization" >> "$GITHUB_PATH"
+          chmod +x official-flowtune/src/build/abc || true
+
       - name: 运行官方快速测试（single_design.sh）
         continue-on-error: true
         run: |
@@ -48,6 +55,16 @@ jobs:
           ./single_design.sh adder2 adder2.blif 1 1 0 1 1 > /tmp/ftune_adder2.log 2>&1 || true
           cp /tmp/ftune_adder2.log "$GITHUB_WORKSPACE/ftune_adder2.log"
           cat /tmp/ftune_adder2.log || true
+
+      - name: 跑一次带多轮采样的 FlowTune（更能看出多臂老虎机在学）
+        continue-on-error: true
+        run: |
+          cd official-flowtune/FlowTune-AIG-Optimization
+          export PATH="$GITHUB_WORKSPACE/official-flowtune/src/build:$PATH"
+          ./single_design.sh adder2 adder2.blif 1 5 0 5 1 > "$GITHUB_WORKSPACE/ftune_adder2_long.log" 2>&1 || true
+          cp .temp.result.txt "$GITHUB_WORKSPACE/ftune_adder2_result.txt" 2>/dev/null || true
+          cp adder2.script "$GITHUB_WORKSPACE/ftune_adder2_script.txt" 2>/dev/null || true
+          tail -n 40 "$GITHUB_WORKSPACE/ftune_adder2_long.log" || true
 
       - name: 再跑一个规模更大的基准（验证可重复性）
         continue-on-error: true
@@ -91,6 +108,21 @@ jobs:
             echo "## 3. 官方示例运行输出（single_design.sh adder2 adder2.blif 1 1 0 1 1）"
             echo '```'
             cat ftune_adder2.log 2>/dev/null || echo "(没有输出)"
+            echo '```'
+            echo
+            echo "## 3b. 多轮采样运行（1 5 0 5 1，能看出老虎机的学习过程）"
+            echo '```'
+            cat ftune_adder2_long.log 2>/dev/null || echo "(没有输出)"
+            echo '```'
+            echo
+            echo "## 3c. FlowTune 学到的臂统计（.temp.result.txt）"
+            echo '```'
+            cat ftune_adder2_result.txt 2>/dev/null || echo "(没有该文件)"
+            echo '```'
+            echo
+            echo "## 3d. FlowTune 最终选出的流程（adder2.script）"
+            echo '```'
+            cat ftune_adder2_script.txt 2>/dev/null || echo "(没有该文件)"
             echo '```'
             echo
             echo "## 4. 第二个基准的运行输出"
