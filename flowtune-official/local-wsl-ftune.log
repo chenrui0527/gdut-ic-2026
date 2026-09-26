@@ -1,0 +1,151 @@
++ cd /root/FlowTune/FlowTune-AIG-Optimization
++ export 'PATH=/root/FlowTune/src/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:/mnt/c/Users/12239/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell:/mnt/c/Users/12239/.codex/tmp/arg0/codex-arg0MYPUuc:/mnt/c/Users/12239/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/libheif/libheif/bin:/mnt/c/Users/12239/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/jxrlib/jxrlib/bin:/mnt/c/Users/12239/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/poppler/Library/bin:/mnt/c/Users/12239/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:/mnt/c/Windows/system32:/mnt/c/Windows:/mnt/c/Windows/System32/Wbem:/mnt/c/Windows/System32/WindowsPowerShell/v1.0/:/mnt/c/Windows/System32/OpenSSH/:/mnt/c/Program Files/dotnet/:/mnt/c/Program Files (x86)/NetSarang/Xshell 8/:/mnt/c/Program Files/Git/cmd:/mnt/c/Users/12239/AppData/Local/Programs/Python/Launcher/:/mnt/c/Users/12239/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell:/mnt/c/Users/12239/AppData/Local/Microsoft/WindowsApps:/mnt/c/Users/12239/AppData/Local/Programs/Microsoft VS Code/bin:/mnt/c/Users/12239/nodejs:/mnt/c/Users/12239/git-tools/cmd:/mnt/c/Users/12239/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/mnt/c/Users/12239/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:/mnt/c/Users/12239/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/git/cmd:/mnt/c/Users/12239/AppData/Local/OpenAI/Codex/bin/48e0e7462d1adb63:/mnt/c/Users/12239/AppData/Local/OpenAI/Codex/bin/d23520d1e41bfb24'
++ PATH='/root/FlowTune/src/build:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:/mnt/c/Users/12239/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell:/mnt/c/Users/12239/.codex/tmp/arg0/codex-arg0MYPUuc:/mnt/c/Users/12239/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/libheif/libheif/bin:/mnt/c/Users/12239/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/jxrlib/jxrlib/bin:/mnt/c/Users/12239/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/poppler/Library/bin:/mnt/c/Users/12239/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:/mnt/c/Windows/system32:/mnt/c/Windows:/mnt/c/Windows/System32/Wbem:/mnt/c/Windows/System32/WindowsPowerShell/v1.0/:/mnt/c/Windows/System32/OpenSSH/:/mnt/c/Program Files/dotnet/:/mnt/c/Program Files (x86)/NetSarang/Xshell 8/:/mnt/c/Program Files/Git/cmd:/mnt/c/Users/12239/AppData/Local/Programs/Python/Launcher/:/mnt/c/Users/12239/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell:/mnt/c/Users/12239/AppData/Local/Microsoft/WindowsApps:/mnt/c/Users/12239/AppData/Local/Programs/Microsoft VS Code/bin:/mnt/c/Users/12239/nodejs:/mnt/c/Users/12239/git-tools/cmd:/mnt/c/Users/12239/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/mnt/c/Users/12239/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:/mnt/c/Users/12239/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/git/cmd:/mnt/c/Users/12239/AppData/Local/OpenAI/Codex/bin/48e0e7462d1adb63:/mnt/c/Users/12239/AppData/Local/OpenAI/Codex/bin/d23520d1e41bfb24'
++ cp /root/FlowTune/src/build/abc ./abc
++ echo '=== 版本确认 ==='
+=== 版本确认 ===
++ ./abc -c version
++ head -3
+ABC command line: "version".
+
+Generic file reader requires a known file extension to open "../abc.rc".
++ echo '=== 官方示例 1：1 轮 1 采样 ==='
+=== 官方示例 1：1 轮 1 采样 ===
++ ./single_design.sh adder2 adder2.blif 1 1 0 1 1
+*************  level-0 tuning starts *********** 
+UC Berkeley, ABC 1.01 (compiled Sep 27 2026 00:02:49)
+Generic file reader requires a known file extension to open "../abc.rc".
+abc 01> ftune -d adder2.blif -r 1 -t 0 -p 1 -i 1 -s 1
+rm: cannot remove '.temp.result.txt': No such file or directory
+rm: cannot remove 'adder2.blif.log': No such file or directory
+Your current setups:
+Design = adder2.blif, target = 0, repeats = 1, prefix = 1, forget = 0, iteration = 1, nSample = 1, liberty = (null)
+begin:abc -c "read adder2.blif;strash;
+0,10
+Best Flow(s) (#max=5):
+strash;rewrite;dc2;resub -K 8;refactor;refactor -z;rewrite -z;strash;ifraig;dch -f;strash;print_stats;
+strash;rewrite;rewrite -z;refactor -z;dc2;refactor;resub -K 8;strash;ifraig;dch -f;strash;print_stats;
+strash;rewrite;rewrite -z;refactor -z;dc2;refactor;resub -K 8;strash;ifraig;dch -f;strash;print_stats;
+strash;rewrite;refactor;dc2;rewrite -z;resub -K 8;refactor -z;strash;ifraig;dch -f;strash;print_stats;
+strash;rewrite;resub -K 8;dc2;refactor;refactor -z;rewrite -z;strash;ifraig;dch -f;strash;print_stats;
+abc 01> ***EOF***
+UC Berkeley, ABC 1.01 (compiled Sep 27 2026 00:02:49)
+Generic file reader requires a known file extension to open "../abc.rc".
+abc 01> read adder2.blif; source adder2.script;strash;write internal.aig;ps
+[1;37mADD2                          :[0m i/o =    4/    3  lat =    0  and =     10  lev =  4
+** cmd error: unknown command 'ps'
+(this is likely caused by using an alias defined in "abc.rc"
+without having this file in the current or parent directory)
+abc 10> ***EOF***
+*************  level[1] tuning starts *********** 
+UC Berkeley, ABC 1.01 (compiled Sep 27 2026 00:02:49)
+Generic file reader requires a known file extension to open "../abc.rc".
+abc 01> ftune -d internal.aig -r 1 -t 0 -p 1 -i 1 -s 1
+rm: cannot remove 'internal.aig.log': No such file or directory
+Your current setups:
+Design = internal.aig, target = 0, repeats = 1, prefix = 1, forget = 0, iteration = 1, nSample = 1, liberty = (null)
+begin:abc -c "read internal.aig;strash;
+0,10
+Best Flow(s) (#max=5):
+strash;rewrite;dc2;resub -K 8;refactor;refactor -z;rewrite -z;strash;ifraig;dch -f;strash;print_stats;
+strash;rewrite;rewrite -z;refactor -z;dc2;refactor;resub -K 8;strash;ifraig;dch -f;strash;print_stats;
+strash;rewrite;rewrite -z;refactor -z;dc2;refactor;resub -K 8;strash;ifraig;dch -f;strash;print_stats;
+strash;rewrite;refactor;dc2;rewrite -z;resub -K 8;refactor -z;strash;ifraig;dch -f;strash;print_stats;
+strash;rewrite;resub -K 8;dc2;refactor;refactor -z;rewrite -z;strash;ifraig;dch -f;strash;print_stats;
+abc 01> ***EOF***
+UC Berkeley, ABC 1.01 (compiled Sep 27 2026 00:02:49)
+Generic file reader requires a known file extension to open "../abc.rc".
+abc 01> read internal.aig; source adder2.script;strash;write internal.aig
+[1;37minternal                      :[0m i/o =    4/    3  lat =    0  and =     10  lev =  4
+abc 10> ***EOF***
+********************************************************
+[0;31m Final design produced by FlowTune: adder2.ftune.aig[0m
+********************************************************
++ echo '=== 官方示例 2：5 轮 5 采样（能看出老虎机在学） ==='
+=== 官方示例 2：5 轮 5 采样（能看出老虎机在学） ===
++ ./single_design.sh adder2 adder2.blif 1 5 0 5 1
+*************  level-0 tuning starts *********** 
+UC Berkeley, ABC 1.01 (compiled Sep 27 2026 00:02:49)
+Generic file reader requires a known file extension to open "../abc.rc".
+abc 01> ftune -d adder2.blif -r 1 -t 0 -p 1 -i 5 -s 5
+Your current setups:
+Design = adder2.blif, target = 0, repeats = 1, prefix = 1, forget = 0, iteration = 5, nSample = 5, liberty = (null)
+begin:abc -c "read adder2.blif;strash;
+0,10
+1,10
+2,10
+3,10
+4,10
+Best Flow(s) (#max=5):
+strash;rewrite;dc2;resub -K 8;refactor;refactor -z;rewrite -z;strash;ifraig;dch -f;strash;print_stats;
+strash;rewrite;rewrite -z;refactor -z;dc2;refactor;resub -K 8;strash;ifraig;dch -f;strash;print_stats;
+strash;rewrite;rewrite -z;refactor -z;dc2;refactor;resub -K 8;strash;ifraig;dch -f;strash;print_stats;
+strash;rewrite;refactor;dc2;rewrite -z;resub -K 8;refactor -z;strash;ifraig;dch -f;strash;print_stats;
+strash;rewrite;resub -K 8;dc2;refactor;refactor -z;rewrite -z;strash;ifraig;dch -f;strash;print_stats;
+abc 01> ***EOF***
+UC Berkeley, ABC 1.01 (compiled Sep 27 2026 00:02:49)
+Generic file reader requires a known file extension to open "../abc.rc".
+abc 01> read adder2.blif; source adder2.script;strash;write internal.aig;ps
+[1;37mADD2                          :[0m i/o =    4/    3  lat =    0  and =     10  lev =  4
+** cmd error: unknown command 'ps'
+(this is likely caused by using an alias defined in "abc.rc"
+without having this file in the current or parent directory)
+abc 10> ***EOF***
+*************  level[1] tuning starts *********** 
+UC Berkeley, ABC 1.01 (compiled Sep 27 2026 00:02:49)
+Generic file reader requires a known file extension to open "../abc.rc".
+abc 01> ftune -d internal.aig -r 1 -t 0 -p 1 -i 5 -s 5
+rm: cannot remove 'internal.aig.log': No such file or directory
+Your current setups:
+Design = internal.aig, target = 0, repeats = 1, prefix = 1, forget = 0, iteration = 5, nSample = 5, liberty = (null)
+begin:abc -c "read internal.aig;strash;
+0,10
+1,10
+2,10
+3,10
+4,10
+Best Flow(s) (#max=5):
+strash;rewrite;dc2;resub -K 8;refactor;refactor -z;rewrite -z;strash;ifraig;dch -f;strash;print_stats;
+strash;rewrite;rewrite -z;refactor -z;dc2;refactor;resub -K 8;strash;ifraig;dch -f;strash;print_stats;
+strash;rewrite;rewrite -z;refactor -z;dc2;refactor;resub -K 8;strash;ifraig;dch -f;strash;print_stats;
+strash;rewrite;refactor;dc2;rewrite -z;resub -K 8;refactor -z;strash;ifraig;dch -f;strash;print_stats;
+strash;rewrite;resub -K 8;dc2;refactor;refactor -z;rewrite -z;strash;ifraig;dch -f;strash;print_stats;
+abc 01> ***EOF***
+UC Berkeley, ABC 1.01 (compiled Sep 27 2026 00:02:49)
+Generic file reader requires a known file extension to open "../abc.rc".
+abc 01> read internal.aig; source adder2.script;strash;write internal.aig
+[1;37minternal                      :[0m i/o =    4/    3  lat =    0  and =     10  lev =  4
+abc 10> ***EOF***
+********************************************************
+[0;31m Final design produced by FlowTune: adder2.ftune.aig[0m
+********************************************************
++ echo '=== 产物 ==='
+=== 产物 ===
++ ls -l adder2.ftune.aig
+-rwxr-xr-x 1 root root 225 Sep 27 00:07 adder2.ftune.aig
++ echo '=== 学到的臂统计（.temp.result.txt）==='
+=== 学到的臂统计（.temp.result.txt）===
++ cat .temp.result.txt
++ head -20
+(Warning)Mean : 10; best : 10; size : 36stdev: 0
+0: mean=10; stdev=0; current_epoch_win_rate : 0
+1: mean=10; stdev=0; current_epoch_win_rate : 0
+2: mean=10; stdev=0; current_epoch_win_rate : 0
+3: mean=10; stdev=0; current_epoch_win_rate : 0
+4: mean=10; stdev=0; current_epoch_win_rate : 0
+5: mean=10; stdev=0; current_epoch_win_rate : 0
+
+*********  Info  ************
+******  ARM   --  ACTIONS --  WINRATE  *********
+	 [0] -- [6] : [0.166667]
+	 [1] -- [6] : [0.166667]
+	 [2] -- [6] : [0.166667]
+	 [3] -- [6] : [0.166667]
+	 [4] -- [6] : [0.166667]
+	 [5] -- [6] : [0.166667]
+Mean : 10; best : 10; size : 42stdev: 0
+0: mean=10; stdev=0; current_epoch_win_rate : 0
+1: mean=10; stdev=0; current_epoch_win_rate : 0
+2: mean=10; stdev=0; current_epoch_win_rate : 0
++ echo RUN_DONE
+RUN_DONE
