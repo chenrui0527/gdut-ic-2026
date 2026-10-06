@@ -3,5 +3,5 @@ ABC command line: "read bfly.abc.blif; source chosen_t0.script; strash; print_st
 Hierarchy reader converted 4 instances of blackboxes.
 Hierarchy reader converted 4 instances of blackboxes.
 Warning: The choice nodes in the original AIG are removed by strashing.
-[1;37mbfly                          :[0m i/o =  482/  257  lat = 1748  and =  23711  lev = 87
-[1;37mbfly                          :[0m i/o =  482/  257  lat = 1748  and =  23711  lev = 87
+[1;37mbfly                          :[0m i/o =  482/  257  lat = 1748  and =  23192  lev = 87
+[1;37mbfly                          :[0m i/o =  482/  257  lat = 1748  and =  23192  lev = 87

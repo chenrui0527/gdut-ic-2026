@@ -1,5 +1,2 @@
-read bfly.abc.blif;strash;rewrite;dc2;resub -K 8;refactor;refactor -z;rewrite -z;strash;ifraig;dch -f;strash;print_stats;
-read bfly.abc.blif;strash;rewrite;rewrite -z;refactor -z;dc2;refactor;resub -K 8;strash;ifraig;dch -f;strash;print_stats;
-read bfly.abc.blif;strash;rewrite;rewrite -z;refactor -z;dc2;refactor;resub -K 8;strash;ifraig;dch -f;strash;print_stats;
-read bfly.abc.blif;strash;rewrite;refactor;dc2;rewrite -z;resub -K 8;refactor -z;strash;ifraig;dch -f;strash;print_stats;
-read bfly.abc.blif;strash;rewrite;resub -K 8;dc2;refactor;refactor -z;rewrite -z;strash;ifraig;dch -f;strash;print_stats;
+read bfly.abc.blif;strash;dc2;dc2;refactor;resub -K 8;rewrite -z;refactor -z;strash;ifraig;dch -f;strash;print_stats;
+read bfly.abc.blif;strash;read dontCare;dc2;dc2;refactor;resub -K 8;rewrite -z;refactor -z;strash;ifraig;dch -f;strash;print_stats;
