@@ -1,0 +1,79 @@
+UC Berkeley, ABC 1.01 (compiled Oct  6 2026 15:57:52)
+abc 01> ftune -d bfly.abc.blif -r 1 -t 0 -p 1 -i 5 -s 5
+rm: cannot remove '.temp.result.txt': No such file or directory
+rm: cannot remove 'bfly.abc.blif.log': No such file or directory
+Your current setups:
+Design = bfly.abc.blif, target = 0, repeats = 1, prefix = 1, forget = 0, iteration = 5, nSample = 5, liberty = (null)
+begin:abc -c "read bfly.abc.blif;strash;
+sh: 1: abc: not found
+sh: 1: sh: 1: sh: 1: abc: not foundabc: not foundabc: not found
+
+
+sh: 1: abc: not found
+sh: 1: abc: not found
+sh: 1: abc: not found
+sh: 1: abc: not found
+sh: 1: abc: not found
+sh: 1: abc: not found
+sh: 1: abc: not found
+sh: 1: abc: not found
+sh: 1: abc: not found
+sh: 1: abc: not found
+sh: 1: abc: not found
+sh: 1: abc: not found
+sh: 1: abc: not found
+sh: 1: sh: 1: abc: not foundabc: not found
+
+sh: 1: abc: not found
+sh: 1: abc: not found
+sh: 1: abc: not found
+sh: 1: abc: not found
+sh: 1: abc: not found
+sh: 1: abc: not found
+sh: 1: abc: not found
+sh: 1: sh: 1: abc: not foundabc: not found
+
+sh: 1: abc: not found
+sh: 1: abc: not found
+sh: 1: abc: not found
+sh: 1: abc: not found
+sh: 1: abc: not found
+sh: 1: abc: not found
+sh: 1: abc: not found
+sh: 1: abc: not found
+0,1e+09
+sh: 1: abc: not found
+sh: 1: abc: not found
+sh: 1: sh: 1: abc: not foundabc: not found
+
+sh: 1: abc: not found
+sh: 1: abc: not found
+1,1e+09
+sh: 1: sh: 1: abc: not foundabc: not found
+
+sh: 1: sh: 1: abc: not foundabc: not found
+
+sh: 1: abc: not foundsh: 1: 
+abc: not found
+2,1e+09
+sh: 1: sh: 1: sh: 1: abc: not foundabc: not foundabc: not found
+
+
+sh: 1: abc: not found
+sh: 1: abc: not found
+sh: 1: abc: not found
+3,1e+09
+sh: 1: sh: 1: abc: not foundabc: not found
+
+sh: 1: sh: 1: abc: not foundabc: not found
+
+sh: 1: abc: not found
+sh: 1: abc: not found
+4,1e+09
+Best Flow(s) (#max=5):
+strash;rewrite;dc2;resub -K 8;refactor;refactor -z;rewrite -z;strash;ifraig;dch -f;strash;print_stats;
+strash;rewrite;rewrite -z;refactor -z;dc2;refactor;resub -K 8;strash;ifraig;dch -f;strash;print_stats;
+strash;rewrite;rewrite -z;refactor -z;dc2;refactor;resub -K 8;strash;ifraig;dch -f;strash;print_stats;
+strash;rewrite;refactor;dc2;rewrite -z;resub -K 8;refactor -z;strash;ifraig;dch -f;strash;print_stats;
+strash;rewrite;resub -K 8;dc2;refactor;refactor -z;rewrite -z;strash;ifraig;dch -f;strash;print_stats;
+abc 01> ***EOF***

@@ -1,0 +1,4 @@
+ABC command line: "read bfly.abc.blif; resyn; strash; print_stats; write baseline_resyn.aig".
+
+Hierarchy reader converted 4 instances of blackboxes.
+[1;37mbfly                          :[0m i/o =  482/  257  lat = 1748  and =  26177  lev = 68
