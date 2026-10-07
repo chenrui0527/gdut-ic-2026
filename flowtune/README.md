@@ -136,8 +136,8 @@ flowtune/
 
 - **官方仓库**：<https://github.com/Yu-Maryland/FlowTune>（FlowTune 的实现就是 ABC 的一个分支，编译出一个带 `ftune` 命令的 `abc`）
 - **为什么在云端跑**：本机是 Windows，没有 Linux 编译器（也没装 WSL），而作者的 `install.sh` 要求 Ubuntu + g++ + cmake + readline。
-  所以我写了工作流 [.github/workflows/flowtune-official.yml](../../.github/workflows/flowtune-official.yml)，在 GitHub Actions 的 `ubuntu-latest` 上自动完成：装依赖 → `cmake && make` 编译 ABC → 运行作者的 `single_design.sh`。
-- **完整日志**（自动提交回仓库）：[flowtune-official/official-run-report.md](../../flowtune-official/official-run-report.md)
+  所以我写了工作流 [.github/workflows/flowtune-official.yml](../.github/workflows/flowtune-official.yml)，在 GitHub Actions 的 `ubuntu-latest` 上自动完成：装依赖 → `cmake && make` 编译 ABC → 运行作者的 `single_design.sh`。
+- **完整日志**（自动提交回仓库）：[flowtune-official/official-run-report.md](../flowtune-official/official-run-report.md)
 
 **跑出来的结果**（作者代码的真实输出）：
 
@@ -147,7 +147,7 @@ flowtune/
 | `ftune` 命令 | 正常运行，打印出多臂老虎机的探索过程与最终选择 |
 | 臂统计（`ARM -- ACTIONS -- WINRATE`） | 例如 adder2：6 个臂 × 6 个动作，胜率均 1/6（因为该设计所有流程结果相同） |
 | `adder2` 基准 | AIG 节点 10 → 10、级数 4 → 4（这个设计已经是极简，没有优化空间） |
-| `bfly` 基准 | AIG 节点 **23192 → 22270**（−4.0%），级数 87 → 87 |
+| `bfly` 基准 | **原来写的 `23192 → 22270` 有误，已在下方的"修正说明"里改正** |
 | 产物 | 生成 `adder2.ftune.aig`（FlowTune 优化后的 AIG） |
 
 **FlowTune 在这两个基准上选出的最佳流程**（作者代码打印）：
@@ -161,3 +161,45 @@ strash;rewrite;dc2;resub -K 8;refactor;refactor -z;rewrite -z;strash;ifraig;dch 
 - 这是**跑通了作者代码**（代码级复现）；第六节那张"5 设计 × 10 种子"的表才是**方法级**实验（我自己实现的老虎机 + Yosys 环境）。
 - 官方仓库的默认示例参数很小（`-i 5 -s 5`），我按它的用法原样跑，没有改参数，所以提升幅度有限；论文里报的大数字是在更大规模的基准和更多迭代下得到的。
 - 编译过程中遇到的坑也记录在报告里：新版本 gcc 需要 `-fcommon -w` 兜住老代码的多重定义；`ftune` 内部会调用 `abc`，必须把编译产物加进 `PATH`，否则内部评估全部失败（第一次运行就是这个错，第二次修好后正常）。
+
+### 修正说明（2026-10-07）
+
+上面这张表里 `bfly` 那一行原来写的是"23192 → 22270（−4.0%）"。**这个说法是错的。**
+
+去翻原始报告 [flowtune-official/official-run-report.md](../flowtune-official/official-run-report.md) 的第 388–405 行就能看到：23192 是 `ftune` 搜索过程中打印出来的评分，22270 是应用它选出的流程之后的结果。**两个数都是 ftune 的输出，根本不是"优化前 → 优化后"。** 拿 ftune 跟 ftune 比，等于基准用错了。
+
+错在哪：我当时直接把日志里第一次出现的数字当成了原始值，没有单独去量"这个设计本来有多大"。
+
+重新做的实验（第十节）里，我先单独量了原始设计，得到 **28910 个 AIG 节点、97 层**——与论文表 III 里 bfly 那一行（Nodes 28910、Level 97）完全一致。所以 **28910 才是正确的基准**。
+
+---
+
+## 十、按老师要求的复现：网表 + 逻辑门数量 + 网表深度
+
+老师的批注要求是三条：**① 得到逻辑综合的网表；② 比较逻辑门的数量和网表的深度；③ 先不用跑布线。**
+
+对应的实验在 `flowtune-reproduction/` 目录，由工作流 [.github/workflows/flowtune-reproduction.yml](../.github/workflows/flowtune-reproduction.yml) 在云端 Ubuntu 上完整跑出，**原始日志、网表文件、汇总表全部自动提交回仓库**，可以逐步复查。
+
+**结果**（每个数字都取自 `flowtune-reproduction/raw/` 里的原始日志，来自 ABC 自己打印的 `print_stats`）：
+
+| 做法 | 逻辑门数量 (and) | 网表深度 (lev) | 相对原始设计 |
+|---|---|---|---|
+| 原始设计（未做任何优化） | 28910 | 97 | — |
+| 基线一：ABC 默认 `resyn` | 26177 | 68 | 门数 −9.5%，深度 −29.9% |
+| 基线二：`resyn` 连续 25 次 | 24276 | 68 | 门数 −16.0%，深度 −29.9% |
+| **FlowTune `t=0`（优化门数）** | **23192** | 87 | 门数 **−19.8%**，深度 −10.3% |
+| **FlowTune `t=1`（优化深度）** | 23708 | 86 | 门数 −18.0%，深度 −11.3% |
+
+**结论（好的和坏的都写）**
+
+- **门数上 FlowTune 赢**：`t=0` 拿到 23192 个节点，比 `resyn×25` 的 24276 **再少 4.5%**，比原始设计少 19.8%，方向和论文一致。
+- **深度上 FlowTune 输**：`resyn` 把深度从 97 降到 68，而 FlowTune 只降到 87 / 86。原因很具体——它两次选出的流程里**都没有 `balance` 这个命令**，而 `balance` 正是用来摊平电路、降低深度的；FlowTune 只能在它候选的命令集合里挑，候选里没有它。这不是它算错了，是命令集合决定的。
+- **搜索配置偏小**：本次用 `-r 1 -i 5 -s 5`（共 25 次评估）。日志显示五轮迭代的评分始终是同一个数，说明第一轮就找到了最好值、后面四轮没有继续改进。论文用的是大得多的预算，所以提升幅度小于论文属于预期，不是复现失败。
+
+**原始证据（老师问"你怎么知道数是对的"就打开这些）**
+
+- 自检结论与汇总表：[flowtune-reproduction/SELFCHECK.md](../flowtune-reproduction/SELFCHECK.md)、[flowtune-reproduction/RESULTS.md](../flowtune-reproduction/RESULTS.md)
+- 逐份原始日志：[flowtune-reproduction/raw/](../flowtune-reproduction/raw/)（`00_original` 原始设计、两组基线、两组 FlowTune 的搜索与应用日志）
+- 综合出来的网表：[flowtune-reproduction/netlists/](../flowtune-reproduction/netlists/)（4 个 `.aig` 文件）
+
+**踩坑记录（第二次，也是我自己犯的错）**：第一版工作流里我只把 `abc` 放进了当前目录、用 `./abc` 调用，但 `ftune` 内部是用 `system("abc ...")` 按 PATH 去找它的，结果每次评估都输出 `sh: 1: abc: not found`、评分全部变成哨兵值 `1e+09`，搜索等于没做。**我一开始没发现，是去翻原始日志才看到的。** 现在工作流里加了硬性自检：日志里只要出现 `abc: not found` 或 `1e+09` 就直接判定失败，并把结论写进 `SELFCHECK.md`——不允许把无效结果当成结果交出去。

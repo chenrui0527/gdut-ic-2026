@@ -155,13 +155,16 @@ AI 每一步做两件事：先用广搜（BFS）算出到食物的最短路的**
 
 ## 五、进阶挑战：复现 FlowTune 论文（多臂老虎机做逻辑综合流程搜索）
 
-进度挑战选的是“读懂论文 + 跑通前端后端”这一类。论文：**FlowTune: End-to-End Automatic Logic Optimization Exploration via Domain-Specific Multiarmed Bandit**（IEEE TCAD，作者 Cunxi Yu），<https://ieeexplore.ieee.org/abstract/document/9916059>。
+进阶挑战选的是“读懂论文 + 跑通前端后端”这一类。论文：**FlowTune: End-to-End Automatic Logic Optimization Exploration via Domain-Specific Multiarmed Bandit**（IEEE TCAD，作者 Cunxi Yu），<https://ieeexplore.ieee.org/abstract/document/9916059>。
 
 - **前端（设计输入与功能验证）**：写 RTL（4 位计数器、8×8 乘法器），用 Yosys 读入并展开，再用**形式化等价性检查**证明综合出来的门级网表与原始 RTL 功能一致，跑完输出 `Equivalence successfully proven!`。
 - **后端（逻辑综合与优化）**：把 RTL 综合成门级网表，统计门数与关键路径深度。
 - **论文核心（多臂老虎机 + 领域知识）**：把流程优化建模成**多阶段多臂老虎机**，用 UCB1 在 3 个阶段的候选配方里选择（共 54 种组合），把真实综合出来的门数当奖励反馈；并实现**跨设计经验迁移**（论文 domain-specific 思想的代理实现），把前一个设计学到的经验带到下一个设计。
 - **实测结果**（5 个设计、每个配置 10 个随机种子）：8×8 乘法器门数 769 → **367**（−52%），16 位加法器 198 → 113，4 位 ALU 183 → 120，4 位计数器 39 → 10；找到最优所需评估次数，冷启动中位数 **2 次**、弱迁移降到 **1 次**（穷举要 54 次），并且发现**强迁移会负迁移**（乘法器反而变 4 次）——说明迁移强度本身需要领域知识来决策。
-- **官方代码级复现**：找到并编译了作者的官方仓库（[Yu-Maryland/FlowTune](https://github.com/Yu-Maryland/FlowTune)，FlowTune 是 ABC 的一个分支），在 GitHub Actions 的 Ubuntu 环境里跑通它的 `ftune` 命令与官方示例脚本；`bfly` 基准的 AIG 节点数 **23192 → 22270**，日志自动提交在 [flowtune-official/official-run-report.md](flowtune-official/official-run-report.md)（因为我本机是 Windows、没有 Linux 编译器，所以借助云端 Ubuntu 完成）。
+- **官方代码级复现（按老师批注要求：得到逻辑综合的网表、比较逻辑门数量和网表深度、先不跑布线）**：编译了作者的官方仓库（[Yu-Maryland/FlowTune](https://github.com/Yu-Maryland/FlowTune)，FlowTune 是 ABC 的一个分支），在云端 Ubuntu 上完整跑出结果，**原始日志、网表和汇总表全部自动提交回仓库**，见 [flowtune-reproduction/RESULTS.md](flowtune-reproduction/RESULTS.md)。
+  以 `bfly` 为例（数字都取自原始日志里 ABC 打印的 `print_stats`）：原始设计 **28910 节点 / 97 层**（与论文表 III 一致），ABC 默认 `resyn` 得到 26177 / 68，`resyn` 连跑 25 次得到 24276 / 68，**FlowTune 优化门数得到 23192 / 87，优化深度得到 23708 / 86**。
+  结论是**一半赢一半输**：门数上 FlowTune 比 `resyn×25` 再少 **4.5%**（比原始设计少 19.8%），方向与论文一致；但深度上不如 `resyn`——原因是它选出的流程里没有 `balance` 命令，而 `balance` 正是降深度的关键。这些数字和局限都写在 [flowtune/README.md](flowtune/README.md) 第十节。
+  另外，早先 [flowtune-official/official-run-report.md](flowtune-official/official-run-report.md) 里写的“`bfly` AIG 节点 23192 → 22270”**说法有误**：这两个数其实都是 `ftune` 的输出，不是优化前后的对比，已在 [flowtune/README.md](flowtune/README.md) 的“修正说明”里改正。
 - **本机也跑通了**：后来我在自己电脑上装了 WSL2 + Ubuntu 26.04（gcc 15.2、cmake 4.2），把作者代码在本机编译（`abc` 24.8 MB）并跑通官方示例，记录在 [flowtune-official/local-wsl-run.md](flowtune-official/local-wsl-run.md)。
 
 代码、运行方式和更详细的说明见 [flowtune/README.md](flowtune/README.md)（`flowtune/` 目录）。
