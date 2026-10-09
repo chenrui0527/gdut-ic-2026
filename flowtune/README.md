@@ -1,7 +1,8 @@
 # FlowTune 论文复现：用多臂老虎机做逻辑综合流程搜索
 
-这一部分是第五题（进阶挑战）。下面写的是我实际做过的事，包括跑失败、返工的过程，
-以及最后在云端 Ubuntu 上把作者官方代码编译并跑通的结果。
+这一部分是第五题（进阶挑战）。**先说清楚：这一节里的代码全都是 AI 写的，我不会自己写代码。**
+我负责的是提需求、测试能不能用、把问题反馈回去、要求 AI 解释清楚、核对它说的是不是真的，以及把结果提交到 GitHub。
+下面记的是整个过程，包括跑失败和返工的地方。
 
 这个子项目对应招新考核书第五部分"进阶挑战"里的第 2 类任务（读懂论文 + 跑通前端后端），
 论文是 IEEE Xplore 上的 **FlowTune: End-to-End Automatic Logic Optimization Exploration via Domain-Specific Multiarmed Bandit**（IEEE TCAD，作者 Cunxi Yu）：
@@ -120,23 +121,23 @@ flowtune/
 └── results/                 实验输出（每种配置的 CSV + summary.json）
 ```
 
-## 八、我自己实现的那套，还差什么
+## 八、AI 写的这套，还差什么
 
-- 论文里说的"代码公开"是成立的：作者仓库是 <https://github.com/Yu-Maryland/FlowTune>，**我已经把它编译并跑通**（见第九节，在 GitHub Actions 的 Ubuntu 上完成）。
-- 我自己实现的那套（第五～七节）跑在 Yosys（WebAssembly 版）上，它不带 iverilog/verilator，也没有 ABC 外部二进制，因此：
+- 论文里说的"代码公开"是成立的：作者仓库是 <https://github.com/Yu-Maryland/FlowTune>，**AI 已经把它编译并跑通**（见第九节，在 GitHub Actions 的 Ubuntu 上完成）。
+- AI 写的这套（第五～七节）跑在 Yosys（WebAssembly 版）上，它不带 iverilog/verilator，也没有 ABC 外部二进制，因此：
   - 技术映射用的是 Yosys 自带的 `techmap` + `simplemap`，不是论文里的 ABC 配方；
   - 前端用形式化等价性检查代替波形仿真。
-- 我自己实现的奖励只用了"门数"（面积）这一个指标；论文还考虑延时，以及多个设计之间的泛化。
-- 第五节的跨设计迁移是我对论文 "domain-specific" 思想的一个**可运行代理实现**（用已优化设计的臂统计做先验），
+- 这套实现里的奖励只用了"门数"（面积）这一个指标；论文还考虑延时，以及多个设计之间的泛化。
+- 第五节的跨设计迁移是 AI 对论文 "domain-specific" 思想的一个**可运行代理实现**（用已优化设计的臂统计做先验），
   并不是论文里完整的领域知识建模：论文还会结合设计特征做 context、并覆盖不同的电路表示与后端工具。
 
 ## 九、官方代码复现（跑通作者仓库，GitHub Actions 自动执行）
 
-前面第五节到第七节是我自己实现的多阶段老虎机；这一节是**把作者的官方代码真正编译并运行起来**（代码级复现）。
+前面第五节到第七节是 AI 写的那套多阶段老虎机；这一节是**把作者的官方代码真正编译并运行起来**（代码级复现）。
 
 - **官方仓库**：<https://github.com/Yu-Maryland/FlowTune>（FlowTune 的实现就是 ABC 的一个分支，编译出一个带 `ftune` 命令的 `abc`）
 - **为什么在云端跑**：本机是 Windows，没有 Linux 编译器（也没装 WSL），而作者的 `install.sh` 要求 Ubuntu + g++ + cmake + readline。
-  所以我写了工作流 [.github/workflows/flowtune-official.yml](../.github/workflows/flowtune-official.yml)，在 GitHub Actions 的 `ubuntu-latest` 上自动完成：装依赖 → `cmake && make` 编译 ABC → 运行作者的 `single_design.sh`。
+  所以 AI 写了工作流 [.github/workflows/flowtune-official.yml](../.github/workflows/flowtune-official.yml)，在 GitHub Actions 的 `ubuntu-latest` 上自动完成：装依赖 → `cmake && make` 编译 ABC → 运行作者的 `single_design.sh`。
 - **完整日志**（自动提交回仓库）：[flowtune-official/official-run-report.md](../flowtune-official/official-run-report.md)
 
 **跑出来的结果**（作者代码的真实输出）：
@@ -158,8 +159,8 @@ strash;rewrite;dc2;resub -K 8;refactor;refactor -z;rewrite -z;strash;ifraig;dch 
 
 **说明与边界**：
 
-- 这是**跑通了作者代码**（代码级复现）；第六节那张"5 设计 × 10 种子"的表才是**方法级**实验（我自己实现的老虎机 + Yosys 环境）。
-- 官方仓库的默认示例参数很小（`-i 5 -s 5`），我按它的用法原样跑，没有改参数，所以提升幅度有限；论文里报的大数字是在更大规模的基准和更多迭代下得到的。
+- 这是**跑通了作者代码**（代码级复现）；第六节那张"5 设计 × 10 种子"的表才是**方法级**实验（AI 写的老虎机 + Yosys 环境）。
+- 官方仓库的默认示例参数很小（`-i 5 -s 5`），AI 按它的用法原样跑，没有改参数，所以提升幅度有限；论文里报的大数字是在更大规模的基准和更多迭代下得到的。
 - 编译过程中遇到的坑也记录在报告里：新版本 gcc 需要 `-fcommon -w` 兜住老代码的多重定义；`ftune` 内部会调用 `abc`，必须把编译产物加进 `PATH`，否则内部评估全部失败（第一次运行就是这个错，第二次修好后正常）。
 
 ### 修正说明（2026-10-07）
@@ -168,9 +169,9 @@ strash;rewrite;dc2;resub -K 8;refactor;refactor -z;rewrite -z;strash;ifraig;dch 
 
 去翻原始报告 [flowtune-official/official-run-report.md](../flowtune-official/official-run-report.md) 的第 388–405 行就能看到：23192 是 `ftune` 搜索过程中打印出来的评分，22270 是应用它选出的流程之后的结果。**两个数都是 ftune 的输出，根本不是"优化前 → 优化后"。** 拿 ftune 跟 ftune 比，等于基准用错了。
 
-错在哪：我当时直接把日志里第一次出现的数字当成了原始值，没有单独去量"这个设计本来有多大"。
+错在哪：**AI 当时直接把日志里第一次出现的数字当成了原始值**，没有单独去量"这个设计本来有多大"。
 
-重新做的实验（第十节）里，我先单独量了原始设计，得到 **28910 个 AIG 节点、97 层**——与论文表 III 里 bfly 那一行（Nodes 28910、Level 97）完全一致。所以 **28910 才是正确的基准**。
+重新做的实验（第十节）里，AI 先单独量了原始设计，得到 **28910 个 AIG 节点、97 层**——与论文表 III 里 bfly 那一行（Nodes 28910、Level 97）完全一致。所以 **28910 才是正确的基准**。
 
 ---
 
@@ -202,4 +203,4 @@ strash;rewrite;dc2;resub -K 8;refactor;refactor -z;rewrite -z;strash;ifraig;dch 
 - 逐份原始日志：[flowtune-reproduction/raw/](../flowtune-reproduction/raw/)（`00_original` 原始设计、两组基线、两组 FlowTune 的搜索与应用日志）
 - 综合出来的网表：[flowtune-reproduction/netlists/](../flowtune-reproduction/netlists/)（4 个 `.aig` 文件）
 
-**踩坑记录（第二次，也是我自己犯的错）**：第一版工作流里我只把 `abc` 放进了当前目录、用 `./abc` 调用，但 `ftune` 内部是用 `system("abc ...")` 按 PATH 去找它的，结果每次评估都输出 `sh: 1: abc: not found`、评分全部变成哨兵值 `1e+09`，搜索等于没做。**我一开始没发现，是去翻原始日志才看到的。** 现在工作流里加了硬性自检：日志里只要出现 `abc: not found` 或 `1e+09` 就直接判定失败，并把结论写进 `SELFCHECK.md`——不允许把无效结果当成结果交出去。
+**踩坑记录（第二次，是 AI 犯的错）**：第一版工作流里只把 `abc` 放进了当前目录、用 `./abc` 调用，但 `ftune` 内部是用 `system("abc ...")` 按 PATH 去找它的，结果每次评估都输出 `sh: 1: abc: not found`、评分全部变成哨兵值 `1e+09`，搜索等于没做。**AI 一开始没发现，是后来去翻原始日志才看到的。** 现在工作流里加了硬性自检：日志里只要出现 `abc: not found` 或 `1e+09` 就直接判定失败，并把结论写进 `SELFCHECK.md`——不允许把无效结果当成结果交出去。
