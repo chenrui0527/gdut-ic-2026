@@ -136,7 +136,8 @@ flowtune/
 前面第五节到第七节是 AI 写的那套多阶段老虎机；这一节是**把作者的官方代码真正编译并运行起来**（代码级复现）。
 
 - **官方仓库**：<https://github.com/Yu-Maryland/FlowTune>（FlowTune 的实现就是 ABC 的一个分支，编译出一个带 `ftune` 命令的 `abc`）
-- **为什么在云端跑**：本机是 Windows，没有 Linux 编译器（也没装 WSL），而作者的 `install.sh` 要求 Ubuntu + g++ + cmake + readline。
+- **为什么一开始在云端跑**：**写这段的时候**本机是 Windows，没有 Linux 编译器，也还没装 WSL，而作者的 `install.sh` 要求 Ubuntu + g++ + cmake + readline。
+  **后来 AI 在本机装了 WSL2，作者代码也在本机编译并跑通了**，记录见 [flowtune-official/local-wsl-run.md](../flowtune-official/local-wsl-run.md)。
   所以 AI 写了工作流 [.github/workflows/flowtune-official.yml](../.github/workflows/flowtune-official.yml)，在 GitHub Actions 的 `ubuntu-latest` 上自动完成：装依赖 → `cmake && make` 编译 ABC → 运行作者的 `single_design.sh`。
 - **完整日志**（自动提交回仓库）：[flowtune-official/official-run-report.md](../flowtune-official/official-run-report.md)
 
