@@ -28,11 +28,12 @@ def find_yosys() -> str:
     local = Path(sys.executable).parent / "Scripts" / "yowasp-yosys.exe"
     if local.exists():
         return str(local)
-    # 3) 兜底：在 Codex 运行时目录里搜一遍（版本更新后路径会变，所以用通配符找）
+    # 3) 兜底：在当前用户目录里搜一遍（版本更新后具体路径会变，所以用通配符找，
+    #    不写死某个机器的用户名，换台电脑也能用）
+    home = Path.home()
     for pattern in (
-        r"C:\Users\12239\.cache\codex-runtimes\*\*\python\Scripts\yowasp-yosys.exe",
-        r"C:\Users\12239\.cache\codex-runtimes\*\*\*\python\Scripts\yowasp-yosys.exe",
-        r"C:\Users\12239\AppData\Local\Programs\Python\**\Scripts\yowasp-yosys.exe",
+        str(home / ".cache" / "codex-runtimes" / "**" / "python" / "Scripts" / "yowasp-yosys.exe"),
+        str(home / "AppData" / "Local" / "Programs" / "Python" / "**" / "Scripts" / "yowasp-yosys.exe"),
     ):
         hits = sorted(glob.glob(pattern, recursive=True))
         if hits:

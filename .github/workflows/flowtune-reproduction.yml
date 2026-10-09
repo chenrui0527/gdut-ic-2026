@@ -1,6 +1,6 @@
 name: FlowTune 论文复现（网表 + 逻辑门数量 + 网表深度）
 
-# 按高鹏老师批注要求：
+# 按任务要求（老师批注）：
 #   1) 得到逻辑综合的网表
 #   2) 比较逻辑门的数量和网表的深度 (depth)
 #   3) 先不用跑布线
@@ -222,7 +222,7 @@ jobs:
           size_of () { [ -f "$1" ] && stat -c%s "$1" || echo "-"; }
 
           {
-            echo "# FlowTune 论文复现结果（按高鹏老师要求）"
+            echo "# FlowTune 论文复现结果（按任务要求）"
             echo
             echo "- 运行时间（UTC）：$(date -u '+%Y-%m-%d %H:%M:%S')"
             echo "- 运行环境：GitHub Actions ubuntu-latest，gcc $(gcc -dumpversion)"

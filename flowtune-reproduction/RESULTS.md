@@ -1,4 +1,4 @@
-# FlowTune 论文复现结果（按高鹏老师要求）
+# FlowTune 论文复现结果（按任务要求）
 
 - 运行时间（UTC）：2026-10-06 17:00:54
 - 运行环境：GitHub Actions ubuntu-latest，gcc 13
