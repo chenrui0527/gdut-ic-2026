@@ -1,17 +1,16 @@
-name: FlowTune 论文复现（网表 + 逻辑门数量 + 网表深度）
+name: FlowTune 论文复现（六个基准 × 两个目标）
 
 # 按任务要求（老师批注）：
 #   1) 得到逻辑综合的网表
 #   2) 比较逻辑门的数量和网表的深度 (depth)
 #   3) 先不用跑布线
 #
-# 关于"对齐论文"的说明（这里写一份，报告里也原样写一遍）：
-#   - 论文的五组配置 (s,m) = 2_30 / 3_20 / 4_15 / 5_12 / 6_10，总探索次数都是 60。
-#     本次把 -i × -s 对齐到 60：-i 12、-s 5。
-#   - 两个优化目标（t=0 最小化门数、t=1 最小化深度）拆成两个并行任务，
-#     各自独立跑满 60 次，这样总时长能压在 40 分钟内。
-#   - 仍然存在的差别（不隐瞒）：本次是单阶段（搜一次、应用一次），论文是多阶段（s 段）；
-#     论文正文没有给出 nSample 取值，这里沿用作者脚本里的 5。
+# 与论文的对齐情况（这里写一份，报告里也原样写一遍）：
+#   对齐：六个基准设计（论文表 III 全部）、两个优化目标、用作者自己的 single_design.sh、
+#         多阶段结构、iteration=6（与论文 6_10 那组一致）、单次运行的总评估 60 次。
+#   缩小：stage 取 1（论文 6_10 那组是 10）。作者的原配置一个设计一个目标约 330 次评估、
+#         要两个多小时；六个设计 × 两个目标就是十几个小时，无法在一次运行内完成，故缩小。
+#   未给出：论文正文没有给出 nSample 取值，这里沿用作者脚本里的 sample=5。
 
 on:
   push:
@@ -23,20 +22,21 @@ permissions:
   contents: write
 
 env:
-  DESIGN: bfly.abc.blif
   REPEAT: "1"
-  ITER: "12"
+  ITER: "6"
   SAMPLE: "5"
+  STAGE: "1"
 
 jobs:
-  # ── 两个优化目标并行跑：t=0 优化门数，t=1 优化深度 ──────────────────────
+  # ── 6 个设计 × 2 个目标 = 12 个任务并行跑 ──────────────────────────────
   search:
     strategy:
       fail-fast: false
       matrix:
+        design: ["bfly", "dscg", "fir", "ode", "or1200", "syn2"]
         target: [0, 1]
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 50
 
     steps:
       - name: 拉取本仓库
@@ -59,7 +59,7 @@ jobs:
           make -j"$(nproc)" >> build.log 2>&1
           ls -l abc
 
-      - name: 修复 abc 与 abc.rc 两个软链接（Windows 签出会变成普通文本文件）
+      - name: 修复 abc / abc.rc 软链接（Windows 签出会变成普通文本文件）
         run: |
           set -x
           cd official-flowtune/FlowTune-AIG-Optimization
@@ -67,69 +67,47 @@ jobs:
           cp ../src/build/abc ./abc
           cp ../abc.rc ./abc.rc
           chmod +x ./abc
-          echo "abc  大小: $(stat -c%s abc) 字节"
-          echo "abc.rc 大小: $(stat -c%s abc.rc) 字节"
+          echo "abc 大小: $(stat -c%s abc) 字节；abc.rc 大小: $(stat -c%s abc.rc) 字节"
+          ./abc -c "read ../Benchmarks/BLIF/${{ matrix.design }}.abc.blif; ps" | tail -3
 
       - name: 把 abc 加进 PATH（ftune 内部靠 PATH 调用它）
         run: |
           echo "$GITHUB_WORKSPACE/official-flowtune/FlowTune-AIG-Optimization" >> "$GITHUB_PATH"
           echo "$GITHUB_WORKSPACE/official-flowtune/src/build" >> "$GITHUB_PATH"
 
-      - name: 验证 abc 已在 PATH 中可用
-        run: |
-          cd official-flowtune/FlowTune-AIG-Optimization
-          which abc
-          abc -c "version" | head -2
-
-      - name: 准备设计与结果目录
+      - name: 用作者的脚本跑这一组
         run: |
           set -e
           cd official-flowtune/FlowTune-AIG-Optimization
-          cp ../Benchmarks/BLIF/${DESIGN} .
-          mkdir -p "$GITHUB_WORKSPACE/out-${{ matrix.target }}"
-          echo "OUT=$GITHUB_WORKSPACE/out-${{ matrix.target }}" >> "$GITHUB_ENV"
-
-      - name: FlowTune 搜索（目标 t=${{ matrix.target }}）
-        run: |
-          set -e
-          cd official-flowtune/FlowTune-AIG-Optimization
-          rm -f "${DESIGN}.script"
+          cp ../Benchmarks/BLIF/${{ matrix.design }}.abc.blif .
+          OUT="$GITHUB_WORKSPACE/out-${{ matrix.design }}-t${{ matrix.target }}"
+          mkdir -p "$OUT"
           START=$(date +%s)
-          echo "ftune -d ${DESIGN} -r ${REPEAT} -t ${{ matrix.target }} -p 1 -i ${ITER} -s ${SAMPLE}" | ./abc \
+          ./single_design.sh ${{ matrix.design }} ${{ matrix.design }}.abc.blif \
+            ${REPEAT} ${ITER} ${{ matrix.target }} ${SAMPLE} ${STAGE} \
             > "$OUT/search.log" 2>&1 || true
           echo "搜索用时: $(( $(date +%s) - START )) 秒"
           if grep -q 'abc: not found' "$OUT/search.log"; then
-            echo "::error::内部调用 abc 失败，搜索无效（abc: not found）"; exit 1
+            echo "::error::内部调用 abc 失败，搜索无效"; exit 1
           fi
           if grep -q '1e+09' "$OUT/search.log"; then
             echo "::error::评估结果全是 1e+09 哨兵值，搜索无效"; exit 1
           fi
           if grep -q "unknown command 'ps'" "$OUT/search.log"; then
-            echo "::error::abc.rc 未加载（unknown command 'ps'）"; exit 1
+            echo "::error::abc.rc 未加载"; exit 1
           fi
-          cp "${DESIGN}.script" "$OUT/best_flows.txt"
-          head -1 "${DESIGN}.script" > chosen.script
-          echo "--- 选中的流程 ---"; cat chosen.script
-
-      - name: 应用选中的流程并统计（得到网表）
-        run: |
-          set -e
-          cd official-flowtune/FlowTune-AIG-Optimization
-          APPLY_START=$(date +%s)
-          ./abc -c "read ${DESIGN}; source chosen.script; strash; print_stats; write flowtune_t${{ matrix.target }}.aig" \
-            > "$OUT/apply.log" 2>&1
-          echo "应用用时: $(( $(date +%s) - APPLY_START )) 秒"
-          cat "$OUT/apply.log"
-          cp "flowtune_t${{ matrix.target }}.aig" "$OUT/"
-          cp chosen.script "$OUT/"
+          ./abc -c "read ${{ matrix.design }}.ftune.aig; print_stats" > "$OUT/final.log" 2>&1
+          cat "$OUT/final.log"
+          cp "${{ matrix.design }}.ftune.aig" "$OUT/" 2>/dev/null || true
+          echo "OUT=$OUT" >> "$GITHUB_ENV"
 
       - name: 上传这一组的结果
         uses: actions/upload-artifact@v4
         with:
-          name: result-t${{ matrix.target }}
-          path: out-${{ matrix.target }}
+          name: r-${{ matrix.design }}-t${{ matrix.target }}
+          path: out-${{ matrix.design }}-t${{ matrix.target }}
 
-  # ── 汇总：跑基线、合并两组结果、生成报告、提交 ──────────────────────────
+  # ── 汇总：跑每组基线、合并 12 组结果、生成报告、提交 ────────────────────
   report:
     needs: search
     if: always()
@@ -148,65 +126,53 @@ jobs:
       - name: 克隆作者官方仓库
         run: git clone --depth 1 https://github.com/Yu-Maryland/FlowTune.git official-flowtune
 
-      - name: 编译 FlowTune 版 ABC
+      - name: 编译 ABC 并修复软链接
         run: |
+          set -e
           mkdir -p official-flowtune/src/build
           cd official-flowtune/src/build
           cmake .. -DCMAKE_C_FLAGS="-fcommon -w" -DCMAKE_CXX_FLAGS="-fcommon -w -std=c++11" > build.log 2>&1
           make -j"$(nproc)" >> build.log 2>&1
-
-      - name: 修复软链接并准备目录
-        run: |
-          set -e
-          cd official-flowtune/FlowTune-AIG-Optimization
+          cd ../../FlowTune-AIG-Optimization
           rm -f abc abc.rc
           cp ../src/build/abc ./abc && cp ../abc.rc ./abc.rc && chmod +x ./abc
-          cp ../Benchmarks/BLIF/${DESIGN} .
           mkdir -p "$GITHUB_WORKSPACE/flowtune-reproduction/raw"
           mkdir -p "$GITHUB_WORKSPACE/flowtune-reproduction/netlists"
           echo "OUT=$GITHUB_WORKSPACE/flowtune-reproduction" >> "$GITHUB_ENV"
 
-      - name: 参照点：原始设计（未做任何优化）
+      - name: 六个设计的参照点与两组基线
         run: |
+          set +e
           cd official-flowtune/FlowTune-AIG-Optimization
-          ./abc -c "read ${DESIGN}; strash; print_stats" > "$OUT/raw/00_original.log" 2>&1
-          cat "$OUT/raw/00_original.log"
+          for d in bfly dscg fir ode or1200 syn2; do
+            cp ../Benchmarks/BLIF/$d.abc.blif .
+            ./abc -c "read $d.abc.blif; strash; print_stats" > "$OUT/raw/$d.original.log" 2>&1
+            ./abc -c "read $d.abc.blif; resyn; strash; print_stats; write $d.resyn.aig" > "$OUT/raw/$d.resyn.log" 2>&1
+            CMD="read $d.abc.blif"; for i in $(seq 1 25); do CMD="$CMD; resyn"; done
+            ./abc -c "$CMD; strash; print_stats; write $d.resyn25.aig" > "$OUT/raw/$d.resyn25.log" 2>&1
+            cp $d.resyn.aig $d.resyn25.aig "$OUT/netlists/" 2>/dev/null
+            echo "--- $d ---"; tail -2 "$OUT/raw/$d.original.log"; tail -2 "$OUT/raw/$d.resyn.log"; tail -2 "$OUT/raw/$d.resyn25.log"
+          done
 
-      - name: 基线一：ABC 默认流程 resyn
-        run: |
-          cd official-flowtune/FlowTune-AIG-Optimization
-          ./abc -c "read ${DESIGN}; resyn; strash; print_stats; write baseline_resyn.aig" \
-            > "$OUT/raw/baseline_resyn.log" 2>&1
-          cat "$OUT/raw/baseline_resyn.log"
-
-      - name: 基线二：resyn 连续 25 次（作者 README 用的基线）
-        run: |
-          cd official-flowtune/FlowTune-AIG-Optimization
-          CMD="read ${DESIGN}"; for i in $(seq 1 25); do CMD="$CMD; resyn"; done
-          ./abc -c "$CMD; strash; print_stats; write baseline_resyn25.aig" \
-            > "$OUT/raw/baseline_resyn25.log" 2>&1
-          cat "$OUT/raw/baseline_resyn25.log"
-          cp baseline_resyn.aig baseline_resyn25.aig "$OUT/netlists/" 2>/dev/null || true
-
-      - name: 取回两个并行任务的结果
+      - name: 取回 12 个并行任务的结果
         uses: actions/download-artifact@v4
         with:
-          pattern: result-t*
+          pattern: r-*
           path: downloaded
 
       - name: 合并结果并做自检
         run: |
           set +e
-          OUT="$GITHUB_WORKSPACE/flowtune-reproduction"
-          for t in 0 1; do
-            src="$GITHUB_WORKSPACE/downloaded/result-t$t"
-            [ -d "$src" ] || { echo "缺少 t=$t 的结果"; continue; }
-            cp "$src/search.log" "$OUT/raw/ftune_t${t}_search.log" 2>/dev/null
-            cp "$src/apply.log"  "$OUT/raw/ftune_t${t}_apply.log" 2>/dev/null
-            cp "$src/best_flows.txt" "$OUT/raw/ftune_t${t}_best_flows.txt" 2>/dev/null
-            cp "$src/flowtune_t$t.aig" "$OUT/netlists/" 2>/dev/null
+          for d in bfly dscg fir ode or1200 syn2; do
+            for t in 0 1; do
+              src="$GITHUB_WORKSPACE/downloaded/r-$d-t$t"
+              [ -d "$src" ] || { echo "缺少 $d t=$t"; continue; }
+              cp "$src/search.log" "$OUT/raw/$d.t$t.search.log" 2>/dev/null
+              cp "$src/final.log"  "$OUT/raw/$d.t$t.final.log" 2>/dev/null
+              cp "$src/$d.ftune.aig" "$OUT/netlists/$d.t$t.aig" 2>/dev/null
+            done
           done
-          ls -l "$OUT/raw" "$OUT/netlists"
+          ls -l "$OUT/raw" | head -30
 
           {
             echo "# 实验自检"
@@ -230,58 +196,58 @@ jobs:
       - name: 生成汇总报告
         run: |
           set +e
-          stat_of () { sed -n 's/.*[^a-z]and = *\([0-9][0-9]*\).*lev = *\([0-9][0-9]*\).*/\1\t\2/p' "$1" | tail -1; }
-          row () {
-            local v; v=$(stat_of "$2")
-            printf '| %s | %s | %s | %s |\n' "$1" "${v%%$'\t'*}" "${v##*$'\t'}" "${3:-}"
-          }
+          stat_of () { sed -n 's/.*[^a-z]and = *\([0-9][0-9]*\).*lev = *\([0-9][0-9]*\).*/\1\/\2/p' "$1" | tail -1; }
           size_of () { [ -f "$1" ] && stat -c%s "$1" || echo "-"; }
           {
-            echo "# FlowTune 论文复现结果（按任务要求）"
+            echo "# FlowTune 论文复现结果（六个基准 × 两个目标）"
             echo
             echo "- 运行时间（UTC）：$(date -u '+%Y-%m-%d %H:%M:%S')"
             echo "- 运行环境：GitHub Actions ubuntu-latest，gcc $(gcc -dumpversion)"
             echo "- 作者代码：https://github.com/Yu-Maryland/FlowTune"
-            echo "- 基准设计：\`${DESIGN}\`（论文用的六个 VTR 基准之一）"
-            echo "- **本次配置**：ftune \`-r ${REPEAT} -i ${ITER} -s ${SAMPLE}\`，即 12 轮迭代 × 每轮 5 次采样 = **60 次探索**，与论文五组配置（2_30 / 3_20 / 4_15 / 5_12 / 6_10）的总次数一致"
-            echo "- 两个优化目标（t=0 门数、t=1 深度）由两个并行任务各自独立跑满 60 次"
-            echo "- **仍存在的差别**：本次是单阶段（搜一次、应用一次），论文是多阶段（s 段）；论文正文未给出 nSample 取值，这里沿用作者脚本里的 5"
+            echo "- **本次配置**：用作者的 \`single_design.sh\`，参数 \`repeat=${REPEAT} iteration=${ITER} target=t sample=${SAMPLE} stage=${STAGE}\`"
+            echo "- **与论文的对齐**：六个基准设计（论文表 III 全部）；两个优化目标（t=0 门数 / t=1 深度）；用作者自己的脚本；多阶段结构；iteration=6 与论文的 6_10 那一组一致"
+            echo "- **缩小的部分**：stage 取 1（论文 6_10 那组是 10）。作者原配置一个设计一个目标约 330 次评估、要两个多小时，六个设计 × 两个目标就是十几个小时，一次运行内做不完"
+            echo "- **论文未给出**：nSample 的取值；这里沿用作者脚本里的 sample=5"
             echo
             echo "## 0. 实验自检（先看这一节）"
             echo
             cat "$OUT/SELFCHECK.md" 2>/dev/null || echo "(没有自检文件)"
             echo
-            echo "## 1. 结果对照表"
+            echo "> 表格里每个格子是「逻辑门数量 and / 网表深度 lev」，取自 ABC 的 print_stats 原始输出。"
             echo
-            echo "| 做法 | 逻辑门数量 (and) | 网表深度 (lev) | 网表文件大小 (字节) |"
-            echo "|---|---|---|---|"
-            row "参照点：原始设计（未优化）"      "$OUT/raw/00_original.log"      "-"
-            row "基线一：ABC 默认 resyn"          "$OUT/raw/baseline_resyn.log"   "$(size_of "$OUT/netlists/baseline_resyn.aig")"
-            row "基线二：resyn 连续 25 次"         "$OUT/raw/baseline_resyn25.log" "$(size_of "$OUT/netlists/baseline_resyn25.aig")"
-            row "FlowTune t=0（优化门数，60 次）"  "$OUT/raw/ftune_t0_apply.log"   "$(size_of "$OUT/netlists/flowtune_t0.aig")"
-            row "FlowTune t=1（优化深度，60 次）"  "$OUT/raw/ftune_t1_apply.log"   "$(size_of "$OUT/netlists/flowtune_t1.aig")"
-            echo
-            echo "说明：\`and\` 是 ABC 统计的 AIG 与门节点数（逻辑门数量）；\`lev\` 是逻辑级数（网表深度）。两者都来自 ABC 的 \`print_stats\` 原始输出。"
-            echo
-            for pair in "00-原始设计:00_original" "基线一-resyn:baseline_resyn" "基线二-resyn25:baseline_resyn25" "FlowTune-t0-搜索:ftune_t0_search" "FlowTune-t0-应用:ftune_t0_apply" "FlowTune-t1-搜索:ftune_t1_search" "FlowTune-t1-应用:ftune_t1_apply"; do
-              echo "## 原始输出：${pair%%:*}"; echo '```'
-              cat "$OUT/raw/${pair##*:}.log" 2>/dev/null || echo "(没有该文件)"
-              echo '```'; echo
+            echo "| 设计 | 原始设计 | 基线一 resyn | 基线二 resyn×25 | FlowTune t=0（门数） | FlowTune t=1（深度） |"
+            echo "|---|---|---|---|---|---|"
+            for d in bfly dscg fir ode or1200 syn2; do
+              printf '| %s | %s | %s | %s | %s | %s |\n' "$d" \
+                "$(stat_of "$OUT/raw/$d.original.log")" \
+                "$(stat_of "$OUT/raw/$d.resyn.log")" \
+                "$(stat_of "$OUT/raw/$d.resyn25.log")" \
+                "$(stat_of "$OUT/raw/$d.t0.final.log")" \
+                "$(stat_of "$OUT/raw/$d.t1.final.log")"
             done
-            echo "## FlowTune 搜出的候选流程（原始）"; echo '```'
-            echo "--- t=0（门数）---"; cat "$OUT/raw/ftune_t0_best_flows.txt" 2>/dev/null || echo "(无)"
-            echo "--- t=1（深度）---"; cat "$OUT/raw/ftune_t1_best_flows.txt" 2>/dev/null || echo "(无)"
-            echo '```'; echo
-            echo "## 网表产物"; echo '```'
+            echo
+            echo "## 网表产物（字节）"
+            echo '```'
             ls -l "$OUT/netlists" 2>/dev/null || echo "(没有网表)"
             echo '```'
+            echo
+            echo "## 原始输出（每个设计的自检结果与最终统计）"
+            for f in "$OUT"/raw/*.final.log; do
+              [ -f "$f" ] || continue
+              echo "### $(basename "$f")"; echo '```'; cat "$f"; echo '```'; echo
+            done
+            echo "## FlowTune 的搜索日志（节选：每个设计每个目标的最后 25 行）"
+            for f in "$OUT"/raw/*.search.log; do
+              [ -f "$f" ] || continue
+              echo "### $(basename "$f")"; echo '```'; tail -25 "$f"; echo '```'; echo
+            done
           } > "$OUT/RESULTS.md"
-          cat "$OUT/RESULTS.md"
+          head -40 "$OUT/RESULTS.md"
 
       - name: 把结果提交回仓库
         run: |
           git config user.name "flowtune-runner"
           git config user.email "actions@users.noreply.github.com"
           git add flowtune-reproduction
-          git commit -m "复现结果（对齐论文的 60 次探索）：FlowTune 网表 / 逻辑门数量 / 网表深度" || echo "没有变化"
+          git commit -m "复现结果：六个基准 × 两个目标（用作者脚本，多阶段结构）" || echo "没有变化"
           git push || echo "推送失败"
