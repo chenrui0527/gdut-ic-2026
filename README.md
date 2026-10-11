@@ -111,10 +111,29 @@
 - **后端（逻辑综合与优化）**：把 RTL 综合成门级网表，统计门数与关键路径深度。
 - **论文核心（多臂老虎机 + 领域知识）**：把流程优化建模成**多阶段多臂老虎机**，用 UCB1 在 3 个阶段的候选配方里选择（共 54 种组合），把真实综合出来的门数当奖励反馈；并实现**跨设计经验迁移**（论文 domain-specific 思想的代理实现），把前一个设计学到的经验带到下一个设计。
 - **实测结果**（5 个设计、每个配置 10 个随机种子）：8×8 乘法器门数 769 → **367**（−52%），16 位加法器 198 → 113，4 位 ALU 183 → 120，4 位计数器 39 → 10；找到最优所需评估次数，冷启动中位数 **2 次**、弱迁移降到 **1 次**（穷举要 54 次），并且发现**强迁移会负迁移**（乘法器反而变 4 次）——说明迁移强度本身需要领域知识来决策。
-- **官方代码级复现（按老师批注要求：得到逻辑综合的网表、比较逻辑门数量和网表深度、先不跑布线）**：编译了作者的官方仓库（[Yu-Maryland/FlowTune](https://github.com/Yu-Maryland/FlowTune)，FlowTune 是 ABC 的一个分支），在云端 Ubuntu 上完整跑出结果，**原始日志、网表和汇总表全部自动提交回仓库**，见 [flowtune-reproduction/RESULTS.md](flowtune-reproduction/RESULTS.md)。
-  以 `bfly` 为例（数字都取自原始日志里 ABC 打印的 `print_stats`）：原始设计 **28910 节点 / 97 层**（与论文表 III 一致），ABC 默认 `resyn` 得到 26177 / 68，`resyn` 连跑 25 次得到 24276 / 68，**FlowTune 优化门数得到 23192 / 87，优化深度得到 23708 / 86**。
-  结论是**一半赢一半输**：门数上 FlowTune 比 `resyn×25` 再少 **4.5%**（比原始设计少 19.8%），方向与论文一致；但深度上不如 `resyn`——原因是它选出的流程里没有 `balance` 命令，而 `balance` 正是降深度的关键。这些数字和局限都写在 [flowtune/README.md](flowtune/README.md) 第十节。
-  另外，早先 [flowtune-official/official-run-report.md](flowtune-official/official-run-report.md) 里写的“`bfly` AIG 节点 23192 → 22270”**说法有误**：这两个数其实都是 `ftune` 的输出，不是优化前后的对比，已在 [flowtune/README.md](flowtune/README.md) 的“修正说明”里改正。
+- **官方代码级复现（按老师批注要求：得到逻辑综合的网表、比较逻辑门数量和网表深度、先不跑布线）**：编译了作者的官方仓库（[Yu-Maryland/FlowTune](https://github.com/Yu-Maryland/FlowTune)，FlowTune 是 ABC 的一个分支），在云端 Ubuntu 上**用作者自己的 `single_design.sh`** 完整跑出结果，**原始日志、网表和汇总表全部自动提交回仓库**，见 [flowtune-reproduction/RESULTS.md](flowtune-reproduction/RESULTS.md)。
+  这次跑的是论文表 III 里的**全部六个基准设计**（bfly、dscg、fir、ode、or1200、syn2），每个设计跑两个目标（`t=0` 优化门数、`t=1` 优化深度），一共 12 个任务并行。参数用作者脚本自己的 `repeat=1 iteration=6 sample=5 stage=2`；作者的脚本会先做一轮 level-0 搜索、再循环 `stage` 次，所以 `stage=2` 等于 **3 轮「搜索 → 应用」**（论文 `6_10` 那一组是 11 轮）。我从 10 缩到 2，**这是唯一缩水的地方**。
+
+  | 设计 | 原始 | resyn | resyn×25 | FlowTune t=0（优化门数） | FlowTune t=1（优化深度） |
+  |---|---|---|---|---|---|
+  | bfly | 28910/97 | 26177/68 | 24276/68 | **21634**/88 | 22132/**86** |
+  | dscg | 28252/92 | 25427/67 | 23511/67 | **21180**/88 | 21870/**76** |
+  | fir | 27704/94 | 24930/67 | 23147/67 | **20630**/90 | 21051/**82** |
+  | ode | 16069/98 | 14723/71 | 13747/71 | **12364**/92 | 12737/**89** |
+  | or1200 | 12833/148 | 11256/132 | 11214/132 | **10159**/132 | 10198/**130** |
+  | syn2 | 30003/93 | 26911/67 | 24771/67 | **22534**/85 | 23085/**80** |
+
+  每格是 ABC `print_stats` 打印的 `and` 门数 / `lev` 深度；12 个任务全部成功，没有失败也没有缺数据，自检结论 ✅。
+- **结论一：门数赢了。**六个设计全部比 `resyn×25` 再少 **9%~11%**，比原始设计少 **21%~26%**，方向与论文一致。
+- **结论二：深度没优化。**`t=1` 这一列本来就是拿深度当目标去搜的，结果是 **1 赢 5 输**：只有 `or1200` 的 130 层比 `resyn` 的 132 层浅，其余五个都比 `resyn` 深（最明显的是 `bfly`，86 层 vs `resyn` 的 68 层）。
+  原因很直接：**FlowTune 的候选命令里没有降深度的算子**。看它实际选出来的流程（原始日志里的 `Best Flow(s)`），命令只有 `strash / dc2 / rewrite -z / refactor / refactor -z / resub -K 8 / ifraig / dch -f`；而 `resyn` 的定义是 `b; rw; rwz; b; rwz; b`，里面有**三个 `b`（balance）**，`balance` 就是把电路重新摆成平衡树、专门用来压深度的命令。搜索空间里没有它，深度自然压不下去。
+- 另外，早先 [flowtune-official/official-run-report.md](flowtune-official/official-run-report.md) 里写的“`bfly` AIG 节点 23192 → 22270”**说法有误**：这两个数其实都是 `ftune` 的输出，不是优化前后的对比，已在 [flowtune/README.md](flowtune/README.md) 的“修正说明”里改正。
+- **论文作者自己是怎么绕开深度的**：论文全篇**没有给出任何深度的对比结果**，也没有承认自己降不了深度，而是先把「工艺无关指标」和「映射后结果」切开。第 8 页 A 节开头的原话是：
+
+  > "It is known that technology-independent metrics have often miss-correlation with post-technology mapping results [47]. Yet, many logic synthesis works limit the results and analysis to node count and logic depth, instead of actual post-mapping area and delay. In this work, we aim to show that FlowTune can find good solutions post-mapping, and is not limited to DAG size and depth reduction."
+
+  直译：**大家早就知道，工艺无关的指标（节点数、逻辑深度）经常和工艺映射之后的结果对不上；但很多逻辑综合工作还是只报节点数和逻辑深度，不报真正的映射后面积和延时。本文要说明的是 FlowTune 在映射之后也能找到好方案，并不局限于把 DAG 的大小和深度降下来。**
+  所以论文表 III 里的 `Level` 那一列只是描述基准本身有多大，不是 FlowTune 的优化结果；它的结果图全部搬到下游去报——图 6/7 报 Cadence Genus + ASAP 7nm 库的延时和面积，图 8/9 报布线后的面积、线长、关键路径延时和 TNS。作者唯一明确承认过的失败是 `or1200` 在延时优化上「初始化之后找不到更好的流程」（第 8 页），和深度无关。
 - **本机也跑通了**：后来 AI 在我自己电脑上装了 WSL2 + Ubuntu 26.04（gcc 15.2、cmake 4.2），把作者代码在本机编译（`abc` 24.8 MB）并跑通官方示例，记录在 [flowtune-official/local-wsl-run.md](flowtune-official/local-wsl-run.md)（我负责给管理员权限和重启电脑）。
 
 代码、运行方式和更详细的说明见 [flowtune/README.md](flowtune/README.md)（`flowtune/` 目录）。
