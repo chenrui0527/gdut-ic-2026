@@ -184,24 +184,36 @@ strash;rewrite;dc2;resub -K 8;refactor;refactor -z;rewrite -z;strash;ifraig;dch 
 
 **结果**（每个数字都取自 `flowtune-reproduction/raw/` 里的原始日志，来自 ABC 自己打印的 `print_stats`）：
 
-| 做法 | 逻辑门数量 (and) | 网表深度 (lev) | 相对原始设计 |
-|---|---|---|---|
-| 原始设计（未做任何优化） | 28910 | 97 | — |
-| 基线一：ABC 默认 `resyn` | 26177 | 68 | 门数 −9.5%，深度 −29.9% |
-| 基线二：`resyn` 连续 25 次 | 24276 | 68 | 门数 −16.0%，深度 −29.9% |
-| **FlowTune `t=0`（优化门数）** | **23192** | 87 | 门数 **−19.8%**，深度 −10.3% |
-| **FlowTune `t=1`（优化深度）** | 23708 | 86 | 门数 −18.0%，深度 −11.3% |
+这次跑的是论文表 III 里的**全部六个基准设计**（bfly、dscg、fir、ode、or1200、syn2），每个设计跑两个目标（`t=0` 优化门数、`t=1` 优化深度），一共 12 个任务并行。参数用作者脚本自己的 `repeat=1 iteration=6 sample=5 stage=2`；作者的脚本会先做一轮 level-0 搜索、再循环 `stage` 次，所以 `stage=2` 等于 **3 轮「搜索 → 应用」**（论文 `6_10` 那一组是 11 轮，**这是唯一缩水的地方**）。
+
+| 设计 | 原始 | resyn | resyn×25 | FlowTune t=0（优化门数） | FlowTune t=1（优化深度） |
+|---|---|---|---|---|---|
+| bfly | 28910/97 | 26177/68 | 24276/68 | **21634**/88 | 22132/**86** |
+| dscg | 28252/92 | 25427/67 | 23511/67 | **21180**/88 | 21870/**76** |
+| fir | 27704/94 | 24930/67 | 23147/67 | **20630**/90 | 21051/**82** |
+| ode | 16069/98 | 14723/71 | 13747/71 | **12364**/92 | 12737/**89** |
+| or1200 | 12833/148 | 11256/132 | 11214/132 | **10159**/132 | 10198/**130** |
+| syn2 | 30003/93 | 26911/67 | 24771/67 | **22534**/85 | 23085/**80** |
+
+每格是 ABC `print_stats` 打印的 `and` 门数 / `lev` 深度。12 个任务全部成功，没有失败也没有缺数据（自检结论 ✅）。
 
 **结论（好的和坏的都写）**
 
-- **门数上 FlowTune 赢**：`t=0` 拿到 23192 个节点，比 `resyn×25` 的 24276 **再少 4.5%**，比原始设计少 19.8%，方向和论文一致。
-- **深度上 FlowTune 输**：`resyn` 把深度从 97 降到 68，而 FlowTune 只降到 87 / 86。原因很具体——它两次选出的流程里**都没有 `balance` 这个命令**，而 `balance` 正是用来摊平电路、降低深度的；FlowTune 只能在它候选的命令集合里挑，候选里没有它。这不是它算错了，是命令集合决定的。
-- **搜索配置偏小**：本次用 `-r 1 -i 5 -s 5`（共 25 次评估）。日志显示五轮迭代的评分始终是同一个数，说明第一轮就找到了最好值、后面四轮没有继续改进。论文用的是大得多的预算，所以提升幅度小于论文属于预期，不是复现失败。
+- **门数上 FlowTune 赢**：六个设计全部比 `resyn×25` 再少 **9%~11%**，比原始设计少 **21%~26%**，方向和论文一致。
+- **深度上 FlowTune 基本没优化**：`t=1` 这一列本来就是拿深度当目标去搜的，结果是 **1 赢 5 输**——只有 `or1200` 的 130 层比 `resyn` 的 132 层浅，另外五个都比 `resyn` 深（最明显的 `bfly` 是 86 层 vs `resyn` 的 68 层）。
+- **为什么深度上不去**：它选出的流程里**没有 `balance`**。原始日志里 `Best Flow(s)` 打印出来的命令只有 `strash / dc2 / rewrite -z / refactor / refactor -z / resub -K 8 / ifraig / dch -f`；而 `resyn` 的定义是 `b; rw; rwz; b; rwz; b`，里面有**三个 `b`（balance）**，`balance` 就是把电路重新摆成平衡树、专门用来压深度的。FlowTune 只能在候选命令集合里挑，集合里没有它，深度自然压不下去。这不是它算错了，是命令集合决定的。
+- **论文作者自己是怎么绕开深度的**：论文全篇**没有给出任何深度的对比结果**，也没有承认自己降不了深度，而是先把「工艺无关指标」和「映射后结果」切开。第 8 页 A 节开头的原话是：
+
+  > "It is known that technology-independent metrics have often miss-correlation with post-technology mapping results [47]. Yet, many logic synthesis works limit the results and analysis to node count and logic depth, instead of actual post-mapping area and delay. In this work, we aim to show that FlowTune can find good solutions post-mapping, and is not limited to DAG size and depth reduction."
+
+  直译：**大家早就知道，工艺无关的指标（节点数、逻辑深度）经常和工艺映射之后的结果对不上；但很多逻辑综合工作还是只报节点数和逻辑深度，不报真正的映射后面积和延时。本文要说明的是 FlowTune 在映射之后也能找到好方案，并不局限于把 DAG 的大小和深度降下来。**
+
+  所以论文表 III 里的 `Level` 那一列只是描述基准本身有多大，不是 FlowTune 的优化结果；论文的结果图全部搬到下游去报——图 6/7 是 Cadence Genus + ASAP 7nm 库的延时和面积，图 8/9 是布线后的面积、线长、关键路径延时和 TNS。作者唯一明确承认过的失败是 `or1200` 在延时优化上「初始化之后找不到更好的流程」（第 8 页），和深度无关。
 
 **原始证据（老师问"你怎么知道数是对的"就打开这些）**
 
 - 自检结论与汇总表：[flowtune-reproduction/SELFCHECK.md](../flowtune-reproduction/SELFCHECK.md)、[flowtune-reproduction/RESULTS.md](../flowtune-reproduction/RESULTS.md)
-- 逐份原始日志：[flowtune-reproduction/raw/](../flowtune-reproduction/raw/)（`00_original` 原始设计、两组基线、两组 FlowTune 的搜索与应用日志）
-- 综合出来的网表：[flowtune-reproduction/netlists/](../flowtune-reproduction/netlists/)（4 个 `.aig` 文件）
+- 逐份原始日志：[flowtune-reproduction/raw/](../flowtune-reproduction/raw/)（六个设计各自的 original / resyn / resyn25 / `t=0` 搜索+应用 / `t=1` 搜索+应用，共 51 个文件，含早先那一版的）
+- 综合出来的网表：[flowtune-reproduction/netlists/](../flowtune-reproduction/netlists/)（每个设计 4 个：`resyn` / `resyn25` / `t0` / `t1`，六个设计共 24 个 `.aig`，另有早先那一版的 4 个）
 
 **踩坑记录（第二次，是 AI 犯的错）**：第一版工作流里只把 `abc` 放进了当前目录、用 `./abc` 调用，但 `ftune` 内部是用 `system("abc ...")` 按 PATH 去找它的，结果每次评估都输出 `sh: 1: abc: not found`、评分全部变成哨兵值 `1e+09`，搜索等于没做。**AI 一开始没发现，是后来去翻原始日志才看到的。** 现在工作流里加了硬性自检：日志里只要出现 `abc: not found` 或 `1e+09` 就直接判定失败，并把结论写进 `SELFCHECK.md`——不允许把无效结果当成结果交出去。
