@@ -1,0 +1,3 @@
+ABC command line: "read fir.ftune.aig; print_stats".
+
+[1;37mfir.ftune                     :[0m i/o =  450/  225  lat = 1882  and =  21051  lev = 82

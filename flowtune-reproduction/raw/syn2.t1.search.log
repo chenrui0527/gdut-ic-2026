@@ -1,0 +1,72 @@
+*************  level-0 tuning starts *********** 
+UC Berkeley, ABC 1.01 (compiled Oct 11 2026 09:50:20)
+abc 01> ftune -d syn2.abc.blif -r 1 -t 1 -p 1 -i 6 -s 5
+rm: cannot remove '.temp.result.txt': No such file or directory
+rm: cannot remove 'syn2.abc.blif.log': No such file or directory
+Your current setups:
+Design = syn2.abc.blif, target = 1, repeats = 1, prefix = 1, forget = 0, iteration = 6, nSample = 5, liberty = (null)
+begin:abc -c "read syn2.abc.blif;strash;
+0,77
+1,77
+2,77
+3,77
+4,77
+5,77
+Best Flow(s) (#max=5):
+strash;refactor -z;resub -K 8;refactor;rewrite -z;dc2;refactor -z;strash;
+abc 01> ***EOF***
+UC Berkeley, ABC 1.01 (compiled Oct 11 2026 09:50:20)
+abc 01> read syn2.abc.blif; source syn2.script;strash;write internal.aig;ps
+Hierarchy reader converted 4 instances of blackboxes.
+Hierarchy reader converted 4 instances of blackboxes.
+Warning: The choice nodes in the original AIG are removed by strashing.
+[1;37msyn2                          :[0m i/o =  450/  321  lat = 1512  and =  24534  lev = 77
+[1;37msyn2                          :[0m i/o =  450/  321  lat = 1512  and =  24534  lev = 77
+abc 10> ***EOF***
+*************  level[1] tuning starts *********** 
+UC Berkeley, ABC 1.01 (compiled Oct 11 2026 09:50:20)
+abc 01> ftune -d internal.aig -r 1 -t 1 -p 1 -i 6 -s 5
+rm: cannot remove 'internal.aig.log': No such file or directory
+Your current setups:
+Design = internal.aig, target = 1, repeats = 1, prefix = 1, forget = 0, iteration = 6, nSample = 5, liberty = (null)
+begin:abc -c "read internal.aig;strash;
+0,80
+1,80
+2,80
+3,80
+4,80
+5,79
+Best Flow(s) (#max=5):
+strash;read dontCare;resub -K 8;resub -K 8;dc2;refactor -z;refactor;rewrite -z;strash;
+abc 01> ***EOF***
+UC Berkeley, ABC 1.01 (compiled Oct 11 2026 09:50:20)
+abc 01> read internal.aig; source syn2.script;strash;write internal.aig
+Generic file reader requires a known file extension to open "dontCare".
+Warning: The choice nodes in the original AIG are removed by strashing.
+[1;37minternal                      :[0m i/o =  450/  321  lat = 1512  and =  23666  lev = 79
+abc 10> ***EOF***
+*************  level[2] tuning starts *********** 
+UC Berkeley, ABC 1.01 (compiled Oct 11 2026 09:50:20)
+abc 01> ftune -d internal.aig -r 1 -t 1 -p 1 -i 6 -s 5
+Your current setups:
+Design = internal.aig, target = 1, repeats = 1, prefix = 1, forget = 0, iteration = 6, nSample = 5, liberty = (null)
+begin:abc -c "read internal.aig;strash;
+0,80
+1,80
+2,80
+3,80
+4,80
+5,80
+Best Flow(s) (#max=5):
+strash;refactor;refactor -z;dc2;rewrite -z;refactor;resub -K 8;strash;
+strash;refactor;resub -K 8;dc2;refactor -z;refactor;rewrite -z;strash;
+strash;read dontCare;resub -K 8;resub -K 8;dc2;refactor -z;refactor;rewrite -z;strash;
+abc 01> ***EOF***
+UC Berkeley, ABC 1.01 (compiled Oct 11 2026 09:50:20)
+abc 01> read internal.aig; source syn2.script;strash;write internal.aig
+Warning: The choice nodes in the original AIG are removed by strashing.
+[1;37minternal                      :[0m i/o =  450/  321  lat = 1512  and =  23085  lev = 80
+abc 10> ***EOF***
+********************************************************
+[0;31m Final design produced by FlowTune: syn2.ftune.aig[0m
+********************************************************

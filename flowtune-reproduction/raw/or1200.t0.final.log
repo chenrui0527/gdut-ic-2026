@@ -1,0 +1,3 @@
+ABC command line: "read or1200.ftune.aig; print_stats".
+
+[1;37mor1200.ftune                  :[0m i/o =  588/  509  lat =  670  and =  10159  lev =132

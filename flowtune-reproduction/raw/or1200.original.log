@@ -1,0 +1,4 @@
+ABC command line: "read or1200.abc.blif; strash; print_stats".
+
+Hierarchy reader converted 65 instances of blackboxes.
+[1;37mor1200_flat                   :[0m i/o =  588/  509  lat =  670  and =  12833  lev =148

@@ -1,0 +1,4 @@
+ABC command line: "read fir.abc.blif; resyn; resyn; resyn; resyn; resyn; resyn; resyn; resyn; resyn; resyn; resyn; resyn; resyn; resyn; resyn; resyn; resyn; resyn; resyn; resyn; resyn; resyn; resyn; resyn; resyn; strash; print_stats; write fir.resyn25.aig".
+
+Hierarchy reader converted 4 instances of blackboxes.
+[1;37mfir                           :[0m i/o =  450/  225  lat = 1882  and =  23147  lev = 67

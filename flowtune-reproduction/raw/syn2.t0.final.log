@@ -1,0 +1,3 @@
+ABC command line: "read syn2.ftune.aig; print_stats".
+
+[1;37msyn2.ftune                    :[0m i/o =  450/  321  lat = 1512  and =  22534  lev = 85
