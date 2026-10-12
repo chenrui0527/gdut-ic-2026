@@ -135,5 +135,6 @@
   直译：**大家早就知道，工艺无关的指标（节点数、逻辑深度）经常和工艺映射之后的结果对不上；但很多逻辑综合工作还是只报节点数和逻辑深度，不报真正的映射后面积和延时。本文要说明的是 FlowTune 在映射之后也能找到好方案，并不局限于把 DAG 的大小和深度降下来。**
   所以论文表 III 里的 `Level` 那一列只是描述基准本身有多大，不是 FlowTune 的优化结果；它的结果图全部搬到下游去报——图 6/7 报 Cadence Genus + ASAP 7nm 库的延时和面积，图 8/9 报布线后的面积、线长、关键路径延时和 TNS。作者唯一明确承认过的失败是 `or1200` 在延时优化上「初始化之后找不到更好的流程」（第 8 页），和深度无关。
 - **本机也跑通了**：后来 AI 在我自己电脑上装了 WSL2 + Ubuntu 26.04（gcc 15.2、cmake 4.2），把作者代码在本机编译（`abc` 24.8 MB）并跑通官方示例，记录在 [flowtune-official/local-wsl-run.md](flowtune-official/local-wsl-run.md)（我负责给管理员权限和重启电脑）。
+- **和论文对得上吗**：论文**没有门数表**，它报的是布线后的面积、线长、延时、TNS，基线是 VTR 8.0 默认流程（OpenFPGA 那套的基线是 LSOracle 默认流程）；我们因为按老师要求不跑布线，比的是工艺无关的 AIG 门数，基线用 `resyn` 和 `resyn`×25。方向上对得很齐：bfly、dscg、fir、ode、syn2 五个设计我们降 31%~35%（平均 33%），论文说这五个"平均约 30%"；or1200 两边都是最差的（我们只降 22%）。完整对照见 [flowtune-reproduction/PAPER-COMPARISON.md](flowtune-reproduction/PAPER-COMPARISON.md)。
 
 代码、运行方式和更详细的说明见 [flowtune/README.md](flowtune/README.md)（`flowtune/` 目录）。
