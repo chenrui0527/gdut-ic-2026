@@ -6,14 +6,19 @@ name: FlowTune 论文复现（六个基准 × 两个目标）
 #   3) 先不用跑布线
 #
 # 与论文的对齐情况（这里写一份，报告里也原样写一遍）：
-#   对齐：六个基准设计（论文表 III 全部）、两个优化目标、用作者自己的 single_design.sh、
-#         多阶段结构、iteration=6（与论文 6_10 那组一致）。
-#   规模缩小：stage 取 2（论文 6_10 那组是 10）。
+#   完全对齐：六个基准设计（论文表 III 全部）、用作者自己的 single_design.sh、多阶段结构，
+#            参数就是作者 run.sh 里的那一组 6_10：
+#              FlowTune-AIG-Optimization/run.sh -> ./all.sh 6 10 | tee 6_10.log
+#              而 all.sh 里写死了 repeat=2、sample=5，$1 是 iteration(=6)、$2 是 stage(=10)。
+#            所以我们用 repeat=2 iteration=6 sample=5 stage=10，与作者完全一致。
+#            另外多做一组 target=1（优化深度），因为老师要求比较网表深度；作者 all.sh 只跑了 target=0。
 #      注意：作者的脚本无论如何都会先做一次 level-0 搜索，再循环 stage 次，
-#            所以 stage=2 表示总共 3 轮「搜索 → 应用到电路 → 再搜索」。
-#            论文的 stage=10 是 11 轮。作者的原配置一个设计一个目标要两个多小时，
-#            六个设计 × 两个目标就是十几个小时，一次运行内做不完，故缩小到 3 轮。
+#            所以 stage=10 表示总共 11 轮「搜索 → 应用到电路 → 再搜索」。
 #   未给出：论文正文没有给出 nSample 取值，这里沿用作者脚本里的 sample=5。
+#           另外作者代码里 -s 这个参数在 AIG 优化这条路径上没有真正被使用
+#           （abcBayestune.cpp 的 bayes_flow_tune() 收了 nSamples，函数体里没用到）。
+#   前端：同时补上老师勾的「前端 = RTL 功能验证」——对 flowtune/rtl/ 里的每个 RTL
+#         做形式化等价性检查，并把综合出来的门级网表一起提交回仓库。
 
 on:
   push:
@@ -25,10 +30,10 @@ permissions:
   contents: write
 
 env:
-  REPEAT: "1"
+  REPEAT: "2"
   ITER: "6"
   SAMPLE: "5"
-  STAGE: "2"
+  STAGE: "10"
 
 jobs:
   # ── 6 个设计 × 2 个目标 = 12 个任务并行跑 ──────────────────────────────
@@ -39,7 +44,7 @@ jobs:
         design: ["bfly", "dscg", "fir", "ode", "or1200", "syn2"]
         target: [0, 1]
     runs-on: ubuntu-latest
-    timeout-minutes: 50
+    timeout-minutes: 360
 
     steps:
       - name: 拉取本仓库
@@ -115,7 +120,7 @@ jobs:
     needs: search
     if: always()
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 60
 
     steps:
       - name: 拉取本仓库
@@ -163,6 +168,55 @@ jobs:
           pattern: r-*
           path: downloaded
 
+      # ── 老师勾的「前端 = RTL 功能验证」：对 flowtune/rtl/ 里的 RTL 逐个验证 ──
+      #    这一步失败不影响上面的复现结果，所以用 continue-on-error 兜住。
+      - name: 前端：RTL 形式化等价性检查 + 综合出门级网表
+        continue-on-error: true
+        run: |
+          set +e
+          sudo apt-get install -y yosys
+          yosys -V
+          mkdir -p "$OUT/frontend"
+          cd "$GITHUB_WORKSPACE/flowtune/rtl"
+          for d in counter mult8 adder8 adder16 alu4 lfsr8; do
+            if [ ! -f "$d.v" ]; then
+              echo "跳过 $d（flowtune/rtl 里没有这个 RTL）"
+              continue
+            fi
+            echo "===================== $d ====================="
+            cat > "/tmp/$d.equiv.ys" <<EOF
+          read_verilog $d.v
+          prep -top $d
+          async2sync
+          design -stash gold
+          design -reset
+          read_verilog $d.v
+          synth -top $d -run :fine
+          opt -full
+          techmap
+          simplemap
+          opt_clean
+          async2sync
+          design -stash gate
+          design -copy-from gold -as gold $d
+          design -copy-from gate -as gate $d
+          equiv_make gold gate equiv
+          hierarchy -top equiv
+          equiv_simple
+          equiv_induct -seq 3
+          equiv_status -assert
+          EOF
+            yosys -s "/tmp/$d.equiv.ys" > "$OUT/frontend/$d.equiv.log" 2>&1
+            echo "等价性检查结果：$(grep -E 'Equivalence successfully proven|unproven' "$OUT/frontend/$d.equiv.log" | tail -2 | tr '\n' ' ')"
+            yosys -p "read_verilog $d.v; synth -top $d; opt -full; techmap; simplemap; opt_clean; stat" > "$OUT/frontend/$d.synth.log" 2>&1
+            yosys -p "read_verilog $d.v; synth -top $d; opt -full; techmap; simplemap; opt_clean; write_verilog -noattr $OUT/frontend/$d.gate.v" >> "$OUT/frontend/$d.synth.log" 2>&1
+            yosys -p "read_verilog $d.v; synth -top $d; opt -full; techmap; simplemap; opt_clean; aigmap; write_aiger -ascii $OUT/frontend/$d.gate.aig" >> "$OUT/frontend/$d.synth.log" 2>&1
+            tail -3 "$OUT/frontend/$d.synth.log"
+          done
+          echo "---------- 前端产物 ----------"
+          ls -l "$OUT/frontend"
+          exit 0
+
       - name: 合并结果并做自检
         run: |
           set +e
@@ -208,10 +262,10 @@ jobs:
             echo "- 运行环境：GitHub Actions ubuntu-latest，gcc $(gcc -dumpversion)"
             echo "- 作者代码：https://github.com/Yu-Maryland/FlowTune"
             echo "- **本次配置**：用作者的 \`single_design.sh\`，参数 \`repeat=${REPEAT} iteration=${ITER} target=t sample=${SAMPLE} stage=${STAGE}\`"
-            echo "- **与论文的对齐**：六个基准设计（论文表 III 全部）；两个优化目标（t=0 门数 / t=1 深度）；用作者自己的脚本；多阶段结构；iteration=6 与论文的 6_10 那一组一致"
-            echo "- **多阶段轮数**：用作者的 \`single_design.sh\`，它会先做一次 level-0 搜索再循环 stage 次，所以 \`stage=${STAGE}\` 表示总共 **3 轮**（论文 6_10 那组是 11 轮）"
-            echo "- **缩小的部分**：stage 从论文的 10 缩到 ${STAGE}（3 轮 vs 11 轮）。作者原配置一个设计一个目标要两个多小时，六个设计 × 两个目标就是十几个小时，一次运行内做不完"
-            echo "- **论文未给出**：nSample 的取值；这里沿用作者脚本里的 sample=5"
+            echo "- **与论文的对齐（完全对齐）**：六个基准设计（论文表 III 全部）；用作者自己的 \`single_design.sh\`；参数 \`repeat=2 iteration=6 sample=5 stage=10\`，就是作者 \`run.sh\` 里的那一组 **6_10**（\`./all.sh 6 10\`，\`all.sh\` 里写死 repeat=2、sample=5）"
+            echo "- **多做的一组**：作者的 \`all.sh\` 只跑 \`target=0\`（优化门数），这里额外跑了 \`target=1\`（优化深度），因为老师要求比较网表深度"
+            echo "- **多阶段轮数**：作者的 \`single_design.sh\` 会先做一次 level-0 搜索、再循环 stage 次，所以 \`stage=${STAGE}\` = 总共 **11 轮**「搜索 → 应用到电路 → 再搜索」，与论文的 6_10 一致"
+            echo "- **论文未给出**：nSample 的取值；这里沿用作者脚本里的 sample=5。补充：作者代码里 \`-s\` 在 AIG 优化这条路径上没有被真正使用（\`bayes_flow_tune()\` 收了 nSamples，函数体里没用到）"
             echo
             echo "## 0. 实验自检（先看这一节）"
             echo
@@ -230,6 +284,21 @@ jobs:
                 "$(stat_of "$OUT/raw/$d.t1.final.log")"
             done
             echo
+            echo "## 前端：RTL 功能验证（老师勾的「前端」）"
+            echo
+            echo "对 \`flowtune/rtl/\` 里的每个 RTL：先用 Yosys 把 RTL 综合成门级网表，再用形式化等价性检查证明「综合出来的门级网表」和「原始 RTL」功能完全一致；综合出的门级网表（\`.gate.v\` / \`.gate.aig\`）也一起提交。"
+            echo
+            echo '```'
+            ls -l "$OUT/frontend" 2>/dev/null || echo "(没有前端产物)"
+            echo '```'
+            for f in "$OUT"/frontend/*.equiv.log; do
+              [ -f "$f" ] || continue
+              echo "### $(basename "$f")"
+              echo '```'
+              grep -E "Equivalence successfully proven|unproven|ERROR" "$f" | tail -4
+              echo '```'
+              echo
+            done
             echo "## 网表产物（字节）"
             echo '```'
             ls -l "$OUT/netlists" 2>/dev/null || echo "(没有网表)"
