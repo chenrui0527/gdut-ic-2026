@@ -218,5 +218,6 @@ strash;rewrite;dc2;resub -K 8;refactor;refactor -z;rewrite -z;strash;ifraig;dch 
 - 前端（RTL 等价性检查 + 综合出的门级网表）：[flowtune-reproduction/frontend/](../flowtune-reproduction/frontend/)
 - 和论文数值的对照（论文报的是布线后的面积/线长/延时，我们报的是工艺无关的 AIG 门数，为什么还能说"方向一致"）：[flowtune-reproduction/PAPER-COMPARISON.md](../flowtune-reproduction/PAPER-COMPARISON.md)
 - 六个基准设计分别是什么（bfly 是 FFT 的蝶形运算单元、or1200 是 OpenRISC 处理器、syn2 是合成电路……附论文表 III 的规格）：[flowtune-reproduction/六个设计是什么.md](../flowtune-reproduction/六个设计是什么.md)
+- 两版结果的对比（3 轮那版 → 11 轮那版：门数再降约 11%、落到论文量级；深度没改善）：[flowtune-reproduction/两版结果对比.md](../flowtune-reproduction/两版结果对比.md)
 
 **踩坑记录（第二次，是 AI 犯的错）**：第一版工作流里只把 `abc` 放进了当前目录、用 `./abc` 调用，但 `ftune` 内部是用 `system("abc ...")` 按 PATH 去找它的，结果每次评估都输出 `sh: 1: abc: not found`、评分全部变成哨兵值 `1e+09`，搜索等于没做。**AI 一开始没发现，是后来去翻原始日志才看到的。** 现在工作流里加了硬性自检：日志里只要出现 `abc: not found` 或 `1e+09` 就直接判定失败，并把结论写进 `SELFCHECK.md`——不允许把无效结果当成结果交出去。
