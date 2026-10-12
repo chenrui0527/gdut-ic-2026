@@ -184,24 +184,27 @@ strash;rewrite;dc2;resub -K 8;refactor;refactor -z;rewrite -z;strash;ifraig;dch 
 
 **结果**（每个数字都取自 `flowtune-reproduction/raw/` 里的原始日志，来自 ABC 自己打印的 `print_stats`）：
 
-这次跑的是论文表 III 里的**全部六个基准设计**（bfly、dscg、fir、ode、or1200、syn2），每个设计跑两个目标（`t=0` 优化门数、`t=1` 优化深度），一共 12 个任务并行。参数用作者脚本自己的 `repeat=1 iteration=6 sample=5 stage=2`；作者的脚本会先做一轮 level-0 搜索、再循环 `stage` 次，所以 `stage=2` 等于 **3 轮「搜索 → 应用」**（论文 `6_10` 那一组是 11 轮，**这是唯一缩水的地方**）。
+这次跑的是论文表 III 里的**全部六个基准设计**（bfly、dscg、fir、ode、or1200、syn2），每个设计跑两个目标（`t=0` 优化门数、`t=1` 优化深度），一共 12 个任务并行。参数用作者 `run.sh` 里那一组 `6_10` 的**原样数值**：`repeat=2 iteration=6 sample=5 stage=10`；作者的脚本会先做一次 level-0 搜索、再循环 `stage` 次，所以 `stage=10` = **11 轮**「搜索 → 应用」。
+
+`6_10` 是「**迭代次数_阶段数**」：每段搜 6 轮 MAB 迭代、分 10 个阶段。作者 `run.sh` 里就是 `./all.sh 6 10 | tee 6_10.log`，`all.sh` 里 `$1` 是 iteration、`$2` 是 stage。论文图 6 的图例也正是这五组（`2_30`、`3_20`、`4_15`、`5_12`、`6_10`），乘起来都是 60——总预算相同、切法不同。
 
 | 设计 | 原始 | resyn | resyn×25 | FlowTune t=0（优化门数） | FlowTune t=1（优化深度） |
 |---|---|---|---|---|---|
-| bfly | 28910/97 | 26177/68 | 24276/68 | **21634**/88 | 22132/**86** |
-| dscg | 28252/92 | 25427/67 | 23511/67 | **21180**/88 | 21870/**76** |
-| fir | 27704/94 | 24930/67 | 23147/67 | **20630**/90 | 21051/**82** |
-| ode | 16069/98 | 14723/71 | 13747/71 | **12364**/92 | 12737/**89** |
-| or1200 | 12833/148 | 11256/132 | 11214/132 | **10159**/132 | 10198/**130** |
-| syn2 | 30003/93 | 26911/67 | 24771/67 | **22534**/85 | 23085/**80** |
+| bfly | 28910/97 | 26177/68 | 24276/68 | **19292**/90 | 19799/**85** |
+| dscg | 28252/92 | 25427/67 | 23511/67 | **18858**/94 | 19715/**87** |
+| fir | 27704/94 | 24930/67 | 23147/67 | **17939**/92 | 18877/**83** |
+| ode | 16069/98 | 14723/71 | 13747/71 | **11020**/94 | 11100/**90** |
+| or1200 | 12833/148 | 11256/132 | 11214/132 | **9974**/131 | 10020/**131** |
+| syn2 | 30003/93 | 26911/67 | 24771/67 | **19936**/89 | 20353/**84** |
 
 每格是 ABC `print_stats` 打印的 `and` 门数 / `lev` 深度。12 个任务全部成功，没有失败也没有缺数据（自检结论 ✅）。
 
 **结论（好的和坏的都写）**
 
-- **门数上 FlowTune 赢**：六个设计全部比 `resyn×25` 再少 **9%~11%**，比原始设计少 **21%~26%**，方向和论文一致。
-- **深度上 FlowTune 基本没优化**：`t=1` 这一列本来就是拿深度当目标去搜的，结果是 **1 赢 5 输**——只有 `or1200` 的 130 层比 `resyn` 的 132 层浅，另外五个都比 `resyn` 深（最明显的 `bfly` 是 86 层 vs `resyn` 的 68 层）。
-- **为什么深度上不去**：它选出的流程里**没有 `balance`**。原始日志里 `Best Flow(s)` 打印出来的命令只有 `strash / dc2 / rewrite -z / refactor / refactor -z / resub -K 8 / ifraig / dch -f`；而 `resyn` 的定义是 `b; rw; rwz; b; rwz; b`，里面有**三个 `b`（balance）**，`balance` 就是把电路重新摆成平衡树、专门用来压深度的。FlowTune 只能在候选命令集合里挑，集合里没有它，深度自然压不下去。这不是它算错了，是命令集合决定的。
+- **门数上 FlowTune 赢，而且这次落到了论文同一量级**：六个设计全部比 `resyn×25` 再少 **11%~23%**；对**原始设计**的降幅，bfly、dscg、fir、ode、syn2 五个平均从上一版（只跑 3 轮）的 **−24.7% 提到 −33.3%**，而论文说这五个"平均约 −30%"（`or1200` 仍是例外，只降 22.3%）。
+- **深度上 FlowTune 基本没优化**：`t=1` 这一列本来就是拿深度当目标去搜的，结果是 **1 赢 5 输**——只有 `or1200` 的 131 层比 `resyn` 的 132 层浅，另外五个都比 `resyn` 深（最明显的 `bfly` 是 85 层 vs `resyn` 的 68 层）。把预算从 3 轮加到 11 轮也救不回来，所以能确定这不是"搜得不够"。
+- **为什么深度上不去**：它选出的流程里**没有 `balance`**。原始日志里 `Best Flow(s)` 打印出来的命令只有 `strash / dc2 / rewrite -z / refactor / refactor -z / resub -K 8 / ifraig / dch -f`；作者源码 `abcBayestune.cpp` 的 `default_options()` 里给的就是 `rewrite / rewrite -z / refactor / refactor -z / resub -K 8 / dc2` 这六个面积导向的命令，`balance` 那一行是被注释掉的（`//default_opts.push_back("balance");`）。而 `resyn` 的定义是 `b; rw; rwz; b; rwz; b`，里面有**三个 `b`（balance）**，专管把电路摆成平衡树、压深度。FlowTune 只能在候选命令集合里挑，集合里没有它，深度自然压不下去。这不是它算错了，是命令集合决定的。
+- **两版对比**（3 轮那版 → 11 轮那版：门数再降约 11%、落到论文量级；深度没改善）：[两版结果对比.md](../flowtune-reproduction/两版结果对比.md)
 - **论文作者自己是怎么绕开深度的**：论文全篇**没有给出任何深度的对比结果**，也没有承认自己降不了深度，而是先把「工艺无关指标」和「映射后结果」切开。第 8 页 A 节开头的原话是：
 
   > "It is known that technology-independent metrics have often miss-correlation with post-technology mapping results [47]. Yet, many logic synthesis works limit the results and analysis to node count and logic depth, instead of actual post-mapping area and delay. In this work, we aim to show that FlowTune can find good solutions post-mapping, and is not limited to DAG size and depth reduction."
