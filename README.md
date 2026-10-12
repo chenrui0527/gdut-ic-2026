@@ -104,15 +104,15 @@
 3. 不能安全直冲时，在所有合法走法里挑一步综合分最高的：活动空间最大、尽量靠棋盘中间、离食物更近。
 
 ## 五、进阶挑战：复现 FlowTune 论文（多臂老虎机做逻辑综合流程搜索）
-经历了三次迭代，这次已经在不做布局布线的前提下对标了论文的计算规模
+经历了三次迭代，这次（第三次）已经在不做布局布线的前提下对标了论文的计算规模，回应了上一次面试的6个设计的简写的含义，本次对比上次对标了作者的参数，stage由3变到11，门数优化更显著
+关于深度的结论与上轮基本不变
 论文：**FlowTune: End-to-End Automatic Logic Optimization Exploration via Domain-Specific Multiarmed Bandit**（IEEE TCAD，作者 Cunxi Yu），<https://ieeexplore.ieee.org/abstract/document/9916059>。
 
-- **前端（设计输入与功能验证）**：6 个 RTL（4 位计数器、8×8 乘法器、8 位/16 位加法器、4 位 ALU、8 位 LFSR；代码是 AI 写的），用 Yosys 把它们综合成门级网表，再用**形式化等价性检查**证明"门级网表"和"原始 RTL"功能完全一致——**6 个全部通过**，每个都输出 `Equivalence successfully proven!`。等价性日志和综合出的门级网表在 [flowtune-reproduction/frontend/](flowtune-reproduction/frontend/)（其中 `counter` 和 `lfsr8` 是时序电路，AIG 格式描述不了，它们的网表看 `.gate.v` 那个文件）。
-  （说明：老师在你《近期汇报》上圈的那条是 **B. RTL 功能验证（前端）+ 逻辑综合出网表（后端）**。论文本身没有 RTL 这一环——它的输入直接是别人给好的网表，所以这一条是老师另外指定的，不是论文的内容。）
+- **前端（设计输入与功能验证）**：6 个 RTL（4 位计数器、8×8 乘法器、8 位/16 位加法器、4 位 ALU、8 位 LFSR；代码是 AI 写的），用 Yosys 把它们综合成门级网表，再用**形式化等价性检查**证明"门级网表"和"原始 RTL"功能完全一致——**6 个全部通过**，每个都输出 `Equivalence successfully proven!`。等价性日志和综合出的门级网表在 [flowtune-reproduction/frontend/](flowtune-reproduction/frontend/)（其中 `counter` 和 `lfsr8` 是时序电路，AIG 格式描述不了，它们的网表看 `.gate.v` 那个文件）
 - **后端（逻辑综合与优化）**：把 RTL 综合成门级网表，统计门数与关键路径深度。
 - **论文核心（多臂老虎机 + 领域知识）**：把流程优化建模成**多阶段多臂老虎机**，用 UCB1 在 3 个阶段的候选配方里选择（共 54 种组合），把真实综合出来的门数当奖励反馈；并实现**跨设计经验迁移**（论文 domain-specific 思想的代理实现），把前一个设计学到的经验带到下一个设计。
 - **实测结果**（5 个设计、每个配置 10 个随机种子）：8×8 乘法器门数 769 → **367**（−52%），16 位加法器 198 → 113，4 位 ALU 183 → 120，4 位计数器 39 → 10；找到最优所需评估次数，冷启动中位数 **2 次**、弱迁移降到 **1 次**（穷举要 54 次），并且发现**强迁移会负迁移**（乘法器反而变 4 次）——说明迁移强度本身需要领域知识来决策。
-- **官方代码级复现（按老师批注要求：得到逻辑综合的网表、比较逻辑门数量和网表深度、先不跑布线）**：编译了作者的官方仓库（[Yu-Maryland/FlowTune](https://github.com/Yu-Maryland/FlowTune)，FlowTune 是 ABC 的一个分支），在云端 Ubuntu 上**用作者自己的 `single_design.sh`** 完整跑出结果，**原始日志、网表和汇总表全部自动提交回仓库**，见 [flowtune-reproduction/RESULTS.md](flowtune-reproduction/RESULTS.md)。
+- **官方代码级复现**：编译了作者的官方仓库（[Yu-Maryland/FlowTune](https://github.com/Yu-Maryland/FlowTune)，FlowTune 是 ABC 的一个分支），在云端 Ubuntu 上**用作者自己的 `single_design.sh`** 完整跑出结果，**原始日志、网表和汇总表全部自动提交回仓库**，见 [flowtune-reproduction/RESULTS.md](flowtune-reproduction/RESULTS.md)。
   这次跑的是论文表 III 里的**全部六个基准设计**（bfly、dscg、fir、ode、or1200、syn2），每个设计跑两个目标（`t=0` 优化门数、`t=1` 优化深度），一共 12 个任务并行。参数用作者 `run.sh` 里那一组 `6_10` 的**原样数值**：`repeat=2 iteration=6 sample=5 stage=10`（作者脚本会先做一次 level-0 搜索、再循环 `stage` 次，所以 `stage=10` = **11 轮**「搜索 → 应用」）。
 
   **`6_10` 是什么意思**：读作"6 乘 10"，指的是**每次搜 6 轮迭代 × 分 10 个阶段**。作者 `run.sh` 里就是 `./all.sh 6 10 | tee 6_10.log`，而 `all.sh` 里 `$1` 是 iteration、`$2` 是 stage。论文图 6 的图例也正是这五组：`2_30`、`3_20`、`4_15`、`5_12`、`6_10`——乘起来都是 60，是"总预算相同、切法不同"的五组对比。
