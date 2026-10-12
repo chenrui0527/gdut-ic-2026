@@ -1,72 +1,262 @@
 *************  level-0 tuning starts *********** 
-UC Berkeley, ABC 1.01 (compiled Oct 11 2026 09:50:17)
-abc 01> ftune -d ode.abc.blif -r 1 -t 1 -p 1 -i 6 -s 5
+UC Berkeley, ABC 1.01 (compiled Oct 12 2026 03:48:00)
+abc 01> ftune -d ode.abc.blif -r 2 -t 1 -p 1 -i 6 -s 5
 rm: cannot remove '.temp.result.txt': No such file or directory
 rm: cannot remove 'ode.abc.blif.log': No such file or directory
 Your current setups:
-Design = ode.abc.blif, target = 1, repeats = 1, prefix = 1, forget = 0, iteration = 6, nSample = 5, liberty = (null)
+Design = ode.abc.blif, target = 1, repeats = 2, prefix = 1, forget = 0, iteration = 6, nSample = 5, liberty = (null)
 begin:abc -c "read ode.abc.blif;strash;
-0,86
-1,86
-2,86
-3,86
-4,86
-5,86
-Best Flow(s) (#max=5):
-strash;rewrite;dc2;resub -K 8;refactor;refactor -z;rewrite -z;strash;
-abc 01> ***EOF***
-UC Berkeley, ABC 1.01 (compiled Oct 11 2026 09:50:17)
-abc 01> read ode.abc.blif; source ode.script;strash;write internal.aig;ps
-Hierarchy reader converted 2 instances of blackboxes.
-Hierarchy reader converted 2 instances of blackboxes.
-Warning: The choice nodes in the original AIG are removed by strashing.
-[1;37mode                           :[0m i/o =  275/  169  lat = 1316  and =  13495  lev = 86
-[1;37mode                           :[0m i/o =  275/  169  lat = 1316  and =  13495  lev = 86
-abc 10> ***EOF***
-*************  level[1] tuning starts *********** 
-UC Berkeley, ABC 1.01 (compiled Oct 11 2026 09:50:17)
-abc 01> ftune -d internal.aig -r 1 -t 1 -p 1 -i 6 -s 5
-rm: cannot remove 'internal.aig.log': No such file or directory
-Your current setups:
-Design = internal.aig, target = 1, repeats = 1, prefix = 1, forget = 0, iteration = 6, nSample = 5, liberty = (null)
-begin:abc -c "read internal.aig;strash;
-0,88
+0,87
 1,87
 2,87
 3,87
 4,87
 5,87
 Best Flow(s) (#max=5):
-strash;read dontCare;resub -K 8;resub -K 8;refactor -z;refactor;dc2;rewrite -z;strash;
+strash;rewrite;dc2;refactor -z;resub -K 8;rewrite -z;refactor;rewrite;refactor;dc2;rewrite -z;resub -K 8;refactor -z;strash;
 abc 01> ***EOF***
-UC Berkeley, ABC 1.01 (compiled Oct 11 2026 09:50:17)
-abc 01> read internal.aig; source ode.script;strash;write internal.aig
-Generic file reader requires a known file extension to open "dontCare".
+UC Berkeley, ABC 1.01 (compiled Oct 12 2026 03:48:00)
+abc 01> read ode.abc.blif; source ode.script;strash;write internal.aig;ps
+Hierarchy reader converted 2 instances of blackboxes.
+Hierarchy reader converted 2 instances of blackboxes.
 Warning: The choice nodes in the original AIG are removed by strashing.
-[1;37minternal                      :[0m i/o =  275/  169  lat = 1316  and =  13027  lev = 87
-abc 10> ***EOF***
-*************  level[2] tuning starts *********** 
-UC Berkeley, ABC 1.01 (compiled Oct 11 2026 09:50:17)
-abc 01> ftune -d internal.aig -r 1 -t 1 -p 1 -i 6 -s 5
+[1;37mode                           :[0m i/o =  275/  169  lat = 1316  and =  13139  lev = 87
+[1;37mode                           :[0m i/o =  275/  169  lat = 1316  and =  13139  lev = 87
+abc 11> ***EOF***
+*************  level[1] tuning starts *********** 
+UC Berkeley, ABC 1.01 (compiled Oct 12 2026 03:48:00)
+abc 01> ftune -d internal.aig -r 2 -t 1 -p 1 -i 6 -s 5
+rm: cannot remove 'internal.aig.log': No such file or directory
 Your current setups:
-Design = internal.aig, target = 1, repeats = 1, prefix = 1, forget = 0, iteration = 6, nSample = 5, liberty = (null)
+Design = internal.aig, target = 1, repeats = 2, prefix = 1, forget = 0, iteration = 6, nSample = 5, liberty = (null)
 begin:abc -c "read internal.aig;strash;
 0,90
 1,90
 2,90
 3,90
-4,89
-5,89
+4,90
+5,90
 Best Flow(s) (#max=5):
-strash;read dontCare;rewrite;refactor -z;rewrite -z;resub -K 8;dc2;refactor;strash;
-strash;read dontCare;refactor;refactor -z;resub -K 8;refactor;rewrite -z;dc2;strash;
+strash;rewrite;dc2;dc2;refactor;refactor -z;rewrite -z;rewrite;refactor -z;refactor;rewrite -z;resub -K 8;resub -K 8;strash;
+strash;refactor -z;refactor;resub -K 8;refactor;dc2;dc2;rewrite;refactor -z;refactor -z;resub -K 8;rewrite -z;rewrite -z;strash;
+strash;refactor -z;refactor;dc2;rewrite -z;dc2;resub -K 8;rewrite;refactor;refactor -z;rewrite -z;resub -K 8;refactor -z;strash;
+strash;read dontCare;rewrite;dc2;refactor -z;resub -K 8;refactor;dc2;rewrite;resub -K 8;refactor;rewrite -z;refactor -z;rewrite -z;strash;
+strash;read dontCare;dc2;dc2;resub -K 8;resub -K 8;refactor -z;refactor;rewrite;dc2;rewrite -z;refactor;refactor -z;rewrite -z;strash;
 abc 01> ***EOF***
-UC Berkeley, ABC 1.01 (compiled Oct 11 2026 09:50:17)
+UC Berkeley, ABC 1.01 (compiled Oct 12 2026 03:48:00)
+abc 01> read internal.aig; source ode.script;strash;write internal.aig
+Warning: The choice nodes in the original AIG are removed by strashing.
+[1;37minternal                      :[0m i/o =  275/  169  lat = 1316  and =  12581  lev = 90
+abc 11> ***EOF***
+*************  level[2] tuning starts *********** 
+UC Berkeley, ABC 1.01 (compiled Oct 12 2026 03:48:00)
+abc 01> ftune -d internal.aig -r 2 -t 1 -p 1 -i 6 -s 5
+Your current setups:
+Design = internal.aig, target = 1, repeats = 2, prefix = 1, forget = 0, iteration = 6, nSample = 5, liberty = (null)
+begin:abc -c "read internal.aig;strash;
+0,90
+1,90
+2,90
+3,90
+4,90
+5,90
+Best Flow(s) (#max=5):
+strash;rewrite;dc2;dc2;refactor;refactor -z;rewrite -z;rewrite;refactor -z;refactor;rewrite -z;resub -K 8;resub -K 8;strash;
+strash;rewrite;dc2;refactor -z;rewrite -z;resub -K 8;rewrite -z;refactor -z;resub -K 8;dc2;refactor;refactor;rewrite;strash;
+strash;refactor;resub -K 8;resub -K 8;rewrite;dc2;dc2;rewrite -z;refactor -z;refactor;refactor;rewrite -z;refactor -z;strash;
+strash;refactor -z;refactor;resub -K 8;refactor;dc2;dc2;rewrite;refactor -z;refactor -z;resub -K 8;rewrite -z;rewrite -z;strash;
+strash;refactor -z;refactor;dc2;rewrite -z;dc2;resub -K 8;rewrite;refactor;refactor -z;rewrite -z;resub -K 8;refactor -z;strash;
+abc 01> ***EOF***
+UC Berkeley, ABC 1.01 (compiled Oct 12 2026 03:48:00)
+abc 01> read internal.aig; source ode.script;strash;write internal.aig
+Warning: The choice nodes in the original AIG are removed by strashing.
+[1;37minternal                      :[0m i/o =  275/  169  lat = 1316  and =  12179  lev = 90
+abc 11> ***EOF***
+*************  level[3] tuning starts *********** 
+UC Berkeley, ABC 1.01 (compiled Oct 12 2026 03:48:00)
+abc 01> ftune -d internal.aig -r 2 -t 1 -p 1 -i 6 -s 5
+Your current setups:
+Design = internal.aig, target = 1, repeats = 2, prefix = 1, forget = 0, iteration = 6, nSample = 5, liberty = (null)
+begin:abc -c "read internal.aig;strash;
+0,90
+1,90
+2,90
+3,90
+4,90
+5,90
+Best Flow(s) (#max=5):
+strash;rewrite;dc2;dc2;refactor;refactor -z;rewrite -z;rewrite;refactor -z;refactor;rewrite -z;resub -K 8;resub -K 8;strash;
+strash;refactor;refactor -z;rewrite -z;refactor;rewrite;rewrite -z;refactor -z;refactor;dc2;resub -K 8;resub -K 8;dc2;strash;
+strash;refactor;resub -K 8;resub -K 8;rewrite;dc2;dc2;rewrite -z;refactor -z;refactor;refactor;rewrite -z;refactor -z;strash;
+strash;refactor -z;refactor;dc2;rewrite -z;dc2;resub -K 8;rewrite;refactor;refactor -z;rewrite -z;resub -K 8;refactor -z;strash;
+strash;refactor -z;rewrite -z;rewrite -z;resub -K 8;refactor;refactor -z;refactor;rewrite;refactor -z;resub -K 8;dc2;dc2;strash;
+abc 01> ***EOF***
+UC Berkeley, ABC 1.01 (compiled Oct 12 2026 03:48:00)
+abc 01> read internal.aig; source ode.script;strash;write internal.aig
+Warning: The choice nodes in the original AIG are removed by strashing.
+[1;37minternal                      :[0m i/o =  275/  169  lat = 1316  and =  11883  lev = 90
+abc 11> ***EOF***
+*************  level[4] tuning starts *********** 
+UC Berkeley, ABC 1.01 (compiled Oct 12 2026 03:48:00)
+abc 01> ftune -d internal.aig -r 2 -t 1 -p 1 -i 6 -s 5
+Your current setups:
+Design = internal.aig, target = 1, repeats = 2, prefix = 1, forget = 0, iteration = 6, nSample = 5, liberty = (null)
+begin:abc -c "read internal.aig;strash;
+0,90
+1,90
+2,90
+3,90
+4,90
+5,90
+Best Flow(s) (#max=5):
+strash;rewrite;dc2;dc2;refactor;refactor -z;rewrite -z;rewrite;refactor -z;refactor;rewrite -z;resub -K 8;resub -K 8;strash;
+strash;rewrite;dc2;refactor -z;rewrite -z;resub -K 8;rewrite -z;refactor -z;resub -K 8;dc2;refactor;refactor;rewrite;strash;
+strash;dc2;rewrite;dc2;dc2;refactor;refactor -z;refactor;refactor -z;resub -K 8;rewrite -z;resub -K 8;rewrite -z;strash;
+strash;read dontCare;rewrite;refactor;refactor -z;rewrite -z;dc2;dc2;rewrite;refactor;refactor -z;resub -K 8;rewrite -z;resub -K 8;strash;
+strash;read dontCare;refactor;refactor;refactor;dc2;rewrite -z;resub -K 8;resub -K 8;rewrite;dc2;refactor -z;rewrite -z;refactor -z;strash;
+abc 01> ***EOF***
+UC Berkeley, ABC 1.01 (compiled Oct 12 2026 03:48:00)
 abc 01> read internal.aig; source ode.script;strash;write internal.aig
 Generic file reader requires a known file extension to open "dontCare".
 Warning: The choice nodes in the original AIG are removed by strashing.
-[1;37minternal                      :[0m i/o =  275/  169  lat = 1316  and =  12737  lev = 89
-abc 10> ***EOF***
+[1;37minternal                      :[0m i/o =  275/  169  lat = 1316  and =  11723  lev = 90
+abc 11> ***EOF***
+*************  level[5] tuning starts *********** 
+UC Berkeley, ABC 1.01 (compiled Oct 12 2026 03:48:00)
+abc 01> ftune -d internal.aig -r 2 -t 1 -p 1 -i 6 -s 5
+Your current setups:
+Design = internal.aig, target = 1, repeats = 2, prefix = 1, forget = 0, iteration = 6, nSample = 5, liberty = (null)
+begin:abc -c "read internal.aig;strash;
+0,91
+1,90
+2,90
+3,90
+4,90
+5,90
+Best Flow(s) (#max=5):
+strash;read dontCare;rewrite -z;dc2;refactor -z;refactor;rewrite;dc2;resub -K 8;refactor -z;rewrite -z;rewrite -z;refactor;resub -K 8;strash;
+strash;read dontCare;resub -K 8;refactor -z;dc2;refactor -z;dc2;rewrite;refactor;resub -K 8;resub -K 8;rewrite -z;refactor;rewrite -z;strash;
+strash;read dontCare;rewrite;refactor;refactor -z;rewrite -z;dc2;dc2;rewrite;refactor;refactor -z;resub -K 8;rewrite -z;resub -K 8;strash;
+abc 01> ***EOF***
+UC Berkeley, ABC 1.01 (compiled Oct 12 2026 03:48:00)
+abc 01> read internal.aig; source ode.script;strash;write internal.aig
+Generic file reader requires a known file extension to open "dontCare".
+Warning: The choice nodes in the original AIG are removed by strashing.
+[1;37minternal                      :[0m i/o =  275/  169  lat = 1316  and =  11525  lev = 90
+abc 11> ***EOF***
+*************  level[6] tuning starts *********** 
+UC Berkeley, ABC 1.01 (compiled Oct 12 2026 03:48:00)
+abc 01> ftune -d internal.aig -r 2 -t 1 -p 1 -i 6 -s 5
+Your current setups:
+Design = internal.aig, target = 1, repeats = 2, prefix = 1, forget = 0, iteration = 6, nSample = 5, liberty = (null)
+begin:abc -c "read internal.aig;strash;
+0,91
+1,91
+2,91
+3,91
+4,91
+5,91
+Best Flow(s) (#max=5):
+strash;rewrite;dc2;dc2;refactor;refactor -z;rewrite -z;rewrite;refactor -z;refactor;rewrite -z;resub -K 8;resub -K 8;strash;
+strash;rewrite;dc2;refactor -z;resub -K 8;rewrite -z;refactor;rewrite;refactor;dc2;rewrite -z;resub -K 8;refactor -z;strash;
+strash;rewrite;rewrite -z;refactor;rewrite;resub -K 8;refactor -z;rewrite -z;refactor;resub -K 8;dc2;refactor -z;dc2;strash;
+strash;rewrite;refactor -z;resub -K 8;rewrite -z;dc2;rewrite -z;rewrite;resub -K 8;refactor -z;refactor;refactor;dc2;strash;
+strash;rewrite;refactor -z;resub -K 8;refactor -z;rewrite -z;dc2;resub -K 8;dc2;refactor;rewrite;rewrite -z;refactor;strash;
+abc 01> ***EOF***
+UC Berkeley, ABC 1.01 (compiled Oct 12 2026 03:48:00)
+abc 01> read internal.aig; source ode.script;strash;write internal.aig
+Warning: The choice nodes in the original AIG are removed by strashing.
+[1;37minternal                      :[0m i/o =  275/  169  lat = 1316  and =  11343  lev = 91
+abc 11> ***EOF***
+*************  level[7] tuning starts *********** 
+UC Berkeley, ABC 1.01 (compiled Oct 12 2026 03:48:00)
+abc 01> ftune -d internal.aig -r 2 -t 1 -p 1 -i 6 -s 5
+Your current setups:
+Design = internal.aig, target = 1, repeats = 2, prefix = 1, forget = 0, iteration = 6, nSample = 5, liberty = (null)
+begin:abc -c "read internal.aig;strash;
+0,90
+1,90
+2,90
+3,90
+4,90
+5,90
+Best Flow(s) (#max=5):
+strash;rewrite -z;resub -K 8;refactor;refactor -z;refactor;resub -K 8;rewrite -z;refactor -z;dc2;rewrite;rewrite -z;dc2;strash;
+strash;rewrite -z;refactor -z;rewrite -z;refactor;dc2;resub -K 8;rewrite -z;rewrite;refactor;resub -K 8;dc2;refactor -z;strash;
+abc 01> ***EOF***
+UC Berkeley, ABC 1.01 (compiled Oct 12 2026 03:48:00)
+abc 01> read internal.aig; source ode.script;strash;write internal.aig
+Warning: The choice nodes in the original AIG are removed by strashing.
+[1;37minternal                      :[0m i/o =  275/  169  lat = 1316  and =  11237  lev = 90
+abc 11> ***EOF***
+*************  level[8] tuning starts *********** 
+UC Berkeley, ABC 1.01 (compiled Oct 12 2026 03:48:00)
+abc 01> ftune -d internal.aig -r 2 -t 1 -p 1 -i 6 -s 5
+Your current setups:
+Design = internal.aig, target = 1, repeats = 2, prefix = 1, forget = 0, iteration = 6, nSample = 5, liberty = (null)
+begin:abc -c "read internal.aig;strash;
+0,90
+1,90
+2,90
+3,90
+4,90
+5,90
+Best Flow(s) (#max=5):
+strash;rewrite -z;dc2;refactor;rewrite;rewrite -z;resub -K 8;refactor -z;rewrite -z;resub -K 8;refactor -z;dc2;refactor;strash;
+abc 01> ***EOF***
+UC Berkeley, ABC 1.01 (compiled Oct 12 2026 03:48:00)
+abc 01> read internal.aig; source ode.script;strash;write internal.aig
+Warning: The choice nodes in the original AIG are removed by strashing.
+[1;37minternal                      :[0m i/o =  275/  169  lat = 1316  and =  11169  lev = 90
+abc 11> ***EOF***
+*************  level[9] tuning starts *********** 
+UC Berkeley, ABC 1.01 (compiled Oct 12 2026 03:48:00)
+abc 01> ftune -d internal.aig -r 2 -t 1 -p 1 -i 6 -s 5
+Your current setups:
+Design = internal.aig, target = 1, repeats = 2, prefix = 1, forget = 0, iteration = 6, nSample = 5, liberty = (null)
+begin:abc -c "read internal.aig;strash;
+0,90
+1,90
+2,90
+3,90
+4,90
+5,90
+Best Flow(s) (#max=5):
+strash;rewrite;dc2;dc2;refactor;refactor -z;rewrite -z;rewrite;refactor -z;refactor;rewrite -z;resub -K 8;resub -K 8;strash;
+strash;rewrite -z;resub -K 8;dc2;rewrite;resub -K 8;rewrite -z;rewrite -z;refactor;dc2;refactor -z;refactor -z;refactor;strash;
+strash;rewrite -z;resub -K 8;refactor;refactor -z;refactor;resub -K 8;rewrite -z;refactor -z;dc2;rewrite;rewrite -z;dc2;strash;
+strash;rewrite -z;dc2;refactor;rewrite;rewrite -z;resub -K 8;refactor -z;rewrite -z;resub -K 8;refactor -z;dc2;refactor;strash;
+strash;refactor;resub -K 8;resub -K 8;rewrite;dc2;dc2;rewrite -z;refactor -z;refactor;refactor;rewrite -z;refactor -z;strash;
+abc 01> ***EOF***
+UC Berkeley, ABC 1.01 (compiled Oct 12 2026 03:48:00)
+abc 01> read internal.aig; source ode.script;strash;write internal.aig
+Warning: The choice nodes in the original AIG are removed by strashing.
+[1;37minternal                      :[0m i/o =  275/  169  lat = 1316  and =  11126  lev = 90
+abc 11> ***EOF***
+*************  level[10] tuning starts *********** 
+UC Berkeley, ABC 1.01 (compiled Oct 12 2026 03:48:00)
+abc 01> ftune -d internal.aig -r 2 -t 1 -p 1 -i 6 -s 5
+Your current setups:
+Design = internal.aig, target = 1, repeats = 2, prefix = 1, forget = 0, iteration = 6, nSample = 5, liberty = (null)
+begin:abc -c "read internal.aig;strash;
+0,90
+1,90
+2,90
+3,90
+4,90
+5,90
+Best Flow(s) (#max=5):
+strash;rewrite;refactor -z;resub -K 8;rewrite -z;dc2;rewrite -z;rewrite;resub -K 8;refactor -z;refactor;refactor;dc2;strash;
+strash;rewrite -z;resub -K 8;dc2;rewrite;resub -K 8;rewrite -z;rewrite -z;refactor;dc2;refactor -z;refactor -z;refactor;strash;
+strash;rewrite -z;dc2;rewrite -z;refactor;resub -K 8;refactor -z;refactor -z;rewrite;rewrite -z;resub -K 8;dc2;refactor;strash;
+strash;refactor;refactor -z;rewrite -z;refactor;rewrite;rewrite -z;refactor -z;refactor;dc2;resub -K 8;resub -K 8;dc2;strash;
+strash;refactor;resub -K 8;resub -K 8;rewrite;dc2;dc2;rewrite -z;refactor -z;refactor;refactor;rewrite -z;refactor -z;strash;
+abc 01> ***EOF***
+UC Berkeley, ABC 1.01 (compiled Oct 12 2026 03:48:00)
+abc 01> read internal.aig; source ode.script;strash;write internal.aig
+Warning: The choice nodes in the original AIG are removed by strashing.
+[1;37minternal                      :[0m i/o =  275/  169  lat = 1316  and =  11100  lev = 90
+abc 11> ***EOF***
 ********************************************************
 [0;31m Final design produced by FlowTune: ode.ftune.aig[0m
 ********************************************************

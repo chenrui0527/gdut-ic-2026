@@ -4711,5 +4711,5 @@ o319 top.fpu_mul+x3_mul^opb_r~22_FF_NODE
 o320 top.fpu_mul+x3_mul.pre_norm_fmul+u2^LOGICAL_NOT~14549
 c
 syn2 
-This file was written by ABC on Sun Oct 11 10:27:04 2026
+This file was written by ABC on Mon Oct 12 05:57:42 2026
 For information about AIGER format, refer to http://fmv.jku.at/aiger

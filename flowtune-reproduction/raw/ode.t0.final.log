@@ -1,3 +1,3 @@
 ABC command line: "read ode.ftune.aig; print_stats".
 
-[1;37mode.ftune                     :[0m i/o =  275/  169  lat = 1316  and =  12364  lev = 92
+[1;37mode.ftune                     :[0m i/o =  275/  169  lat = 1316  and =  11020  lev = 94

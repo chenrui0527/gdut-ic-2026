@@ -1,3 +1,3 @@
 ABC command line: "read dscg.ftune.aig; print_stats".
 
-[1;37mdscg.ftune                    :[0m i/o =  418/  257  lat = 1618  and =  21870  lev = 76
+[1;37mdscg.ftune                    :[0m i/o =  418/  257  lat = 1618  and =  19715  lev = 87

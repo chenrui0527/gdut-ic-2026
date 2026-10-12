@@ -1,0 +1,586 @@
+
+ /----------------------------------------------------------------------------\
+ |                                                                            |
+ |  yosys -- Yosys Open SYnthesis Suite                                       |
+ |                                                                            |
+ |  Copyright (C) 2012 - 2020  Claire Xenia Wolf <claire@yosyshq.com>         |
+ |                                                                            |
+ |  Permission to use, copy, modify, and/or distribute this software for any  |
+ |  purpose with or without fee is hereby granted, provided that the above    |
+ |  copyright notice and this permission notice appear in all copies.         |
+ |                                                                            |
+ |  THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES  |
+ |  WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF          |
+ |  MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR   |
+ |  ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES    |
+ |  WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN     |
+ |  ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF   |
+ |  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.            |
+ |                                                                            |
+ \----------------------------------------------------------------------------/
+
+ Yosys 0.33 (git sha1 2584903a060)
+
+
+-- Executing script file `/tmp/lfsr8.equiv.ys' --
+
+1. Executing Verilog-2005 frontend: lfsr8.v
+Parsing Verilog input from `lfsr8.v' to AST representation.
+Generating RTLIL representation for module `\lfsr8'.
+Successfully finished Verilog frontend.
+
+2. Executing PREP pass.
+
+2.1. Executing HIERARCHY pass (managing design hierarchy).
+
+2.1.1. Analyzing design hierarchy..
+Top module:  \lfsr8
+
+2.1.2. Analyzing design hierarchy..
+Top module:  \lfsr8
+Removed 0 unused modules.
+
+2.2. Executing PROC pass (convert processes to netlists).
+
+2.2.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+2.2.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Marked 1 switch rules as full_case in process $proc$lfsr8.v:9$4 in module lfsr8.
+Removed a total of 0 dead cases.
+
+2.2.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 0 redundant assignments.
+Promoted 0 assignments to connections.
+
+2.2.4. Executing PROC_INIT pass (extract init attributes).
+
+2.2.5. Executing PROC_ARST pass (detect async resets in processes).
+Found async reset \rst_n in `\lfsr8.$proc$lfsr8.v:9$4'.
+
+2.2.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+<suppressed ~1 debug messages>
+
+2.2.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `\lfsr8.$proc$lfsr8.v:9$4'.
+     1/1: $0\q[7:0]
+
+2.2.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+
+2.2.9. Executing PROC_DFF pass (convert process syncs to FFs).
+Creating register for signal `\lfsr8.\q' using process `\lfsr8.$proc$lfsr8.v:9$4'.
+  created $adff cell `$procdff$8' with positive edge clock and negative level reset.
+
+2.2.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+2.2.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Found and cleaned up 1 empty switch in `\lfsr8.$proc$lfsr8.v:9$4'.
+Removing empty process `lfsr8.$proc$lfsr8.v:9$4'.
+Cleaned up 1 empty switch.
+
+2.2.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module lfsr8.
+
+2.3. Executing OPT_EXPR pass (perform const folding).
+Optimizing module lfsr8.
+
+2.4. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \lfsr8..
+Removed 1 unused cells and 4 unused wires.
+<suppressed ~2 debug messages>
+
+2.5. Executing CHECK pass (checking for obvious problems).
+Checking module lfsr8...
+Found and reported 0 problems.
+
+2.6. Executing OPT pass (performing simple optimizations).
+
+2.6.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module lfsr8.
+
+2.6.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\lfsr8'.
+Removed a total of 0 cells.
+
+2.6.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \lfsr8..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~1 debug messages>
+
+2.6.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \lfsr8.
+Performed a total of 0 changes.
+
+2.6.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\lfsr8'.
+Removed a total of 0 cells.
+
+2.6.6. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \lfsr8..
+
+2.6.7. Executing OPT_EXPR pass (perform const folding).
+Optimizing module lfsr8.
+
+2.6.8. Finished OPT passes. (There is nothing left to do.)
+
+2.7. Executing WREDUCE pass (reducing word size of cells).
+
+2.8. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \lfsr8..
+
+2.9. Executing MEMORY_COLLECT pass (generating $mem cells).
+
+2.10. Executing OPT pass (performing simple optimizations).
+
+2.10.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module lfsr8.
+
+2.10.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\lfsr8'.
+Removed a total of 0 cells.
+
+2.10.3. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \lfsr8..
+
+2.10.4. Finished fast OPT passes.
+
+2.11. Printing statistics.
+
+=== lfsr8 ===
+
+   Number of wires:                  8
+   Number of wire bits:             22
+   Number of public wires:           5
+   Number of public wire bits:      12
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                  5
+     $adff                           1
+     $mux                            1
+     $xor                            3
+
+2.12. Executing CHECK pass (checking for obvious problems).
+Checking module lfsr8...
+Found and reported 0 problems.
+
+3. Executing ASYNC2SYNC pass.
+Replacing lfsr8.$procdff$8 ($adff): ARST=\rst_n, D=$0\q[7:0], Q=\q
+
+4. Executing Verilog-2005 frontend: lfsr8.v
+Parsing Verilog input from `lfsr8.v' to AST representation.
+Generating RTLIL representation for module `\lfsr8'.
+Successfully finished Verilog frontend.
+
+5. Executing SYNTH pass.
+
+5.1. Executing HIERARCHY pass (managing design hierarchy).
+
+5.1.1. Analyzing design hierarchy..
+Top module:  \lfsr8
+
+5.1.2. Analyzing design hierarchy..
+Top module:  \lfsr8
+Removed 0 unused modules.
+
+5.2. Executing PROC pass (convert processes to netlists).
+
+5.2.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+5.2.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Marked 1 switch rules as full_case in process $proc$lfsr8.v:9$14 in module lfsr8.
+Removed a total of 0 dead cases.
+
+5.2.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 0 redundant assignments.
+Promoted 0 assignments to connections.
+
+5.2.4. Executing PROC_INIT pass (extract init attributes).
+
+5.2.5. Executing PROC_ARST pass (detect async resets in processes).
+Found async reset \rst_n in `\lfsr8.$proc$lfsr8.v:9$14'.
+
+5.2.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+<suppressed ~1 debug messages>
+
+5.2.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `\lfsr8.$proc$lfsr8.v:9$14'.
+     1/1: $0\q[7:0]
+
+5.2.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+
+5.2.9. Executing PROC_DFF pass (convert process syncs to FFs).
+Creating register for signal `\lfsr8.\q' using process `\lfsr8.$proc$lfsr8.v:9$14'.
+  created $adff cell `$procdff$18' with positive edge clock and negative level reset.
+
+5.2.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+5.2.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Found and cleaned up 1 empty switch in `\lfsr8.$proc$lfsr8.v:9$14'.
+Removing empty process `lfsr8.$proc$lfsr8.v:9$14'.
+Cleaned up 1 empty switch.
+
+5.2.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module lfsr8.
+
+5.3. Executing OPT_EXPR pass (perform const folding).
+Optimizing module lfsr8.
+
+5.4. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \lfsr8..
+Removed 1 unused cells and 4 unused wires.
+<suppressed ~2 debug messages>
+
+5.5. Executing CHECK pass (checking for obvious problems).
+Checking module lfsr8...
+Found and reported 0 problems.
+
+5.6. Executing OPT pass (performing simple optimizations).
+
+5.6.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module lfsr8.
+
+5.6.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\lfsr8'.
+Removed a total of 0 cells.
+
+5.6.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \lfsr8..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~1 debug messages>
+
+5.6.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \lfsr8.
+Performed a total of 0 changes.
+
+5.6.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\lfsr8'.
+Removed a total of 0 cells.
+
+5.6.6. Executing OPT_DFF pass (perform DFF optimizations).
+
+5.6.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \lfsr8..
+
+5.6.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module lfsr8.
+
+5.6.9. Finished OPT passes. (There is nothing left to do.)
+
+5.7. Executing FSM pass (extract and optimize FSM).
+
+5.7.1. Executing FSM_DETECT pass (finding FSMs in design).
+
+5.7.2. Executing FSM_EXTRACT pass (extracting FSM from design).
+
+5.7.3. Executing FSM_OPT pass (simple optimizations of FSMs).
+
+5.7.4. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \lfsr8..
+
+5.7.5. Executing FSM_OPT pass (simple optimizations of FSMs).
+
+5.7.6. Executing FSM_RECODE pass (re-assigning FSM state encoding).
+
+5.7.7. Executing FSM_INFO pass (dumping all available information on FSM cells).
+
+5.7.8. Executing FSM_MAP pass (mapping FSMs to basic logic).
+
+5.8. Executing OPT pass (performing simple optimizations).
+
+5.8.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module lfsr8.
+
+5.8.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\lfsr8'.
+Removed a total of 0 cells.
+
+5.8.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \lfsr8..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~1 debug messages>
+
+5.8.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \lfsr8.
+Performed a total of 0 changes.
+
+5.8.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\lfsr8'.
+Removed a total of 0 cells.
+
+5.8.6. Executing OPT_DFF pass (perform DFF optimizations).
+Adding EN signal on $procdff$18 ($adff) from module lfsr8 (D = { \q [6:0] \fb }, Q = \q).
+
+5.8.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \lfsr8..
+Removed 1 unused cells and 1 unused wires.
+<suppressed ~2 debug messages>
+
+5.8.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module lfsr8.
+
+5.8.9. Rerunning OPT passes. (Maybe there is more to do..)
+
+5.8.10. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \lfsr8..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Removed 0 multiplexer ports.
+
+5.8.11. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \lfsr8.
+Performed a total of 0 changes.
+
+5.8.12. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\lfsr8'.
+Removed a total of 0 cells.
+
+5.8.13. Executing OPT_DFF pass (perform DFF optimizations).
+
+5.8.14. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \lfsr8..
+
+5.8.15. Executing OPT_EXPR pass (perform const folding).
+Optimizing module lfsr8.
+
+5.8.16. Finished OPT passes. (There is nothing left to do.)
+
+5.9. Executing WREDUCE pass (reducing word size of cells).
+
+5.10. Executing PEEPOPT pass (run peephole optimizers).
+
+5.11. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \lfsr8..
+
+5.12. Executing ALUMACC pass (create $alu and $macc cells).
+Extracting $alu and $macc cells in module lfsr8:
+  created 0 $alu and 0 $macc cells.
+
+5.13. Executing SHARE pass (SAT-based resource sharing).
+
+5.14. Executing OPT pass (performing simple optimizations).
+
+5.14.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module lfsr8.
+
+5.14.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\lfsr8'.
+Removed a total of 0 cells.
+
+5.14.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \lfsr8..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Removed 0 multiplexer ports.
+
+5.14.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \lfsr8.
+Performed a total of 0 changes.
+
+5.14.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\lfsr8'.
+Removed a total of 0 cells.
+
+5.14.6. Executing OPT_DFF pass (perform DFF optimizations).
+
+5.14.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \lfsr8..
+
+5.14.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module lfsr8.
+
+5.14.9. Finished OPT passes. (There is nothing left to do.)
+
+5.15. Executing MEMORY pass.
+
+5.15.1. Executing OPT_MEM pass (optimize memories).
+Performed a total of 0 transformations.
+
+5.15.2. Executing OPT_MEM_PRIORITY pass (removing unnecessary memory write priority relations).
+Performed a total of 0 transformations.
+
+5.15.3. Executing OPT_MEM_FEEDBACK pass (finding memory read-to-write feedback paths).
+
+5.15.4. Executing MEMORY_BMUX2ROM pass (converting muxes to ROMs).
+
+5.15.5. Executing MEMORY_DFF pass (merging $dff cells to $memrd).
+
+5.15.6. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \lfsr8..
+
+5.15.7. Executing MEMORY_SHARE pass (consolidating $memrd/$memwr cells).
+
+5.15.8. Executing OPT_MEM_WIDEN pass (optimize memories where all ports are wide).
+Performed a total of 0 transformations.
+
+5.15.9. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \lfsr8..
+
+5.15.10. Executing MEMORY_COLLECT pass (generating $mem cells).
+
+5.16. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \lfsr8..
+
+6. Executing OPT pass (performing simple optimizations).
+
+6.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module lfsr8.
+
+6.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\lfsr8'.
+Removed a total of 0 cells.
+
+6.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \lfsr8..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Removed 0 multiplexer ports.
+
+6.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \lfsr8.
+Performed a total of 0 changes.
+
+6.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\lfsr8'.
+Removed a total of 0 cells.
+
+6.6. Executing OPT_SHARE pass.
+
+6.7. Executing OPT_DFF pass (perform DFF optimizations).
+
+6.8. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \lfsr8..
+
+6.9. Executing OPT_EXPR pass (perform const folding).
+Optimizing module lfsr8.
+
+6.10. Finished OPT passes. (There is nothing left to do.)
+
+7. Executing TECHMAP pass (map to technology primitives).
+
+7.1. Executing Verilog-2005 frontend: /usr/bin/../share/yosys/techmap.v
+Parsing Verilog input from `/usr/bin/../share/yosys/techmap.v' to AST representation.
+Generating RTLIL representation for module `\_90_simplemap_bool_ops'.
+Generating RTLIL representation for module `\_90_simplemap_reduce_ops'.
+Generating RTLIL representation for module `\_90_simplemap_logic_ops'.
+Generating RTLIL representation for module `\_90_simplemap_compare_ops'.
+Generating RTLIL representation for module `\_90_simplemap_various'.
+Generating RTLIL representation for module `\_90_simplemap_registers'.
+Generating RTLIL representation for module `\_90_shift_ops_shr_shl_sshl_sshr'.
+Generating RTLIL representation for module `\_90_shift_shiftx'.
+Generating RTLIL representation for module `\_90_fa'.
+Generating RTLIL representation for module `\_90_lcu'.
+Generating RTLIL representation for module `\_90_alu'.
+Generating RTLIL representation for module `\_90_macc'.
+Generating RTLIL representation for module `\_90_alumacc'.
+Generating RTLIL representation for module `\$__div_mod_u'.
+Generating RTLIL representation for module `\$__div_mod_trunc'.
+Generating RTLIL representation for module `\_90_div'.
+Generating RTLIL representation for module `\_90_mod'.
+Generating RTLIL representation for module `\$__div_mod_floor'.
+Generating RTLIL representation for module `\_90_divfloor'.
+Generating RTLIL representation for module `\_90_modfloor'.
+Generating RTLIL representation for module `\_90_pow'.
+Generating RTLIL representation for module `\_90_pmux'.
+Generating RTLIL representation for module `\_90_demux'.
+Generating RTLIL representation for module `\_90_lut'.
+Successfully finished Verilog frontend.
+
+7.2. Continuing TECHMAP pass.
+Using extmapper simplemap for cells of type $xor.
+Using extmapper simplemap for cells of type $adffe.
+No more expansions possible.
+<suppressed ~77 debug messages>
+
+8. Executing SIMPLEMAP pass (map simple cells to gate primitives).
+
+9. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \lfsr8..
+
+10. Executing ASYNC2SYNC pass.
+Replacing lfsr8.$auto$ff.cc:266:slice$100 ($_DFFE_PN1P_): ARST=\rst_n, D=\fb, Q=\q [0]
+Replacing lfsr8.$auto$ff.cc:266:slice$101 ($_DFFE_PN0P_): ARST=\rst_n, D=\q [0], Q=\q [1]
+Replacing lfsr8.$auto$ff.cc:266:slice$102 ($_DFFE_PN0P_): ARST=\rst_n, D=\q [1], Q=\q [2]
+Replacing lfsr8.$auto$ff.cc:266:slice$103 ($_DFFE_PN0P_): ARST=\rst_n, D=\q [2], Q=\q [3]
+Replacing lfsr8.$auto$ff.cc:266:slice$104 ($_DFFE_PN0P_): ARST=\rst_n, D=\q [3], Q=\q [4]
+Replacing lfsr8.$auto$ff.cc:266:slice$105 ($_DFFE_PN0P_): ARST=\rst_n, D=\q [4], Q=\q [5]
+Replacing lfsr8.$auto$ff.cc:266:slice$106 ($_DFFE_PN0P_): ARST=\rst_n, D=\q [5], Q=\q [6]
+Replacing lfsr8.$auto$ff.cc:266:slice$107 ($_DFFE_PN0P_): ARST=\rst_n, D=\q [6], Q=\q [7]
+
+11. Executing EQUIV_MAKE pass (creating equiv checking module).
+Presumably equivalent wires: clk_gold (\clk_gold), clk_gate (\clk_gate) -> clk
+Presumably equivalent wires: en_gold (\en_gold), en_gate (\en_gate) -> en
+Presumably equivalent wires: fb_gold (\fb_gold), fb_gate (\fb_gate) -> fb
+Presumably equivalent wires: q_gold (\q_gold), q_gate (\q_gate) -> q
+Presumably equivalent wires: rst_n_gold (\rst_n_gold), rst_n_gate (\rst_n_gate) -> rst_n
+Changing input D of cell $auto$ff.cc:266:slice$106_gate ($_SDFFE_PN0P_): \q_gate [5] -> \q [5]
+Changing input D of cell $auto$ff.cc:266:slice$105_gate ($_SDFFE_PN0P_): \q_gate [4] -> \q [4]
+Changing input D of cell $auto$ff.cc:266:slice$104_gate ($_SDFFE_PN0P_): \q_gate [3] -> \q [3]
+Changing input D of cell $auto$ff.cc:266:slice$103_gate ($_SDFFE_PN0P_): \q_gate [2] -> \q [2]
+Changing input D of cell $auto$ff.cc:266:slice$102_gate ($_SDFFE_PN0P_): \q_gate [1] -> \q [1]
+Changing input D of cell $auto$ff.cc:266:slice$101_gate ($_SDFFE_PN0P_): \q_gate [0] -> \q [0]
+Changing input D of cell $auto$ff.cc:266:slice$100_gate ($_SDFFE_PN1P_): \fb_gate -> \fb
+Changing input B of cell $auto$simplemap.cc:75:simplemap_bitop$97_gate ($_XOR_): \q_gate [4] -> \q [4]
+Changing input A of cell $auto$simplemap.cc:75:simplemap_bitop$98_gate ($_XOR_): \q_gate [7] -> \q [7]
+Changing input B of cell $auto$simplemap.cc:75:simplemap_bitop$98_gate ($_XOR_): \q_gate [5] -> \q [5]
+Changing input B of cell $auto$simplemap.cc:75:simplemap_bitop$99_gate ($_XOR_): \q_gate [3] -> \q [3]
+Changing input D of cell $auto$ff.cc:266:slice$107_gate ($_SDFFE_PN0P_): \q_gate [6] -> \q [6]
+Changing input A of cell $procmux$6_gold ($mux): \q_gold -> \q
+Changing input B of cell $procmux$6_gold ($mux): { \q_gold [6:0] \fb_gold } -> { \q [6:0] \fb }
+Changing input A of cell $xor$lfsr8.v:8$1_gold ($xor): \q_gold [7] -> \q [7]
+Changing input B of cell $xor$lfsr8.v:8$1_gold ($xor): \q_gold [5] -> \q [5]
+Changing input B of cell $xor$lfsr8.v:8$2_gold ($xor): \q_gold [4] -> \q [4]
+Changing input B of cell $xor$lfsr8.v:8$3_gold ($xor): \q_gold [3] -> \q [3]
+
+12. Executing HIERARCHY pass (managing design hierarchy).
+
+12.1. Analyzing design hierarchy..
+Top module:  \equiv
+
+12.2. Analyzing design hierarchy..
+Top module:  \equiv
+Removing unused module `\gate'.
+Removing unused module `\gold'.
+Removed 2 unused modules.
+
+13. Executing EQUIV_SIMPLE pass.
+Found 9 unproven $equiv cells (2 groups) in equiv:
+ Grouping SAT models for \q:
+  Trying to prove $equiv for \q [0]: failed.
+  Trying to prove $equiv for \q [1]: failed.
+  Trying to prove $equiv for \q [2]: failed.
+  Trying to prove $equiv for \q [3]: failed.
+  Trying to prove $equiv for \q [4]: failed.
+  Trying to prove $equiv for \q [5]: failed.
+  Trying to prove $equiv for \q [6]: failed.
+  Trying to prove $equiv for \q [7]: failed.
+  Trying to prove $equiv for \fb: success!
+Proved 1 previously unproven $equiv cells.
+
+14. Executing EQUIV_INDUCT pass.
+Found 8 unproven $equiv cells in module equiv:
+  Proving existence of base case for step 1. (688 clauses over 272 variables)
+  Proving induction step 1. (1703 clauses over 647 variables)
+  Proof for induction step holds. Entire workset of 8 cells proven!
+Proved 8 previously unproven $equiv cells.
+
+15. Executing EQUIV_STATUS pass.
+Found 9 $equiv cells in equiv:
+  Of those cells 9 are proven and 0 are unproven.
+  Equivalence successfully proven!
+
+End of script. Logfile hash: 9bb227705c, CPU: user 0.05s system 0.00s, MEM: 12.95 MB peak
+Yosys 0.33 (git sha1 2584903a060)
+Time spent: 21% 5x read_verilog (0 sec), 20% 16x opt_expr (0 sec), ...
