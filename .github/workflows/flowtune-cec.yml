@@ -1,0 +1,146 @@
+name: FlowTune 复现：网表一致性检测（ABC 等价性检查）
+
+# 老师的要求：既然不跑布线，就要用 ABC 做一次「优化后网表」和「输入网表」的一致性检测。
+# 这里的做法就是形式化等价性检查（CEC）：证明优化前后的两个网表逻辑功能完全一致，只是结构变了。
+# 每个设计检查 4 个网表：resyn / resyn25 / t0（优化门数）/ t1（优化深度）。
+# 结果落在 flowtune-reproduction/cec/
+#
+# 注意：这个工作流是独立的，只做一致性检测（几分钟），不会重新跑那 11 轮搜索。
+
+on:
+  push:
+    paths:
+      - '.github/workflows/flowtune-cec.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  cec:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    steps:
+      - name: 拉取本仓库
+        uses: actions/checkout@v4
+
+      - name: 安装编译依赖
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake libreadline-dev flex bison
+
+      - name: 克隆作者官方仓库
+        run: git clone --depth 1 https://github.com/Yu-Maryland/FlowTune.git official-flowtune
+
+      - name: 编译 FlowTune 版 ABC
+        run: |
+          set -x
+          mkdir -p official-flowtune/src/build
+          cd official-flowtune/src/build
+          cmake .. -DCMAKE_C_FLAGS="-fcommon -w" -DCMAKE_CXX_FLAGS="-fcommon -w -std=c++11" > build.log 2>&1
+          make -j"$(nproc)" >> build.log 2>&1
+          ls -l abc
+          ./abc -c "version" || true
+
+      - name: 一致性检测（输入网表 vs 优化后网表）
+        run: |
+          set +e
+          ABC="$GITHUB_WORKSPACE/official-flowtune/src/build/abc"
+          BLIF="$GITHUB_WORKSPACE/official-flowtune/Benchmarks/BLIF"
+          NET="$GITHUB_WORKSPACE/flowtune-reproduction/netlists"
+          OUT="$GITHUB_WORKSPACE/flowtune-reproduction/cec"
+          TMP="$GITHUB_WORKSPACE/cec-tmp"
+          mkdir -p "$OUT" "$TMP"
+          cd "$TMP"
+
+          for d in bfly dscg fir ode or1200 syn2; do
+            [ -f "$BLIF/$d.abc.blif" ] || { echo "缺少输入网表 $d.abc.blif"; continue; }
+            cp "$BLIF/$d.abc.blif" .
+
+            # ① 输入网表：和量「原始设计」用的是同一条命令，保证是同一份网表
+            "$ABC" -c "read $d.abc.blif; strash; print_stats; write $d.orig.aig" > "$OUT/$d.orig.log" 2>&1
+            echo "--- $d 输入网表 ---"
+            grep -E "and =|lev =" "$OUT/$d.orig.log" | tail -1
+
+            for k in resyn resyn25 t0 t1; do
+              if [ ! -f "$NET/$d.$k.aig" ]; then
+                echo "缺少 $d.$k.aig，跳过"
+                continue
+              fi
+              cp "$NET/$d.$k.aig" .
+
+              # ② 组合等价性检查
+              "$ABC" -c "cec -n $d.orig.aig $d.$k.aig" > "$OUT/$d.$k.cec.log" 2>&1
+              # ③ 归纳式时序等价性检查（这几个设计带触发器，所以这一条才是决定性的）
+              timeout 300 "$ABC" -c "dsec -n $d.orig.aig $d.$k.aig" > "$OUT/$d.$k.dsec.log" 2>&1
+
+              echo "=============== $d / $k ==============="
+              echo "[cec ] $(grep -E 'equivalent|NOT EQUIVALENT|ERROR|Error' "$OUT/$d.$k.cec.log" | tail -1)"
+              echo "[dsec] $(grep -E 'equivalent|NOT EQUIVALENT|UNKNOWN|ERROR|Error|TIMEOUT' "$OUT/$d.$k.dsec.log" | tail -1)"
+            done
+          done
+
+      - name: 生成汇总
+        run: |
+          set +e
+          ABC="$GITHUB_WORKSPACE/official-flowtune/src/build/abc"
+          OUT="$GITHUB_WORKSPACE/flowtune-reproduction/cec"
+          verdict () {
+            if grep -q "Networks are equivalent" "$1" 2>/dev/null; then echo "✅ 等价";
+            elif grep -qi "not equivalent" "$1" 2>/dev/null; then echo "❌ 不等价";
+            elif grep -qi "unknown" "$1" 2>/dev/null; then echo "⚠️ 未证明";
+            else echo "⚠️ 见日志"; fi
+          }
+          {
+            echo "# 网表一致性检测（ABC 等价性检查）"
+            echo
+            echo "- 运行时间（UTC）：$(date -u '+%Y-%m-%d %H:%M:%S')"
+            echo "- 工具：作者仓库编译出来的 FlowTune 版 ABC（\`$( "$ABC" -c "version" 2>/dev/null | head -1 )\`）"
+            echo "- **检测的是什么**：① 输入网表（原始设计 \`xxx.abc.blif\` 经 \`read + strash\` 得到的网表）与 ② 优化后的网表，之间的功能一致性"
+            echo "- **怎么检测的**：\`cec\`（组合等价性检查）+ \`dsec\`（归纳式时序等价性检查，因为这几个设计都带触发器，所以时序这条才是决定性的）"
+            echo "- \`-n\` 表示输入/输出按**顺序**对应（AIG 网表文件里不带名字）"
+            echo
+            echo "| 设计 | 优化后的网表 | cec（组合） | dsec（时序） |"
+            echo "|---|---|---|---|"
+            for d in bfly dscg fir ode or1200 syn2; do
+              for k in resyn resyn25 t0 t1; do
+                [ -f "$OUT/$d.$k.cec.log" ] || continue
+                printf '| %s | %s | %s | %s |\n' "$d" "$k" "$(verdict "$OUT/$d.$k.cec.log")" "$(verdict "$OUT/$d.$k.dsec.log")"
+              done
+            done
+            echo
+            echo "## 每个设计输入网表的规模（与 RESULTS.md 里的「原始设计」一致）"
+            echo
+            echo '```'
+            for d in bfly dscg fir ode or1200 syn2; do
+              printf '%-8s %s\n' "$d" "$(grep -E 'and =|i/o =' "$OUT/$d.orig.log" | tail -1 | sed 's/^ *//')"
+            done
+            echo '```'
+            echo
+            echo "## 原始输出（每个设计的输入网表统计）"
+            for f in "$OUT"/*.orig.log; do
+              [ -f "$f" ] || continue
+              echo "### $(basename "$f")"; echo '```'; cat "$f"; echo '```'; echo
+            done
+            echo "## 原始输出（每个网表的 cec 结论）"
+            for f in "$OUT"/*.cec.log; do
+              [ -f "$f" ] || continue
+              echo "### $(basename "$f")"; echo '```'; tail -5 "$f"; echo '```'; echo
+            done
+            echo "## 原始输出（每个网表的 dsec 结论）"
+            for f in "$OUT"/*.dsec.log; do
+              [ -f "$f" ] || continue
+              echo "### $(basename "$f")"; echo '```'; tail -8 "$f"; echo '```'; echo
+            done
+          } > "$OUT/CEC-RESULTS.md"
+          head -40 "$OUT/CEC-RESULTS.md"
+
+      - name: 把检测结果提交回仓库
+        run: |
+          set +e
+          git config user.name "flowtune-runner"
+          git config user.email "actions@users.noreply.github.com"
+          git add flowtune-reproduction/cec
+          git commit -m "网表一致性检测：输入网表 vs 优化后网表（ABC cec + dsec）" || echo "没有变化"
+          git push || echo "推送失败"
