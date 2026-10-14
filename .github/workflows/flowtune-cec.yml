@@ -19,7 +19,7 @@ permissions:
 jobs:
   cec:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 180
 
     steps:
       - name: 拉取本仓库
@@ -36,6 +36,18 @@ jobs:
       - name: 编译 FlowTune 版 ABC
         run: |
           set -x
+          # 上一轮发现：fir 的 t0 / t1 两个网表在 dsec 里报 "UNDECIDED"，
+          # 原因是 ABC 里 PDR（时序证明引擎）的超时被硬编码成 60 秒
+          # （fraSec.c: p->nPdrTimeout = 60;），dsec 的命令行开关改不到它。
+          # 这里只把「时间上限」调大，不碰任何证明逻辑，证明本身的对错不受影响。
+          sed -i 's/p->nPdrTimeout[[:space:]]*=[[:space:]]*60;/p->nPdrTimeout = 1200;/' \
+            "$GITHUB_WORKSPACE/official-flowtune/src/src/proof/fra/fraSec.c"
+          if grep -q "p->nPdrTimeout = 1200;" "$GITHUB_WORKSPACE/official-flowtune/src/src/proof/fra/fraSec.c"; then
+            echo "PDR 超时已改成 1200 秒"
+          else
+            echo "::error::PDR 超时没有改成功（文件路径或写法对不上），继续跑还是会在 60 秒处报 UNDECIDED"
+            exit 1
+          fi
           mkdir -p official-flowtune/src/build
           cd official-flowtune/src/build
           cmake .. -DCMAKE_C_FLAGS="-fcommon -w" -DCMAKE_CXX_FLAGS="-fcommon -w -std=c++11" > build.log 2>&1
@@ -73,7 +85,8 @@ jobs:
               # ② 组合等价性检查
               "$ABC" -c "cec -n $d.orig.aig $d.$k.aig" > "$OUT/$d.$k.cec.log" 2>&1
               # ③ 归纳式时序等价性检查（这几个设计带触发器，所以这一条才是决定性的）
-              timeout 300 "$ABC" -c "dsec -n $d.orig.aig $d.$k.aig" > "$OUT/$d.$k.dsec.log" 2>&1
+              #    PDR 上限已在上一步调到 1200 秒，所以这里的外层兜底给到 1500 秒
+              timeout 1500 "$ABC" -c "dsec -n $d.orig.aig $d.$k.aig" > "$OUT/$d.$k.dsec.log" 2>&1
 
               echo "=============== $d / $k ==============="
               echo "[cec ] $(grep -E 'equivalent|NOT EQUIVALENT|ERROR|Error' "$OUT/$d.$k.cec.log" | tail -1)"
@@ -100,6 +113,7 @@ jobs:
             echo "- **检测的是什么**：① 输入网表（原始设计 \`xxx.abc.blif\` 经 \`read + strash\` 得到的网表）与 ② 优化后的网表，之间的功能一致性"
             echo "- **怎么检测的**：\`cec\`（组合等价性检查）+ \`dsec\`（归纳式时序等价性检查，因为这几个设计都带触发器，所以时序这条才是决定性的）"
             echo "- \`-n\` 表示输入/输出按**顺序**对应（AIG 网表文件里不带名字）"
+            echo "- **对 ABC 做的一处调整**：ABC 里 PDR（时序证明引擎）的超时是源码里硬编码的 60 秒，\`dsec\` 的命令行开关改不到它。上一轮 fir 的 t0/t1 就是卡在这个上限上报了 UNDECIDED。这次编译前把它改成 1200 秒。**只改资源上限，不改证明逻辑**，结论的对错不受影响。"
             echo
             echo "| 设计 | 优化后的网表 | cec（组合） | dsec（时序） |"
             echo "|---|---|---|---|"
