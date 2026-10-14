@@ -1,0 +1,5 @@
+ABC command line: "dsec -n fir.orig.aig fir.t0.aig".
+
+Reached timeout (60 seconds) in frame 12.
+Networks are UNDECIDED.   Time =   191.06 sec
+The unsolved reduced miter is written into file "sm01.aig".

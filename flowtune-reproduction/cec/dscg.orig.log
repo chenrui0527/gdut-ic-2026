@@ -1,0 +1,4 @@
+ABC command line: "read dscg.abc.blif; strash; print_stats; write dscg.orig.aig".
+
+Hierarchy reader converted 4 instances of blackboxes.
+[1;37mdscg                          :[0m i/o =  418/  257  lat = 1618  and =  28252  lev = 92

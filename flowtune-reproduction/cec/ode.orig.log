@@ -1,0 +1,4 @@
+ABC command line: "read ode.abc.blif; strash; print_stats; write ode.orig.aig".
+
+Hierarchy reader converted 2 instances of blackboxes.
+[1;37mode                           :[0m i/o =  275/  169  lat = 1316  and =  16069  lev = 98
