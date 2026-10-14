@@ -1,10 +1,11 @@
 # 网表一致性检测（ABC 等价性检查）
 
-- 运行时间（UTC）：2026-10-14 09:49:38
+- 运行时间（UTC）：2026-10-14 11:38:24
 - 工具：作者仓库编译出来的 FlowTune 版 ABC（`ABC command line: "version".`）
 - **检测的是什么**：① 输入网表（原始设计 `xxx.abc.blif` 经 `read + strash` 得到的网表）与 ② 优化后的网表，之间的功能一致性
 - **怎么检测的**：`cec`（组合等价性检查）+ `dsec`（归纳式时序等价性检查，因为这几个设计都带触发器，所以时序这条才是决定性的）
 - `-n` 表示输入/输出按**顺序**对应（AIG 网表文件里不带名字）
+- **对 ABC 做的一处调整**：ABC 里 PDR（时序证明引擎）的超时是源码里硬编码的 60 秒，`dsec` 的命令行开关改不到它。上一轮 fir 的 t0/t1 就是卡在这个上限上报了 UNDECIDED。这次编译前把它改成 1200 秒。**只改资源上限，不改证明逻辑**，结论的对错不受影响。
 
 | 设计 | 优化后的网表 | cec（组合） | dsec（时序） |
 |---|---|---|---|
@@ -18,8 +19,8 @@
 | dscg | t1 | ✅ 等价 | ✅ 等价 |
 | fir | resyn | ✅ 等价 | ✅ 等价 |
 | fir | resyn25 | ✅ 等价 | ✅ 等价 |
-| fir | t0 | ✅ 等价 | ⚠️ 见日志 |
-| fir | t1 | ✅ 等价 | ⚠️ 见日志 |
+| fir | t0 | ✅ 等价 | ✅ 等价 |
+| fir | t1 | ✅ 等价 | ✅ 等价 |
 | ode | resyn | ✅ 等价 | ✅ 等价 |
 | ode | resyn25 | ✅ 等价 | ✅ 等价 |
 | ode | t0 | ✅ 等价 | ✅ 等价 |
@@ -98,168 +99,168 @@ Hierarchy reader converted 4 instances of blackboxes.
 ```
 ABC command line: "cec -n bfly.orig.aig bfly.resyn.aig".
 
-Networks are equivalent.  Time =     8.98 sec
+Networks are equivalent.  Time =    10.23 sec
 ```
 
 ### bfly.resyn25.cec.log
 ```
 ABC command line: "cec -n bfly.orig.aig bfly.resyn25.aig".
 
-Networks are equivalent.  Time =    10.24 sec
+Networks are equivalent.  Time =    11.67 sec
 ```
 
 ### bfly.t0.cec.log
 ```
 ABC command line: "cec -n bfly.orig.aig bfly.t0.aig".
 
-Networks are equivalent.  Time =    19.54 sec
+Networks are equivalent.  Time =    21.78 sec
 ```
 
 ### bfly.t1.cec.log
 ```
 ABC command line: "cec -n bfly.orig.aig bfly.t1.aig".
 
-Networks are equivalent.  Time =    19.03 sec
+Networks are equivalent.  Time =    21.47 sec
 ```
 
 ### dscg.resyn.cec.log
 ```
 ABC command line: "cec -n dscg.orig.aig dscg.resyn.aig".
 
-Networks are equivalent.  Time =     8.12 sec
+Networks are equivalent.  Time =     9.34 sec
 ```
 
 ### dscg.resyn25.cec.log
 ```
 ABC command line: "cec -n dscg.orig.aig dscg.resyn25.aig".
 
-Networks are equivalent.  Time =     8.72 sec
+Networks are equivalent.  Time =    10.55 sec
 ```
 
 ### dscg.t0.cec.log
 ```
 ABC command line: "cec -n dscg.orig.aig dscg.t0.aig".
 
-Networks are equivalent.  Time =    11.66 sec
+Networks are equivalent.  Time =    13.93 sec
 ```
 
 ### dscg.t1.cec.log
 ```
 ABC command line: "cec -n dscg.orig.aig dscg.t1.aig".
 
-Networks are equivalent.  Time =    17.91 sec
+Networks are equivalent.  Time =    21.34 sec
 ```
 
 ### fir.resyn.cec.log
 ```
 ABC command line: "cec -n fir.orig.aig fir.resyn.aig".
 
-Networks are equivalent.  Time =     8.23 sec
+Networks are equivalent.  Time =    10.06 sec
 ```
 
 ### fir.resyn25.cec.log
 ```
 ABC command line: "cec -n fir.orig.aig fir.resyn25.aig".
 
-Networks are equivalent.  Time =     8.91 sec
+Networks are equivalent.  Time =    10.54 sec
 ```
 
 ### fir.t0.cec.log
 ```
 ABC command line: "cec -n fir.orig.aig fir.t0.aig".
 
-Networks are equivalent.  Time =    18.61 sec
+Networks are equivalent.  Time =    21.58 sec
 ```
 
 ### fir.t1.cec.log
 ```
 ABC command line: "cec -n fir.orig.aig fir.t1.aig".
 
-Networks are equivalent.  Time =    17.37 sec
+Networks are equivalent.  Time =    19.67 sec
 ```
 
 ### ode.resyn.cec.log
 ```
 ABC command line: "cec -n ode.orig.aig ode.resyn.aig".
 
-Networks are equivalent.  Time =     3.40 sec
+Networks are equivalent.  Time =     4.24 sec
 ```
 
 ### ode.resyn25.cec.log
 ```
 ABC command line: "cec -n ode.orig.aig ode.resyn25.aig".
 
-Networks are equivalent.  Time =     3.97 sec
+Networks are equivalent.  Time =     4.88 sec
 ```
 
 ### ode.t0.cec.log
 ```
 ABC command line: "cec -n ode.orig.aig ode.t0.aig".
 
-Networks are equivalent.  Time =     5.24 sec
+Networks are equivalent.  Time =     6.33 sec
 ```
 
 ### ode.t1.cec.log
 ```
 ABC command line: "cec -n ode.orig.aig ode.t1.aig".
 
-Networks are equivalent.  Time =     7.99 sec
+Networks are equivalent.  Time =     9.11 sec
 ```
 
 ### or1200.resyn.cec.log
 ```
 ABC command line: "cec -n or1200.orig.aig or1200.resyn.aig".
 
-Networks are equivalent.  Time =     1.78 sec
+Networks are equivalent.  Time =     2.19 sec
 ```
 
 ### or1200.resyn25.cec.log
 ```
 ABC command line: "cec -n or1200.orig.aig or1200.resyn25.aig".
 
-Networks are equivalent.  Time =     2.12 sec
+Networks are equivalent.  Time =     2.58 sec
 ```
 
 ### or1200.t0.cec.log
 ```
 ABC command line: "cec -n or1200.orig.aig or1200.t0.aig".
 
-Networks are equivalent.  Time =     3.96 sec
+Networks are equivalent.  Time =     4.57 sec
 ```
 
 ### or1200.t1.cec.log
 ```
 ABC command line: "cec -n or1200.orig.aig or1200.t1.aig".
 
-Networks are equivalent.  Time =     4.37 sec
+Networks are equivalent.  Time =     5.05 sec
 ```
 
 ### syn2.resyn.cec.log
 ```
 ABC command line: "cec -n syn2.orig.aig syn2.resyn.aig".
 
-Networks are equivalent.  Time =     7.91 sec
+Networks are equivalent.  Time =     9.46 sec
 ```
 
 ### syn2.resyn25.cec.log
 ```
 ABC command line: "cec -n syn2.orig.aig syn2.resyn25.aig".
 
-Networks are equivalent.  Time =     8.84 sec
+Networks are equivalent.  Time =    10.30 sec
 ```
 
 ### syn2.t0.cec.log
 ```
 ABC command line: "cec -n syn2.orig.aig syn2.t0.aig".
 
-Networks are equivalent.  Time =    14.13 sec
+Networks are equivalent.  Time =    15.73 sec
 ```
 
 ### syn2.t1.cec.log
 ```
 ABC command line: "cec -n syn2.orig.aig syn2.t1.aig".
 
-Networks are equivalent.  Time =    16.65 sec
+Networks are equivalent.  Time =    18.75 sec
 ```
 
 ## 原始输出（每个网表的 dsec 结论）
@@ -267,171 +268,171 @@ Networks are equivalent.  Time =    16.65 sec
 ```
 ABC command line: "dsec -n bfly.orig.aig bfly.resyn.aig".
 
-Networks are equivalent.  Time =    22.39 sec
+Networks are equivalent.  Time =    23.23 sec
 ```
 
 ### bfly.resyn25.dsec.log
 ```
 ABC command line: "dsec -n bfly.orig.aig bfly.resyn25.aig".
 
-Networks are equivalent.  Time =    23.77 sec
+Networks are equivalent.  Time =    24.85 sec
 ```
 
 ### bfly.t0.dsec.log
 ```
 ABC command line: "dsec -n bfly.orig.aig bfly.t0.aig".
 
-Networks are equivalent.  Time =    31.69 sec
+Networks are equivalent.  Time =    34.31 sec
 ```
 
 ### bfly.t1.dsec.log
 ```
 ABC command line: "dsec -n bfly.orig.aig bfly.t1.aig".
 
-Networks are equivalent.  Time =    43.80 sec
+Networks are equivalent.  Time =    47.50 sec
 ```
 
 ### dscg.resyn.dsec.log
 ```
 ABC command line: "dsec -n dscg.orig.aig dscg.resyn.aig".
 
-Networks are equivalent.  Time =    21.65 sec
+Networks are equivalent.  Time =    23.18 sec
 ```
 
 ### dscg.resyn25.dsec.log
 ```
 ABC command line: "dsec -n dscg.orig.aig dscg.resyn25.aig".
 
-Networks are equivalent.  Time =    22.43 sec
+Networks are equivalent.  Time =    24.48 sec
 ```
 
 ### dscg.t0.dsec.log
 ```
 ABC command line: "dsec -n dscg.orig.aig dscg.t0.aig".
 
-Networks are equivalent.  Time =    65.32 sec
+Networks are equivalent.  Time =    76.46 sec
 ```
 
 ### dscg.t1.dsec.log
 ```
 ABC command line: "dsec -n dscg.orig.aig dscg.t1.aig".
 
-Networks are equivalent.  Time =    64.65 sec
+Networks are equivalent.  Time =    73.98 sec
 ```
 
 ### fir.resyn.dsec.log
 ```
 ABC command line: "dsec -n fir.orig.aig fir.resyn.aig".
 
-Networks are equivalent.  Time =    56.23 sec
+Networks are equivalent.  Time =    62.95 sec
 ```
 
 ### fir.resyn25.dsec.log
 ```
 ABC command line: "dsec -n fir.orig.aig fir.resyn25.aig".
 
-Networks are equivalent.  Time =    58.51 sec
+Networks are equivalent.  Time =    65.87 sec
 ```
 
 ### fir.t0.dsec.log
 ```
 ABC command line: "dsec -n fir.orig.aig fir.t0.aig".
 
-Reached timeout (60 seconds) in frame 12.
-Networks are UNDECIDED.   Time =   191.06 sec
-The unsolved reduced miter is written into file "sm01.aig".
+Invariant F[19] : 491 clauses with 331 flops (out of 538) (cex = 0, ave = 23.90)
+Verification of invariant with 491 clauses was successful.  Time =    15.04 sec
+Networks are equivalent.  Time =   671.76 sec
 ```
 
 ### fir.t1.dsec.log
 ```
 ABC command line: "dsec -n fir.orig.aig fir.t1.aig".
 
-Reached timeout (60 seconds) in frame 12.
-Networks are UNDECIDED.   Time =   178.95 sec
-The unsolved reduced miter is written into file "sm01.aig".
+Invariant F[18] : 414 clauses with 293 flops (out of 534) (cex = 0, ave = 20.82)
+Verification of invariant with 414 clauses was successful.  Time =     9.64 sec
+Networks are equivalent.  Time =   611.94 sec
 ```
 
 ### ode.resyn.dsec.log
 ```
 ABC command line: "dsec -n ode.orig.aig ode.resyn.aig".
 
-Networks are equivalent.  Time =    27.03 sec
+Networks are equivalent.  Time =    31.25 sec
 ```
 
 ### ode.resyn25.dsec.log
 ```
 ABC command line: "dsec -n ode.orig.aig ode.resyn25.aig".
 
-Networks are equivalent.  Time =    27.62 sec
+Networks are equivalent.  Time =    32.57 sec
 ```
 
 ### ode.t0.dsec.log
 ```
 ABC command line: "dsec -n ode.orig.aig ode.t0.aig".
 
-Networks are equivalent.  Time =    28.53 sec
+Networks are equivalent.  Time =    32.54 sec
 ```
 
 ### ode.t1.dsec.log
 ```
 ABC command line: "dsec -n ode.orig.aig ode.t1.aig".
 
-Networks are equivalent.  Time =    27.64 sec
+Networks are equivalent.  Time =    30.14 sec
 ```
 
 ### or1200.resyn.dsec.log
 ```
 ABC command line: "dsec -n or1200.orig.aig or1200.resyn.aig".
 
-Networks are equivalent.  Time =    15.37 sec
+Networks are equivalent.  Time =    15.94 sec
 ```
 
 ### or1200.resyn25.dsec.log
 ```
 ABC command line: "dsec -n or1200.orig.aig or1200.resyn25.aig".
 
-Networks are equivalent.  Time =    15.33 sec
+Networks are equivalent.  Time =    16.01 sec
 ```
 
 ### or1200.t0.dsec.log
 ```
 ABC command line: "dsec -n or1200.orig.aig or1200.t0.aig".
 
-Networks are equivalent.  Time =    17.21 sec
+Networks are equivalent.  Time =    17.87 sec
 ```
 
 ### or1200.t1.dsec.log
 ```
 ABC command line: "dsec -n or1200.orig.aig or1200.t1.aig".
 
-Networks are equivalent.  Time =    16.64 sec
+Networks are equivalent.  Time =    17.48 sec
 ```
 
 ### syn2.resyn.dsec.log
 ```
 ABC command line: "dsec -n syn2.orig.aig syn2.resyn.aig".
 
-Networks are equivalent.  Time =    33.02 sec
+Networks are equivalent.  Time =    35.39 sec
 ```
 
 ### syn2.resyn25.dsec.log
 ```
 ABC command line: "dsec -n syn2.orig.aig syn2.resyn25.aig".
 
-Networks are equivalent.  Time =    35.12 sec
+Networks are equivalent.  Time =    37.62 sec
 ```
 
 ### syn2.t0.dsec.log
 ```
 ABC command line: "dsec -n syn2.orig.aig syn2.t0.aig".
 
-Networks are equivalent.  Time =    33.21 sec
+Networks are equivalent.  Time =    35.61 sec
 ```
 
 ### syn2.t1.dsec.log
 ```
 ABC command line: "dsec -n syn2.orig.aig syn2.t1.aig".
 
-Networks are equivalent.  Time =    34.02 sec
+Networks are equivalent.  Time =    36.44 sec
 ```
 
