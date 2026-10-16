@@ -219,6 +219,7 @@ strash;rewrite;dc2;resub -K 8;refactor;refactor -z;rewrite -z;strash;ifraig;dch 
 - 逐份原始日志：[flowtune-reproduction/raw/](../flowtune-reproduction/raw/)（六个设计各自的 original / resyn / resyn25 / `t=0` 搜索+应用 / `t=1` 搜索+应用，共 51 个文件，含早先那一版的）
 - 综合出来的网表：[flowtune-reproduction/netlists/](../flowtune-reproduction/netlists/)（每个设计 4 个：`resyn` / `resyn25` / `t0` / `t1`，六个设计共 24 个 `.aig`，另有早先那一版的 4 个）
 - 前端（RTL 等价性检查 + 综合出的门级网表）：[flowtune-reproduction/frontend/](../flowtune-reproduction/frontend/)
+- 网表一致性检测（输入网表 vs 4 个优化后网表，用 ABC 的 `cec` + `dsec`，24 组全部等价；里面还含本机复跑的完整记录）：[flowtune-reproduction/cec/](../flowtune-reproduction/cec/)
 - 和论文数值的对照（论文报的是布线后的面积/线长/延时，我们报的是工艺无关的 AIG 门数，为什么还能说"方向一致"）：[flowtune-reproduction/PAPER-COMPARISON.md](../flowtune-reproduction/PAPER-COMPARISON.md)
 - 六个基准设计分别是什么（bfly 是 FFT 的蝶形运算单元、or1200 是 OpenRISC 处理器、syn2 是合成电路……附论文表 III 的规格）：[flowtune-reproduction/六个设计是什么.md](../flowtune-reproduction/六个设计是什么.md)
 - 两版结果的对比（3 轮那版 → 11 轮那版：门数再降约 11%、落到论文量级；深度没改善）：[flowtune-reproduction/两版结果对比.md](../flowtune-reproduction/两版结果对比.md)

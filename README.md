@@ -168,6 +168,9 @@
   直译：**大家早就知道，工艺无关的指标（节点数、逻辑深度）经常和工艺映射之后的结果对不上；但很多逻辑综合工作还是只报节点数和逻辑深度，不报真正的映射后面积和延时。本文要说明的是 FlowTune 在映射之后也能找到好方案，并不局限于把 DAG 的大小和深度降下来。**
   所以论文表 III 里的 `Level` 那一列只是描述基准本身有多大，不是 FlowTune 的优化结果；它的结果图全部搬到下游去报——图 6/7 报 Cadence Genus + ASAP 7nm 库的延时和面积，图 8/9 报布线后的面积、线长、关键路径延时和 TNS。作者唯一明确承认过的失败是 `or1200` 在延时优化上「初始化之后找不到更好的流程」（第 8 页），和深度无关。
 - **本机也跑通了**：后来 AI 在我自己电脑上装了 WSL2 + Ubuntu 26.04（gcc 15.2、cmake 4.2），把作者代码在本机编译（`abc` 24.8 MB）并跑通官方示例，记录在 [flowtune-official/local-wsl-run.md](flowtune-official/local-wsl-run.md)（我负责给管理员权限和重启电脑）。
+- **网表一致性检测（证明"优化没把电路改坏"）**：门数降了不等于电路还是对的，所以又用作者仓库那个 ABC 做了形式化等价性检查——把**输入网表**（原始设计经 `read + strash` 得到）和 **4 个优化后网表**（`resyn` / `resyn25` / `t0` / `t1`）逐一比对，6 个设计共 **24 组**。每组跑两条命令：`cec`（组合等价性检查）和 `dsec`（归纳式**时序**等价性检查——这六个设计都带触发器，只查组合逻辑覆盖不到，所以时序这条才是决定性的）。**24 组全部 `Networks are equivalent`**，结论表和逐组日志见 [flowtune-reproduction/cec/](flowtune-reproduction/cec/)。
+  这里有一处需要说明的改动：ABC 里 PDR（负责时序证明的引擎）的超时是源码里写死的 60 秒，`dsec` 的命令行开关改不到它，`fir` 的两个网表在 60 秒内算不完（会报 `UNDECIDED`）。改成 1200 秒之后，`fir` 那两组分别用 672 秒和 612 秒证完。**只改"给它多少时间"，不改判据**——本来就证不出来的东西，给再久也还是 `UNDECIDED`，不会变成"等价"。
+- **本机又完整复核了一遍**：同样的 24 组检查在我自己的 WSL 里重跑，**依然全部等价**，用时 **21 分钟**（6 路并行；慢的全在 `fir` 那两组，各约 20 分钟，其余 22 组加起来才几分钟）。脚本见 [flowtune-reproduction/cec/run_all_cec.sh](flowtune-reproduction/cec/run_all_cec.sh)，完整记录见 [flowtune-reproduction/cec/本机复跑记录.md](flowtune-reproduction/cec/本机复跑记录.md)——里面还附了六个输入网表的规模，和论文表 III 逐行一致（bfly 28910/97、dscg 28252/92、fir 27704/94、ode 16069/98、or1200 12833/148、syn2 30003/93）。
 - **和论文对得上吗**：论文**没有门数表**，它报的是布线后的面积、线长、延时、TNS，基线是 VTR 8.0 默认流程（OpenFPGA 那套的基线是 LSOracle 默认流程）；我们因为按老师要求不跑布线，比的是工艺无关的 AIG 门数，基线用 `resyn` 和 `resyn`×25。方向上对得很齐：bfly、dscg、fir、ode、syn2 五个设计我们降 31%~35%（**平均 33.3%，上一版只有 24.7%**），论文说这五个"平均约 30%"；or1200 两边都是最差的（我们只降 22.3%）。完整对照见 [flowtune-reproduction/PAPER-COMPARISON.md](flowtune-reproduction/PAPER-COMPARISON.md)。
 
 代码、运行方式和更详细的说明见 [flowtune/README.md](flowtune/README.md)（`flowtune/` 目录）。
