@@ -1,0 +1,5 @@
+# 让 .sh 脚本在签出时保持 LF 行尾。
+# 原因：Windows 上 git 默认（core.autocrlf=true）会把文本文件签出成 CRLF，
+# 而 Linux 的 bash 不认那个多出来的 \r，脚本一跑就报 "syntax error near unexpected token $'do\r'"。
+# 加了这一行之后，签出到 Windows 上的 .sh 也是 LF，直接复制进 WSL 就能跑。
+*.sh text eol=lf
