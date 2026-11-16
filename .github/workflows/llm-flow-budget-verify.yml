@@ -1,0 +1,66 @@
+name: Recheck Budget Curve Equivalence
+
+on:
+  workflow_dispatch:
+    inputs:
+      run16:
+        description: GitHub Actions run ID for the 16-candidate run
+        required: true
+      run32:
+        description: GitHub Actions run ID for the 32-candidate run
+        required: true
+      run128:
+        description: GitHub Actions run ID for the 128-candidate run
+        required: true
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake libreadline-dev flex bison
+
+      - name: Clone official FlowTune
+        run: git clone --depth 1 https://github.com/Yu-Maryland/FlowTune.git official-flowtune
+
+      - name: Build ABC
+        run: |
+          mkdir -p official-flowtune/src/build
+          cd official-flowtune/src/build
+          cmake .. -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
+            -DCMAKE_C_FLAGS="-fcommon -w" \
+            -DCMAKE_CXX_FLAGS="-fcommon -w -std=c++11"
+          make -j"$(nproc)"
+
+      - name: Download fir artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p downloaded/16 downloaded/32 downloaded/128
+          gh run download "${{ inputs.run16 }}" -n llm-flow-fir -D downloaded/16
+          gh run download "${{ inputs.run32 }}" -n llm-flow-fir -D downloaded/32
+          gh run download "${{ inputs.run128 }}" -n llm-flow-fir -D downloaded/128
+
+      - name: Recheck fir checkpoints
+        run: |
+          python3 llm-flow/reverify_budget.py \
+            --abc "$GITHUB_WORKSPACE/official-flowtune/src/build/abc" \
+            --root "$GITHUB_WORKSPACE/downloaded"
+
+      - name: Upload recheck
+        uses: actions/upload-artifact@v4
+        with:
+          name: fir-budget-reverification
+          path: |
+            downloaded/fir_reverification.json
+            downloaded/FIR_REVERIFICATION.md
