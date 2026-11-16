@@ -1,1 +1,156 @@
-[]
+[
+  {
+    "design": "ode",
+    "benchmark": "/home/runner/work/gdut-ic-2026/gdut-ic-2026/official-flowtune/Benchmarks/BLIF/ode.abc.blif",
+    "model": "deepseek-v4-flash",
+    "temperature": 0.2,
+    "candidates_per_repeat": 64,
+    "repeats": 3,
+    "original": {
+      "metrics": {
+        "inputs": 275,
+        "outputs": 169,
+        "latches": 1316,
+        "and_gates": 16069,
+        "levels": 98
+      },
+      "seconds": 0.102
+    },
+    "fixed_baseline": {
+      "seconds": 6.051,
+      "metrics": {
+        "inputs": 275,
+        "outputs": 169,
+        "latches": 1316,
+        "and_gates": 13999,
+        "levels": 80
+      }
+    },
+    "repeat_results": [
+      {
+        "repeat": 1,
+        "tested": 64,
+        "successful": 64,
+        "best": {
+          "commands": [
+            "balance",
+            "refactor -z",
+            "balance",
+            "rewrite -z",
+            "balance",
+            "refactor -z",
+            "balance",
+            "rewrite -z",
+            "refactor -z",
+            "balance"
+          ],
+          "command_count": 10,
+          "output": "/home/runner/work/gdut-ic-2026/gdut-ic-2026/llm-flow-output/ode/repeat-01/candidate-044.aig",
+          "seconds": 5.703,
+          "metrics": {
+            "inputs": 275,
+            "outputs": 169,
+            "latches": 1316,
+            "and_gates": 13657,
+            "levels": 68
+          },
+          "candidate_index": 44
+        },
+        "verification": {
+          "equivalent": true,
+          "seconds": 16.542,
+          "output": "ABC command line: \"dsec -n /home/runner/work/gdut-ic-2026/gdut-ic-2026/llm-flow-output/ode/original/ode.orig.aig /home/runner/work/gdut-ic-2026/gdut-ic-2026/llm-flow-output/ode/repeat-01/candidate-044.aig; quit\".\n\nNetworks are equivalent.  Time =    16.46 sec"
+        },
+        "usage": {
+          "prompt_tokens": 31147,
+          "completion_tokens": 83829,
+          "total_tokens": 114976
+        }
+      },
+      {
+        "repeat": 2,
+        "tested": 64,
+        "successful": 64,
+        "best": {
+          "commands": [
+            "balance",
+            "refactor -z",
+            "balance",
+            "rewrite -z",
+            "balance",
+            "refactor -z",
+            "balance",
+            "rewrite -z",
+            "refactor -z",
+            "balance"
+          ],
+          "command_count": 10,
+          "output": "/home/runner/work/gdut-ic-2026/gdut-ic-2026/llm-flow-output/ode/repeat-02/candidate-040.aig",
+          "seconds": 5.676,
+          "metrics": {
+            "inputs": 275,
+            "outputs": 169,
+            "latches": 1316,
+            "and_gates": 13657,
+            "levels": 68
+          },
+          "candidate_index": 40
+        },
+        "verification": {
+          "equivalent": true,
+          "seconds": 16.566,
+          "output": "ABC command line: \"dsec -n /home/runner/work/gdut-ic-2026/gdut-ic-2026/llm-flow-output/ode/original/ode.orig.aig /home/runner/work/gdut-ic-2026/gdut-ic-2026/llm-flow-output/ode/repeat-02/candidate-040.aig; quit\".\n\nNetworks are equivalent.  Time =    16.48 sec"
+        },
+        "usage": {
+          "prompt_tokens": 40273,
+          "completion_tokens": 103542,
+          "total_tokens": 143815
+        }
+      },
+      {
+        "repeat": 3,
+        "tested": 64,
+        "successful": 64,
+        "best": {
+          "commands": [
+            "balance",
+            "refactor -z",
+            "balance",
+            "rewrite -z",
+            "balance",
+            "refactor -z",
+            "balance",
+            "rewrite -z",
+            "refactor -z",
+            "balance"
+          ],
+          "command_count": 10,
+          "output": "/home/runner/work/gdut-ic-2026/gdut-ic-2026/llm-flow-output/ode/repeat-03/candidate-054.aig",
+          "seconds": 5.698,
+          "metrics": {
+            "inputs": 275,
+            "outputs": 169,
+            "latches": 1316,
+            "and_gates": 13657,
+            "levels": 68
+          },
+          "candidate_index": 54
+        },
+        "verification": {
+          "equivalent": true,
+          "seconds": 16.723,
+          "output": "ABC command line: \"dsec -n /home/runner/work/gdut-ic-2026/gdut-ic-2026/llm-flow-output/ode/original/ode.orig.aig /home/runner/work/gdut-ic-2026/gdut-ic-2026/llm-flow-output/ode/repeat-03/candidate-054.aig; quit\".\n\nNetworks are equivalent.  Time =    16.64 sec"
+        },
+        "usage": {
+          "prompt_tokens": 36462,
+          "completion_tokens": 99997,
+          "total_tokens": 136459
+        }
+      }
+    ],
+    "flowtune_t1": {
+      "levels": 90,
+      "and_gates": 11320
+    }
+  }
+]
