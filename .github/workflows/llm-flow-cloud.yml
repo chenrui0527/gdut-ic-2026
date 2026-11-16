@@ -3,6 +3,10 @@ name: LLM Flow Cloud Search
 on:
   workflow_dispatch:
     inputs:
+      designs:
+        description: JSON array of designs to run
+        required: true
+        default: '["bfly","dscg","fir","ode","or1200","syn2"]'
       candidates_per_repeat:
         description: Candidates tested per design per repeat
         required: true
@@ -32,7 +36,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        design: [bfly, dscg, fir, ode, or1200, syn2]
+        design: ${{ fromJSON(inputs.designs) }}
     runs-on: ubuntu-latest
     timeout-minutes: 360
 

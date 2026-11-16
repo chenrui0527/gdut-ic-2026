@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
+import http.client
 import json
 import os
 import re
@@ -247,7 +248,7 @@ def build_user_prompt(design, original_metrics, allowed, history, requested_coun
 
 def llm_request_with_retry(args, system_prompt, user_prompt, call_log):
     error = None
-    for attempt in range(1, 4):
+    for attempt in range(1, 6):
         try:
             response = request_llm(
                 args.base_url,
@@ -268,7 +269,16 @@ def llm_request_with_retry(args, system_prompt, user_prompt, call_log):
                 }
             )
             return response
-        except (urllib.error.URLError, TimeoutError, KeyError, ValueError) as exc:
+        except (
+            urllib.error.URLError,
+            http.client.IncompleteRead,
+            http.client.HTTPException,
+            TimeoutError,
+            ConnectionError,
+            OSError,
+            KeyError,
+            ValueError,
+        ) as exc:
             error = exc
             time.sleep(2**attempt)
     raise RuntimeError(f"LLM request failed after retries: {error}")
