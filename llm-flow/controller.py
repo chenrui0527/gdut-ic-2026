@@ -280,7 +280,7 @@ def search_repeat(args, allowed, system_prompt, original, original_metrics, repe
     results = []
     seen = set()
     rounds = 0
-    max_rounds = max(20, (args.candidates_per_repeat // args.batch_size + 1) * 4)
+    max_rounds = max(30, (args.candidates_per_repeat // args.batch_size + 1) * 6)
 
     while len(results) < args.candidates_per_repeat and rounds < max_rounds:
         remaining = args.candidates_per_repeat - len(results)
@@ -320,9 +320,14 @@ def search_repeat(args, allowed, system_prompt, original, original_metrics, repe
                 validation_error = error
 
         if candidates is None:
-            raise RuntimeError(
-                f"LLM returned invalid candidates after retries: {validation_error}"
+            rounds += 1
+            print(
+                f"repeat={repeat_index} round={rounds} "
+                f"invalid_response={validation_error}",
+                flush=True,
             )
+            time.sleep(min(10, rounds))
+            continue
         accepted = 0
         for commands in candidates:
             signature = tuple(commands)
@@ -468,7 +473,7 @@ def main():
     parser.add_argument("--repeats", type=int, default=3)
     parser.add_argument("--batch-size", type=int, default=8)
     parser.add_argument("--temperature", type=float, default=0.2)
-    parser.add_argument("--max-tokens", type=int, default=2500)
+    parser.add_argument("--max-tokens", type=int, default=4000)
     parser.add_argument("--api-timeout", type=float, default=120)
     parser.add_argument("--abc-timeout", type=float, default=600)
     parser.add_argument("--base-url", default=os.getenv("LLM_BASE_URL", "https://api.deepseek.com"))
