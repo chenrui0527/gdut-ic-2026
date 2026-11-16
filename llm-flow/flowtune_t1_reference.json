@@ -1,0 +1,8 @@
+{
+  "bfly": {"levels": 87, "and_gates": 19954},
+  "dscg": {"levels": 85, "and_gates": 19539},
+  "fir": {"levels": 85, "and_gates": 18710},
+  "ode": {"levels": 90, "and_gates": 11320},
+  "or1200": {"levels": 131, "and_gates": 10064},
+  "syn2": {"levels": 84, "and_gates": 20376}
+}
