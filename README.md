@@ -1,6 +1,6 @@
 # 大一招新考核作品 · 陈睿
 
-本仓库是集成电路协会大一招新考核的提交作品，包含个人简介、个人网站、小游戏，以及完成过程中的记录。这里面有ai生成的文字，也有我自己写的，第一次基本全是ai写的，我回想起也觉得不堪入目了，当时心太急了，这种做法其实是不尊重你们时间的，我在这里道歉。这一次新加入了一些我的思考。
+本仓库是集成电路协会大一招新考核的提交作品，包含个人简介、个人网站、小游戏，以及后续完成的 FlowTune 论文复现和 LLM 驱动的 ABC 流程搜索实验。这里面有 AI 生成的文字，也有我自己写的分析与反思。
 
 **先说清楚分工：这个仓库里的代码和文档初稿都是 AI 写的，我不会自己写代码。**
 
@@ -15,6 +15,11 @@
 │   ├── index.html
 │   └── style.css
 ├── game/snake.html           # 小游戏：贪吃蛇（人工 + AI 自动演示，单文件）
+├── flowtune/                 # FlowTune 原理、运行与问题分析
+├── flowtune-official/        # 作者官方代码的首次运行记录
+├── flowtune-reproduction/    # 六设计、t=0/t=1 与等价性复现
+├── llm-flow/                 # LLM 引导的 ABC 流程搜索
+├── llm-flow-results/         # GitHub Actions 自动汇总结果
 ├── LICENSE                   # MIT 协议
 └── README.md
 ```
@@ -165,3 +170,120 @@
 - **和论文对得上吗**：论文**没有门数表**，它报的是布线后的面积、线长、延时、TNS，基线是 VTR 8.0 默认流程（OpenFPGA 那套的基线是 LSOracle 默认流程）；我们因为按老师要求不跑布线，比的是工艺无关的 AIG 门数，基线用 `resyn` 和 `resyn`×25。方向上对得很齐：bfly、dscg、fir、ode、syn2 五个设计我们降 31%~35%（**平均 33.3%，上一版只有 24.7%**），论文说这五个"平均约 30%"；or1200 两边都是最差的（我们只降 22.3%）。完整对照见 [flowtune-reproduction/PAPER-COMPARISON.md](flowtune-reproduction/PAPER-COMPARISON.md)。
 
 代码、运行方式和更详细的说明见 [flowtune/README.md](flowtune/README.md)（`flowtune/` 目录）。
+
+## 六、后续研究：LLM 引导的 ABC 流程搜索
+
+在完成作者官方 FlowTune 的 `t=0`、`t=1` 双目标复现后，后续实验把 FlowTune 的多臂老虎机搜索替换为 LLM 引导的黑盒搜索。`t=0` 和 `t=1` 都是作者源码原本提供的参数，不是后加的：`t=0` 最小化 AIG 门数 `and`，`t=1` 最小化逻辑深度 `lev`。
+
+### 1. 实验方法
+
+LLM 只能从以下 7 个 ABC 命令中选择：
+
+```text
+balance
+rewrite
+rewrite -z
+refactor
+refactor -z
+resub -K 8
+dc2
+```
+
+每条候选流程包含 1 到 10 条命令。每一轮向 LLM 请求 8 条候选，ABC 执行后返回 `lev` 和 `and`。控制器按以下规则排序：
+
+```text
+先比较逻辑深度 lev，越低越好
+lev 相同时，再比较 AIG 门数 and，越低越好
+```
+
+排序后只把前 10 名的命令序列和指标反馈给 LLM，下一轮继续生成新候选。这里没有训练或微调模型，也没有跨重复的永久记忆；一轮搜索中的“经验”来自控制器重新拼接进提示词的前 10 名结果。
+
+实验覆盖 `bfly`、`dscg`、`fir`、`ode`、`or1200`、`syn2` 六个设计，分别测试 16、32、64、128 条候选预算，每个配置独立重复 3 次，共执行：
+
+```text
+(16 + 32 + 64 + 128) × 6 个设计 × 3 次重复 = 4,320 条候选流程
+```
+
+模型为 `deepseek-v4-flash`，温度 `0.2`，每批 8 条候选。搜索、ABC 评价和结果 artifact 上传均在 GitHub Actions 的公开仓库运行。
+
+### 2. 64 条预算下的结果
+
+每格为 `lev / and`：
+
+| 设计 | 固定评价基线 | LLM 最佳 | FlowTune t=0（面积目标） | FlowTune t=1（深度目标） |
+|---|---:|---:|---:|---:|
+| bfly | 74 / 24721 | **66 / 24105** | 90 / **19292** | 85 / 19799 |
+| dscg | 73 / 24021 | **63 / 23475** | 94 / **18858** | 87 / 19715 |
+| fir | 75 / 23473 | **65 / 22915** | 92 / **17939** | 83 / 18877 |
+| ode | 80 / 13999 | **68 / 13657** | 94 / **11020** | 90 / 11100 |
+| or1200 | 138 / 11012 | **124 / 10733** | 131 / **9974** | 131 / 10020 |
+| syn2 | 70 / 25570 | **63 / 24815** | 89 / **19936** | 84 / 20353 |
+
+结果说明：
+
+- LLM 在六个设计上的逻辑深度均低于 FlowTune `t=0` 和 `t=1`。
+- FlowTune `t=0` 在六个设计上的 AIG 门数均最低。
+- 当前结果是深度与面积的取舍，不能表述为 LLM 在所有指标上全面超过 FlowTune。
+- LLM 命令池启用了 `balance`，而作者 FlowTune 的默认候选池没有启用该命令。这是后续必须做消融实验的公平性问题。
+
+### 3. 候选预算曲线
+
+下表是三次独立重复的平均 `lev`：
+
+| 设计 | 16 条 | 32 条 | 64 条 | 128 条 |
+|---|---:|---:|---:|---:|
+| bfly | 66.33 | 66.33 | 66.33 | 66.00 |
+| dscg | 64.33 | 64.00 | 63.33 | 63.00 |
+| fir | 66.33 | 66.00 | 65.67 | 65.33 |
+| ode | 70.00 | 68.67 | 68.00 | 67.67 |
+| or1200 | 128.67 | 128.00 | **124.00** | 125.00 |
+| syn2 | 64.67 | 64.33 | 63.67 | 63.67 |
+
+从 64 条增加到 128 条后，大多数设计平均只再降低约 0.33 级深度，`syn2` 没有继续下降，`or1200` 的结果波动并在 128 条时平均回升。与此同时，64 条的 Token 总量约为 201 万，128 条约为 635 万，后者增加约 3.15 倍。
+
+因此当前更合理的实验配置是：
+
+- 64 条作为主要预算和后续方法比较的统一配置；
+- 16、32 条用于观察低预算表现；
+- 128 条仅用于检查预算继续增加是否还有明显收益。
+
+### 4. 等价性验证
+
+LLM 最优流程均使用 ABC `dsec` 做顺序等价性检查。64 条预算下展示的 6 个最佳流程全部等价；128 条预算下展示的 6 个最佳流程也全部等价。
+
+`fir` 的证明明显慢于其他设计：
+
+- 64 条预算的两个困难候选分别运行 702.92 秒和 444.40 秒后证明等价。
+- 128 条预算的最优候选最初因单帧 60 秒限制返回 `UNDECIDED`。本地复核使用的 FlowTune ABC 已把 PDR 硬编码时限从 60 秒改为 1200 秒，最终在 649.43 秒后证明等价。只放宽证明器资源上限，没有修改等价判据。
+- GitHub 批量复核中的 `dsec -T 600` 只设置外层运行时限，不能覆盖 PDR 内部硬编码的单帧 60 秒限制，因此该批结果仍为 `UNDECIDED`。
+- 16、32 条预算中的部分 `fir` 候选仍为 `UNDECIDED`，还没有完成严格等价证明。`UNDECIDED` 表示证明器未完成，不能写成“不等价”。
+
+### 5. GitHub Actions 运行记录
+
+| 实验 | 运行 |
+|---|---|
+| 16 条预算 | [43889376732](https://github.com/chenrui0527/gdut-ic-2026/actions/runs/43889376732) |
+| 32 条预算 | [43889391307](https://github.com/chenrui0527/gdut-ic-2026/actions/runs/43889391307) |
+| 64 条预算主运行 | [43819253112](https://github.com/chenrui0527/gdut-ic-2026/actions/runs/43819253112) |
+| 64 条 `ode` 补跑 | [43837147449](https://github.com/chenrui0527/gdut-ic-2026/actions/runs/43837147449) |
+| 128 条预算 | [43889409659](https://github.com/chenrui0527/gdut-ic-2026/actions/runs/43889409659) |
+| `fir` 预算点批量复核 | [43922333641](https://github.com/chenrui0527/gdut-ic-2026/actions/runs/43922333641) |
+
+代码和运行方式见 [llm-flow/README.md](llm-flow/README.md)。主要实现文件包括：
+
+- [llm-flow/controller.py](llm-flow/controller.py)：候选生成、提示词构造、ABC 执行、排序和等价验证入口
+- [llm-flow/depth_prompt.txt](llm-flow/depth_prompt.txt)：LLM 系统提示词
+- [llm-flow/allowed_commands.json](llm-flow/allowed_commands.json)：允许命令池
+- [llm-flow/aggregate.py](llm-flow/aggregate.py)：结果汇总
+- [llm-flow/reverify_budget.py](llm-flow/reverify_budget.py)：`fir` 预算点延长时限复核
+- [.github/workflows/llm-flow-cloud.yml](.github/workflows/llm-flow-cloud.yml)：六设计并行搜索工作流
+- [.github/workflows/llm-flow-budget-verify.yml](.github/workflows/llm-flow-budget-verify.yml)：预算点等价复核工作流
+
+### 6. 当前结论与后续计划
+
+当前实验证明，LLM 在固定命令池和深度优先目标下可以稳定生成比 FlowTune `t=0/t=1` 更浅的流程，但会付出更高的 AIG 门数。下一步需要：
+
+1. 对齐 FlowTune 与 LLM 的实际候选预算；
+2. 增加面积优先的 LLM 实验，与 FlowTune `t=0` 做同目标比较；
+3. 移除 `balance` 做消融，确认深度收益是否主要来自该命令；
+4. 补齐 16、32 条预算下 `fir` 候选的严格等价证明。
